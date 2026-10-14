@@ -59,9 +59,9 @@ export const WEDGE_COLS=[0xff3b30,0xff9500,0xffcc00,0x9be22d,0x34c759,0x00c7be,0
 export function makeVortexWedges(T,R=1500){const g=new T.Group();g.userData.layer='vortexL';
  for(let k=0;k<12;k++){const b0=k*30;const geo=new T.CircleGeometry(R,24,(90-b0-30)*D,30*D).rotateX(-Math.PI/2);
   const m=passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{c:{value:new T.Color(WEDGE_COLS[k])},R:{value:R},t:U.t},vertexShader:'varying vec2 vP;void main(){vP=position.xz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-   fragmentShader:'uniform vec3 c;uniform float R,t;varying vec2 vP;void main(){float r=length(vP)/R;float a=(1.-smoothstep(.15,1.,r))*.2*smoothstep(.01,.05,r);float ring=smoothstep(.97,1.,fract(r*8.-t*.1))*.15*(1.-r);gl_FragColor=vec4(c*(a+ring),a+ring);}'}));
+   fragmentShader:'uniform vec3 c;uniform float R,t;varying vec2 vP;void main(){float r=length(vP)/R;float a=(1.-smoothstep(.15,1.,r))*.2*smoothstep(.01,.05,r);float ring=smoothstep(.97,1.,fract(r*8.-t*.1))*.15*(1.-r);gl_FragColor=vec4(c,min(1.,(a+ring)*1.6));}'}));
   const w=new T.Mesh(geo,m);w.renderOrder=4;w.frustumCulled=false;w.position.y=.01;g.add(w);
-  const rb=new T.Mesh(new T.PlaneGeometry(2.5,R).rotateX(-Math.PI/2).translate(0,.04,-R/2),passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{R:{value:R}},vertexShader:'varying float vZ;void main(){vZ=-position.z;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float R;varying float vZ;void main(){float a=.55*(1.-smoothstep(.2*R,R,vZ))*smoothstep(20.,80.,vZ);gl_FragColor=vec4(vec3(1.,.95,.8)*a,a);}'})));
+  const rb=new T.Mesh(new T.PlaneGeometry(2.5,R).rotateX(-Math.PI/2).translate(0,.04,-R/2),passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{R:{value:R}},vertexShader:'varying float vZ;void main(){vZ=-position.z;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float R;varying float vZ;void main(){float a=.55*(1.-smoothstep(.2*R,R,vZ))*smoothstep(20.,80.,vZ);gl_FragColor=vec4(vec3(1.,.95,.8),a);}'})));
   rb.rotation.y=-b0*D;rb.renderOrder=5;rb.frustumCulled=false;g.add(rb)}
  return g}
 export const antipode=(la,lo)=>[-la,((lo+360)%360)-180];
