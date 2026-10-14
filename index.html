@@ -37,11 +37,14 @@ const local=new T.Group();scene.add(local);let L0=null,sm=null;
 function mPer(la){return[111320,111320*Math.cos(la*D)]}
 function buildLocal(la,lo){L0=[Math.round(la*1000)/1000,Math.round(lo*1000)/1000];// grid origin snapped to rounded lat/lon (~100 m)
 local.clear();const H=-1.6;// eye height below camera, not GPS altitude
-// ribbon quads: 0.5 m every 20 m, 1.5 m every 100 m; widen with distance from center so far lines stay visible
-const pos=[];const quad=(x1,z1,x2,z2,w)=>{const dx=x2-x1,dz=z2-z1,l=Math.hypot(dx,dz),nx=-dz/l*w/2,nz=dx/l*w/2;pos.push(x1+nx,H,z1+nz,x1-nx,H,z1-nz,x2+nx,H,z2+nz,x2+nx,H,z2+nz,x1-nx,H,z1-nz,x2-nx,H,z2-nz)};
-for(let i=-15;i<=15;i++){const c=i*20,maj=i%5===0,w0=maj?1.5:.5;for(let k=-15;k<15;k++){const a=k*20,b=a+20,w=w0*(1+Math.hypot(c,(a+b)/2)/150);quad(c,a,c,b,w);quad(a,c,b,c,w)}}
-const gg=new T.BufferGeometry();gg.setAttribute('position',new T.Float32BufferAttribute(pos,3));
-const gm=new T.Mesh(gg,new T.MeshBasicMaterial({color:0x99ffff,transparent:true,opacity:.85,blending:T.AdditiveBlending,depthTest:false,depthWrite:false,side:T.DoubleSide,fog:false}));gm.renderOrder=6;local.add(gm);
+// procedural grid shader on one 20 km plane: world-anchored ENU coords, AA constant-pixel lines, 20 m / 100 m / 1 km cascade
+const gmat=new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,extensions:{derivatives:true},
+ vertexShader:`varying vec2 vP;varying float vD;void main(){vP=position.xz;vec4 mv=modelViewMatrix*vec4(position,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+ fragmentShader:`varying vec2 vP;varying float vD;
+ float ln(float s,float px){vec2 c=vP/s;vec2 w=fwidth(c);vec2 g=abs(fract(c-.5)-.5)/w;float l=1.-min(min(g.x,g.y)/px,1.);float dens=max(w.x,w.y);return l*(1.-smoothstep(.15,.5,dens));}
+ void main(){float a=ln(20.,1.5)*.55+ln(100.,3.)*.8+ln(1000.,3.)*.9;float fade=1.-smoothstep(3000.,10000.,vD);float glow=smoothstep(4000.,10000.,vD)*.12;
+ vec3 col=vec3(.6,1.,1.);gl_FragColor=vec4(col*min(a*fade*1.2,.92)+vec3(.3,.8,1.)*glow*(1.-fade*.5),1.);}`});
+const gm=new T.Mesh(new T.PlaneGeometry(20000,20000,4,4).rotateX(-Math.PI/2).translate(0,H,0),gmat);gm.renderOrder=6;gm.frustumCulled=false;local.add(gm);
 const[my,mx]=mPer(L0[0]);
 for(const[n,a,l,c]of TARGETS){const p=new T.Vector3((l-L0[1])*mx,H,-(a-L0[0])*my);
 const pil=new T.Mesh(new T.CylinderGeometry(1.5,1.5,120,8),new T.MeshBasicMaterial({color:c,transparent:true,opacity:.75,blending:T.AdditiveBlending,depthTest:false,depthWrite:false}));pil.position.copy(p).y+=60;pil.renderOrder=7;local.add(pil);
