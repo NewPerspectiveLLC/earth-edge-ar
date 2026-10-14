@@ -5,7 +5,10 @@
 #hpP button{width:64px;height:64px;font-size:28px;margin:4px 0}#hpT{width:56px;height:220px;margin:6px auto;background:#fff2;border-radius:28px;position:relative}#hpK{position:absolute;left:4px;width:48px;height:48px;border-radius:24px;background:#9ff}#hpR{font-size:24px;font-weight:bold}
 @media (pointer:coarse){#hpP{display:block}#hpD{display:none}}</style>
 <div id=hpD>Floor height <input id=hpS type=range min=-10 max=10 step=.1 value=0> <span id=hpV>0.0 m</span></div>
-<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>floor height (double-tap to reset)</small></div><div id=desk style='display:none;position:fixed;left:8px;top:64px;z-index:21;background:#000b;padding:6px;border-radius:8px'>Heading <b id=hdg>0°</b> <button data-h=0>N</button><button data-h=90>E</button><button data-h=180>S</button><button data-h=270>W</button><br>Location <select id=locSel><option value=gps>Use GPS</option></select><br><small>drag or arrow keys to look</small></div><div id=cbad style='display:none;position:fixed;left:8px;top:64px;z-index:22;background:#a60;padding:6px 10px;border-radius:8px;font-size:15px'>Compass unsteady: calibrate by waving the phone in a figure 8</div><button id=hlock style='position:fixed;right:8px;top:60px;z-index:22;font-size:14px;padding:10px'>Lock heading</button><button id=ghostB style='display:none;position:fixed;right:8px;top:108px;z-index:22;font-size:14px;padding:10px'>Ghost bot: on</button><button id=sumB style='display:none;position:fixed;right:8px;top:156px;z-index:22;font-size:14px;padding:10px'>Summon ghost</button><div id=upd style='display:none;position:fixed;left:0;right:0;top:0;z-index:60;background:#0a6;color:#fff;text-align:center;padding:14px;font-size:18px'>Update ready - tap to reload</div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
+<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>floor height (double-tap to reset)</small></div><div id=desk style='display:none;position:fixed;left:8px;top:64px;z-index:21;background:#000b;padding:6px;border-radius:8px'>Heading <b id=hdg>0°</b> <button data-h=0>N</button><button data-h=90>E</button><button data-h=180>S</button><button data-h=270>W</button><br>Location <select id=locSel><option value=gps>Use GPS</option></select><br><small>drag or arrow keys to look</small></div><div id=cbad style='display:none;position:fixed;left:8px;top:64px;z-index:22;background:#a60;padding:6px 10px;border-radius:8px;font-size:15px'>Compass unsteady: calibrate by waving the phone in a figure 8</div><button id=hlock style='position:fixed;right:8px;top:60px;z-index:22;font-size:14px;padding:10px'>Lock position</button>
+<div id=lockP style='display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 64px);z-index:23;background:#000b;padding:6px;border-radius:10px;text-align:center'><b>🔒 Position locked</b><br>
+<button data-r=-1>⟲1°</button><button data-r=1>⟳1°</button> <button data-m=n>N1m</button><button data-m=s>S1m</button><button data-m=e>E1m</button><button data-m=w>W1m</button><br><label><input type=checkbox id=camA> Anchor to camera (beta)</label> <small id=flowR></small></div>
+<button id=xrB style='display:none;position:fixed;left:50%;transform:translateX(-50%);top:70px;z-index:23;font-size:18px;padding:12px'>Enter tracked AR</button><button id=ghostB style='display:none;position:fixed;right:8px;top:108px;z-index:22;font-size:14px;padding:10px'>Ghost bot: on</button><button id=sumB style='display:none;position:fixed;right:8px;top:156px;z-index:22;font-size:14px;padding:10px'>Summon ghost</button><div id=upd style='display:none;position:fixed;left:0;right:0;top:0;z-index:60;background:#0a6;color:#fff;text-align:center;padding:14px;font-size:18px'>Update ready - tap to reload</div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
 <script>window.EEAR_API=location.hostname.endsWith('github.io')?'':''</script><script type=module>
 import*as T from'three';import{Line2}from'three/addons/lines/Line2.js';import{LineMaterial}from'three/addons/lines/LineMaterial.js';import{LineGeometry}from'three/addons/lines/LineGeometry.js';
 const R=6371e3,D=Math.PI/180,q=new URLSearchParams(location.search);
@@ -59,7 +62,7 @@ fetch('sheridan.json').then(r=>r.json()).then(J=>{if(Math.hypot((L0[0]-48.117)*1
 function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
 if(!sm)sm=tgt.clone();const d=tgt.distanceTo(sm),dead=Math.max(3,(acc||10)*.5);// dead-band ~half accuracy
 if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outside dead-band
-local.position.set(-sm.x,window.GH_OFF||0,-sm.z);// user stays at origin, world shifts
+local.position.set(-sm.x-(window.nudge?nudge.x:0),window.GH_OFF||0,-sm.z-(window.nudge?nudge.z:0));// user stays at origin, world shifts
 for(const o of local.children){if(o.isLine&&o.userData.t){const a=o.geometry.attributes.position;a.setXYZ(0,sm.x,-1.6,sm.z);a.needsUpdate=true}
 if(o.userData.lb){const km=o.userData.t.clone().setY(0).distanceTo(new T.Vector3(sm.x,0,sm.z));const[n,c]=o.userData.lb;o.position.y=o.userData.t.y+125;if(Math.abs((o.userData.km||0)-km)>5){o.userData.km=km;const tmpL=label(n+'\n'+(km>1000?(km/1000).toFixed(2)+' km':km.toFixed(0)+' m')+' (approx)','#'+c.toString(16).padStart(6,'0'));LABELS.splice(LABELS.indexOf(tmpL),1);o.material.map=tmpL.material.map}o.userData.meta.distM=km;}}}
 let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
@@ -87,7 +90,7 @@ let ori=null,headOff=0;const zee=new T.Vector3(0,0,1),q1=new T.Quaternion(-Math.
 let hInit=false,lastA=null,lastT=0,rejT=0,HLOCK=false;const hBuf=[];const wrap=d=>((d+540)%360)-180;
 function onOri(e){if(e.alpha==null&&e.beta==null)return;ori=e;const now=performance.now();
  const rate=lastA!=null?Math.abs(wrap(e.alpha-lastA))/Math.max(.001,(now-lastT)/1000):0;const dt=lastT?(now-lastT)/1000:0;lastA=e.alpha;lastT=now;
- if(e.webkitCompassHeading==null||HLOCK)return;const h=(360-e.webkitCompassHeading)-e.alpha,acc=e.webkitCompassAccuracy;
+ if(e.webkitCompassHeading==null)return;const h=(360-e.webkitCompassHeading)-e.alpha,acc=e.webkitCompassAccuracy;
  hBuf.push({h,t:now});while(hBuf.length&&now-hBuf[0].t>1500)hBuf.shift();
  let sx=0,sy=0;for(const o of hBuf){sx+=Math.cos(o.h*D);sy+=Math.sin(o.h*D)}const R=Math.hypot(sx,sy)/hBuf.length,mean=Math.atan2(sy,sx)/D;
  const good=acc!=null&&acc>=0&&acc<20;document.getElementById('cbad').style.display=(!good||now-rejT<3000)?'block':'none';
@@ -100,7 +103,7 @@ try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.req
 addEventListener('deviceorientation',onOri);addEventListener('deviceorientationabsolute',e=>{if(e.webkitCompassHeading==null)onOri(e)});
 try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message;setTimeout(enterDesk,0)}
 if(q.has('lat')){build(+q.get('lat'),+q.get('lon'));updLocal(+q.get('lat'),+q.get('lon'),5);MYPOS={lat:+q.get('lat'),lon:+q.get('lon'),acc:5}}
-else navigator.geolocation.watchPosition(p0=>{if(p0.coords.accuracy>30&&MYPOS)return;if(!window._gf)window._gf={lat:p0.coords.latitude,lon:p0.coords.longitude};const gf=window._gf;gf.lat+=(p0.coords.latitude-gf.lat)*.3;gf.lon+=(p0.coords.longitude-gf.lon)*.3;const p={coords:{latitude:gf.lat,longitude:gf.lon,accuracy:p0.coords.accuracy}};build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
+else navigator.geolocation.watchPosition(p0=>{if(PLOCK)return;if(p0.coords.accuracy>30&&MYPOS)return;if(!window._gf)window._gf={lat:p0.coords.latitude,lon:p0.coords.longitude};const gf=window._gf;gf.lat+=(p0.coords.latitude-gf.lat)*.3;gf.lon+=(p0.coords.longitude-gf.lon)*.3;const p={coords:{latitude:gf.lat,longitude:gf.lon,accuracy:p0.coords.accuracy}};build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
 document.getElementById('start').onclick=start;
 if(q.has('auto')){start();if(q.has('pitch')){ori={alpha:+q.get('yaw')||0,beta:+q.get('pitch'),gamma:0}}}
 
@@ -141,9 +144,24 @@ let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('but
 addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag[0],dy=e.clientY-drag[1];drag[4]=Math.max(drag[4],Math.abs(dx)+Math.abs(dy));yaw=(drag[2]-dx*.2+3600)%360;pitch=Math.max(-89,Math.min(89,drag[3]+dy*.2))}});
 addEventListener('pointerup',()=>{drag=null});
 addEventListener('keydown',e=>{if(!desk)return;if(e.key==='ArrowLeft')yaw=(yaw-3+360)%360;if(e.key==='ArrowRight')yaw=(yaw+3)%360;if(e.key==='ArrowUp')pitch=Math.min(89,pitch+3);if(e.key==='ArrowDown')pitch=Math.max(-89,pitch-3)});
+function applyMan(){if(!manYaw)return;cam.quaternion.premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),-manYaw*D))}
 function deskCam(){if(!desk||ori||q.has('look'))return;cam.rotation.set(pitch*D,-yaw*D,0,'YXZ');hdg.textContent=Math.round(yaw)+'°'}
 setTimeout(()=>{if(!ori)enterDesk()},2500);
-hlock.onclick=()=>{HLOCK=!HLOCK;hlock.textContent=HLOCK?'Heading locked':'Lock heading';hlock.style.background=HLOCK?'#0c8':''};
+
+// position lock: freeze GPS, keep gyro live; manual yaw offset + nudge; camera-flow yaw drift cancel (beta)
+var PLOCK=false,manYaw=0,blendT=0;window.nudge=new T.Vector3();const nudge=window.nudge;window.PLOCK=()=>PLOCK;
+hlock.onclick=()=>{PLOCK=!PLOCK;hlock.textContent=PLOCK?'Unlock position':'Lock position';hlock.style.background=PLOCK?'#0c8':'';lockP.style.display=PLOCK?'block':'none';camA.checked=PLOCK;
+ if(!PLOCK){nudge.set(0,0,0);blendT=performance.now();navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{if(!window._gf)return;window._gfTarget={lat:p.coords.latitude,lon:p.coords.longitude,t0:performance.now(),from:{...window._gf}}},()=>{},{enableHighAccuracy:true})}};
+lockP.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(b.dataset.r)manYaw+=+b.dataset.r;const m={n:[0,-1],s:[0,1],e:[1,0],w:[-1,0]}[b.dataset.m];if(m){nudge.x+=m[0];nudge.z+=m[1]}});
+addEventListener('keydown',e=>{if(!PLOCK||desk)return;if(e.key==='ArrowLeft')manYaw-=1;if(e.key==='ArrowRight')manYaw+=1});
+// optical flow (block matching horizontal+vertical shift on 160x120 luma, ~8 Hz)
+const fc=document.createElement('canvas');fc.width=160;fc.height=120;const fx=fc.getContext('2d',{willReadFrequently:true});let prevL=null,prevYaw=null,flowT=0;
+function luma(){fx.drawImage(vid,0,0,160,120);const d=fx.getImageData(0,0,160,120).data,L=new Uint8Array(19200);for(let i=0;i<19200;i++)L[i]=(d[i*4]*77+d[i*4+1]*150+d[i*4+2]*29)>>8;return L}
+function shiftX(A,B){let best=0,bs=1e18;for(let dx=-12;dx<=12;dx++){let s=0;for(let y=20;y<100;y+=3)for(let x=20;x<140;x+=3){const v=A[y*160+x]-B[y*160+x+dx];s+=v*v}if(s<bs){bs=s;best=dx}}return best}
+function flowStep(t){if(!PLOCK||!camA.checked||!vid.videoWidth||t-flowT<125)return;flowT=t;const L=luma();const e=new T.Euler().setFromQuaternion(cam.quaternion,'YXZ'),yaw=e.y/D;
+ if(prevL&&prevYaw!=null){const px=shiftX(prevL,L),fovH=2*Math.atan(Math.tan(cam.fov*D/2)*cam.aspect)/D,camYaw=-px*fovH/160*0+px*fovH/160;// image shift -> yaw change
+  const gy=wrap(yaw-prevYaw);if(Math.abs(gy)<3){const drift=gy-camYaw;manYaw-=drift*.5;flowR.textContent='flow '+camYaw.toFixed(1)+'° gyro '+gy.toFixed(1)+'°'}}prevL=L;prevYaw=yaw}
+
 ghostB.onclick=()=>{if(!window.GHOST)return;GHOST.visible=!GHOST.visible;localStorage.eearGhost=GHOST.visible?'on':'off';ghostB.textContent=GHOST.visible?'Ghost bot: on':'Ghost bot: off'};
 function spawnGhost(){const M=window.MPM;if(!M||!L0)return;if(window.GHOST)local.remove(GHOST);const g=M.stick('Ghost (bot)','#9fdcff',false);const f=new T.Vector3();cam.getWorldDirection(f);f.y=0;if(f.lengthSq()<1e-4)f.set(0,0,-1);f.normalize();const r=new T.Vector3(-f.z,0,f.x);
  const w=f.multiplyScalar(8).add(r.multiplyScalar(2));g.position.set(w.x-local.position.x,-1.6+1.0,w.z-local.position.z);local.add(g);window.GHOST=g;g.visible=localStorage.eearGhost!=='off';ghostB.style.display='';sumB.style.display='';ghostB.textContent=g.visible?'Ghost bot: on':'Ghost bot: off'}
@@ -153,5 +171,17 @@ sumB.onclick=()=>{spawnGhost();if(window.GHOST){GHOST.visible=true;localStorage.
 let VER=null;const chkV=()=>fetch('version.json?'+Date.now()).then(r=>r.json()).then(j=>{if(VER&&j.v!==VER)upd.style.display='block';VER=VER||j.v}).catch(()=>{});chkV();setInterval(chkV,60000);upd.onclick=()=>location.reload();
 // restore floor height
 if(localStorage.eearFloor)setGH(+localStorage.eearFloor);
-ren.setAnimationLoop(t=>{ghostAnim(t);setCam();deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
+
+function gpsBlend(t){const g=window._gfTarget;if(!g||PLOCK)return;const k=Math.min(1,(t-g.t0)/1500);window._gf.lat=g.from.lat+(g.lat-g.from.lat)*k;window._gf.lon=g.from.lon+(g.lon-g.from.lon)*k;
+ updLocal(window._gf.lat,window._gf.lon,5);MYPOS={lat:window._gf.lat,lon:window._gf.lon,acc:5};if(k>=1)window._gfTarget=null}
+// WebXR tracked AR (Android Chrome / Quest): local-floor + hit-test floor placement, ENU aligned by compass at entry
+if(navigator.xr&&navigator.xr.isSessionSupported)navigator.xr.isSessionSupported('immersive-ar').then(ok=>{if(ok)xrB.style.display=''});
+xrB.onclick=async()=>{ren.xr.enabled=true;ren.xr.setReferenceSpaceType('local-floor');
+ const yaw0=new T.Euler().setFromQuaternion(cam.quaternion,'YXZ').y;// current true heading from compass-aligned camera
+ const sess=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['local-floor'],optionalFeatures:['hit-test','dom-overlay'],domOverlay:{root:document.body}});
+ await ren.xr.setSession(sess);vid.style.display='none';scene.rotation.y=-yaw0;world.position.y=1.6;local.position.y=0;
+ let hts=null;try{const vs=await sess.requestReferenceSpace('viewer');hts=await sess.requestHitTestSource({space:vs})}catch(e){}
+ sess.addEventListener('select',()=>{const f=ren.xr.getFrame();if(!hts||!f)return;const h=f.getHitTestResults(hts)[0];if(h){const p=h.getPose(ren.xr.getReferenceSpace()).transform.position;local.position.y=p.y+1.6;setGH(p.y)}});
+ sess.addEventListener('end',()=>{ren.xr.enabled=false;scene.rotation.y=0;world.position.y=0;vid.style.display=''})};
+ren.setAnimationLoop(t=>{gpsBlend(t);if(ren.xr.isPresenting){ghostAnim(t);window._mp&&window._mp.frame(t);ren.render(scene,cam);return}ghostAnim(t);setCam();applyMan();flowStep(t);deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
 </script></body></html>
