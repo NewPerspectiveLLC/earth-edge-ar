@@ -10,7 +10,7 @@
 <button data-r=-1>⟲1°</button><button data-r=1>⟳1°</button> <button data-m=n>N1m</button><button data-m=s>S1m</button><button data-m=e>E1m</button><button data-m=w>W1m</button><br><label><input type=checkbox id=camA> Anchor to camera (beta)</label> <small id=flowR></small></div>
 <div style='position:fixed;left:50%;transform:translateX(-50%);top:70px;z-index:23;text-align:center'><button id=xrB style='display:none;font-size:18px;padding:12px'>Enter tracked AR</button><br><label style='background:#000a;padding:4px'><input type=checkbox id=ptChk> Passthrough check (test cube only)</label></div><button id=ghostB style='display:none;position:fixed;right:8px;top:108px;z-index:22;font-size:14px;padding:10px'>Ghost bot: on</button><button id=sumB style='display:none;position:fixed;right:8px;top:156px;z-index:22;font-size:14px;padding:10px'>Summon ghost</button><div id=upd style='display:none;position:fixed;left:0;right:0;top:0;z-index:60;background:#0a6;color:#fff;text-align:center;padding:14px;font-size:18px'>Update ready - tap to reload</div><div id=pairP style='position:fixed;left:8px;top:190px;z-index:21;background:#000b;padding:6px;border-radius:8px'><button id=pairPhone>Pair a headset</button> <span id=pairCode></span><br><input id=pairIn placeholder='code from phone' size=8 inputmode=numeric style='font-size:16px'> <button id=pairGo>Pair with phone</button> <span id=pairSt></span></div><button id=layB style='position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom) + 100px);z-index:22;font-size:15px;padding:12px'>Layers</button><div id=layP style='display:none;position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom) + 150px);z-index:30;background:#000d;padding:10px;border-radius:10px;font-size:17px;line-height:2'></div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
 <script>window.EEAR_API=location.hostname.endsWith('github.io')?'':''</script><script type=module>
-import*as T from'three';import{Line2}from'three/addons/lines/Line2.js';import{LineMaterial}from'three/addons/lines/LineMaterial.js';import{LineGeometry}from'three/addons/lines/LineGeometry.js';
+import*as T from'three';import{Line2}from'three/addons/lines/Line2.js';import{LineMaterial}from'three/addons/lines/LineMaterial.js';import{LineGeometry}from'three/addons/lines/LineGeometry.js';import*as X from'./extras.js';
 const R=6371e3,D=Math.PI/180,q=new URLSearchParams(location.search);
 if(q.has('iwer')){try{const I=await import('https://esm.sh/iwer@2.6.0');const dev=new I.XRDevice(I.metaQuest3);dev.installRuntime({forceInstall:true});window.IWER=dev}catch(e){console.log('iwer failed',e)}}
 const ui=document.getElementById('ui'),vid=document.getElementById('v');
@@ -60,7 +60,12 @@ fetch('sheridan.json').then(r=>r.json()).then(J=>{if(Math.hypot((L0[0]-48.117)*1
  const mk=(w,op,col)=>{const g=new LineGeometry();g.setPositions(P);const m=new LineMaterial({color:col,linewidth:w,transparent:true,opacity:op,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,resolution:new T.Vector2(innerWidth,innerHeight)});const l=new Line2(g,m);l.computeLineDistances();l.renderOrder=8;l.frustumCulled=false;local.add(l);window.FATLINES=(window.FATLINES||[]).concat(m)};
  mk(7,.22,0xff00cc);mk(3,.9,0xff00cc);mk(1,1,0xffc0f0);// glow, ribbon, core
  for(let i=0,acc=0;i<J.points.length;i++){if(i%30===15){const lb=label('Sheridan St','#ff40e0',{title:'Sheridan Street',color:'#ff40e0'});lb.position.set(P[i*3],1,P[i*3+2]);local.add(lb)}}});
-}}
+}buildX()}
+const VORT=[];function buildX(){const o=L0,G=-1.6,[my,mx]=mPer(o[0]);VORT.length=0;
+ X.makeOcean(T,o,G).then(({mesh,coast})=>{if(L0!==o)return;local.add(mesh);window.OCEAN=mesh;local.add(X.makeCoast(T,o,G,coast));applyLayers()}).catch(e=>console.warn('ocean',e));
+ Promise.all([fetch('streets.json').then(r=>r.json()),fetch('sheridan.json').then(r=>r.json())]).then(([st,sh])=>{if(L0!==o||Math.hypot((o[0]-48.117)*111,(o[1]+122.78)*74)>15)return;for(const l of st.lines)local.add(X.makeRoad(T,o,G,l.points,l.color));local.add(X.makeRoad(T,o,G,sh.points,'#ff00cc'));applyLayers()});
+ for(const[n,a,l,c]of TARGETS){const x=(l-o[1])*mx,z=-(a-o[0])*my,hero=/Ready Athletics/.test(n);const sc=X.makeSaucer(T,c,hero);sc.position.set(x+(hero?30:18),G,z+(hero?30:18));local.add(sc);
+  if(/Ready Athletics|Cappy/.test(n)){const v=X.makeVortexLocal(T,/Cappy/.test(n)?0x30ff60:0xffc800);v.position.set(x,G,z);local.add(v);VORT.push(v)}}applyLayers()}
 function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
 if(!sm)sm=tgt.clone();const d=tgt.distanceTo(sm),dead=Math.max(3,(acc||10)*.5);// dead-band ~half accuracy
 if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outside dead-band
@@ -71,7 +76,7 @@ if(o.userData.lb){const km=o.userData.t.clone().setY(0).distanceTo(new T.Vector3
 // ---- far markers: poles (North flag, Antarctica ice island) + pyramids; true ENU through the Earth
 const gcKm=(a1,o1,a2,o2)=>{a1*=D;o1*=D;a2*=D;o2*=D;return 6371*2*Math.asin(Math.sqrt(Math.sin((a2-a1)/2)**2+Math.cos(a1)*Math.cos(a2)*Math.sin((o2-o1)/2)**2))};
 const brg=(a1,o1,a2,o2)=>{a1*=D;o1*=D;a2*=D;o2*=D;return((Math.atan2(Math.sin(o2-o1)*Math.cos(a2),Math.cos(a1)*Math.sin(a2)-Math.sin(a1)*Math.cos(a2)*Math.cos(o2-o1))/D)+360)%360};
-const FAR=[['North Pole',90,0,'#ffffff','flag'],['Antarctica · South Pole',-90,0,'#bff4ff','ice'],['Great Pyramid of Giza',29.9792,31.1342,'#ffd27a','pyr'],['Pyramid of Khafre',29.9761,31.1308,'#ffb84d','pyr'],['Great Pyramid of Cholula',19.0578,-98.3019,'#7dff9a','pyr'],['Pyramid of the Sun, Teotihuacan',19.6925,-98.8438,'#ff8a5c','pyr']];
+const FAR=[['North Pole',90,0,'#ffffff','flag'],['Antarctica · South Pole',-90,0,'#bff4ff','ice'],['Great Pyramid of Giza',29.97917,31.13417,'#ffd27a','pyr'],['Pyramid of Khafre',29.97611,31.13083,'#ffb84d','pyr'],['Great Pyramid of Cholula',19.0575,-98.30194,'#7dff9a','pyr'],['Pyramid of the Sun, Teotihuacan',19.693,-98.844,'#ff8a5c','pyr']];
 let ANT=null;fetch('antarctica.json').then(r=>r.json()).then(j=>{ANT=j;if(built){const b=built;built=null;build(b[0],b[1])}});
 const glowMat=(c,op=.6)=>new T.MeshBasicMaterial({color:c,transparent:true,opacity:op,blending:T.AdditiveBlending,depthTest:false,depthWrite:false,side:T.DoubleSide});
 function frameAt(a,l,la,lo){const p=toENU(ecef(a,l),la,lo).multiplyScalar(SC),up=toENU(ecef(a,l,1e5),la,lo).multiplyScalar(SC).sub(p).normalize();
@@ -93,6 +98,8 @@ function buildFar(la,lo){for(const[name,a,l,col,kind]of FAR){const{p,q,up}=frame
   const ice=new T.Mesh(geo,im);ice.position.x=-300*S;g.add(ice)}
  const km=gcKm(la,lo,a,l),b=brg(la,lo,a,l);const lb=label(name+'\n'+Math.round(km).toLocaleString()+' km · '+b.toFixed(0)+'°',col,{title:name,color:col,distM:km*1000,el:Math.asin(p.y/d)/D});lb.position.copy(p).add(up.clone().multiplyScalar(800*S));lb.userData.layer='far';world.add(lb)}applyLayers()}
 
+function buildVW(la,lo){for(const[n,a,l,c]of TARGETS.filter(t=>/Ready Athletics|Cappy/.test(t[0]))){const g=X.makeVortexWorld(T,a,l,c,(A,O)=>toENU(ecef(A,O),la,lo).multiplyScalar(SC),8,/Cappy/.test(n)?22.5:0);world.add(g);
+ const[aa,ao]=X.antipode(a,l),p=toENU(ecef(aa,ao),la,lo).multiplyScalar(SC),hx='#'+c.toString(16).padStart(6,'0');const lb=label('Antipode of '+n.split(' (')[0]+'\n'+aa.toFixed(3)+', '+ao.toFixed(3)+' · '+Math.round(gcKm(la,lo,aa,ao)).toLocaleString()+' km',hx,{title:'Antipode of '+n,color:hx,distM:gcKm(la,lo,aa,ao)*1000});lb.position.copy(p);lb.userData.layer='vortexW';world.add(lb)}applyLayers()}
 // ---- light beams + ground shapes by type (shared per-place materials)
 const SHT={value:0};window.SHT=SHT;const RINGS=[];
 const beamMat=c=>new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,uniforms:{c:{value:new T.Color(c)}},
@@ -113,8 +120,8 @@ function buildStreets(){fetch('streets.json').then(r=>r.json()).then(J=>{if(!L0|
   for(const[w,op,cc]of[[7,.22,col],[3,.9,col],[1,1,new T.Color(1,1,1)]]){const g=new LineGeometry();g.setPositions(P);const m=new LineMaterial({color:cc,linewidth:w,transparent:true,opacity:op,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,resolution:new T.Vector2(innerWidth,innerHeight)});const l=new Line2(g,m);l.renderOrder=8;l.frustumCulled=false;local.add(l);window.FATLINES=(window.FATLINES||[]).concat(m)}
   const every=Math.max(10,Math.floor(ln.points.length/6));for(let i=Math.floor(every/2);i<ln.points.length;i+=every){const lb=label(ln.name,ln.color,{title:ln.name+(ln.streets?' via '+ln.streets.join(', '):''),color:ln.color});lb.position.set(P[i*3],1,P[i*3+2]);local.add(lb)}}})}
 // ---- layers menu (persisted)
-const LAYERS={places:'Places',lines:'Lines to places',edges:'Edge-of-Earth markers',far:'Poles & pyramids',grid:'Floor grid',ghost:'Ghost bot'};
-const LAY=Object.assign({places:1,lines:1,edges:1,far:1,grid:1,ghost:1},JSON.parse(localStorage.eearLayers||'{}'));
+const LAYERS={ocean:'Ocean',coast:'Coastline',roads:'Road paths',saucers:'Saucers & landing pads',vortexL:'Vortex (local)',vortexW:'Vortex great circles (world)',places:'Places',lines:'Lines to places',edges:'Edge-of-Earth markers',far:'Poles & pyramids',grid:'Floor grid',ghost:'Ghost bot'};
+const LAY=Object.assign({ocean:1,coast:1,roads:1,saucers:1,vortexL:1,vortexW:1,places:1,lines:1,edges:1,far:1,grid:1,ghost:1},JSON.parse(localStorage.eearLayers||'{}'));
 function layerOn(o){while(o){if(o.userData&&o.userData.layer&&!LAY[o.userData.layer])return false;o=o.parent}return true}
 function applyLayers(){scene.traverse(o=>{if(o.userData&&o.userData.layer&&!o.isSprite)o.visible=!!LAY[o.userData.layer]});localStorage.eearLayers=JSON.stringify(LAY)}
 let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
@@ -135,7 +142,7 @@ const ln=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(0,-2,0),
 const lb=label(`${k}  ${a.toFixed(3)}, ${l.toFixed(3)}\n${dist.toFixed(0)} km  el ${el.toFixed(1)}°`,cols[k],{title:`${k} edge of Earth (${a.toFixed(3)}, ${l.toFixed(3)})`,color:cols[k],distM:dist*1000,el});lb.scale.set(2400,600,1);lb.position.copy(p).add(new T.Vector3(0,500,0));lb.userData.layer='edges';world.add(lb);
 console.log(k,dist.toFixed(0),el.toFixed(1),p.x.toFixed(0),p.y.toFixed(0),p.z.toFixed(0));info.push(`${k}: ${a.toFixed(3)},${l.toFixed(3)}`);
 place(a,l).then(n=>{lb.userData.meta.title+=' · '+n;const l2=label(n,cols[k],lb.userData.meta);l2.scale.set(2400,600,1);l2.position.copy(p).add(new T.Vector3(0,-500,0));l2.userData.layer='edges';world.add(l2)})}
-buildFar(la,lo);ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
+buildFar(la,lo);buildVW(la,lo);ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
 // orientation
 let ori=null,headOff=0;const zee=new T.Vector3(0,0,1),q1=new T.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),eu=new T.Euler();
 // complementary filter: gyro-fused attitude each frame + slow, gated compass heading correction
@@ -148,7 +155,7 @@ function onOri(e){if(e.alpha==null&&e.beta==null)return;ori=e;const now=performa
  const good=acc!=null&&acc>=0&&acc<20;document.getElementById('cbad').style.display=(!good||now-rejT<3000)?'block':'none';
  if(!hInit){if(acc==null||acc<45){headOff=mean;hInit=true}return}
  if(!good||R<0.995||rate>30)return;const d=wrap(mean-headOff);if(Math.abs(d)>15){rejT=now;return}headOff+=d*Math.min(1,dt/7)}
-function setCam(){if(q.has('look')){const k=q.get('look'),v={P:[0.2,-0.3,-1],H:[-0.25,-0.05,1],NP:[0,-0.38,-1],SP:[0,-2.6,1],GZ:[0.55,-1.4,-0.35],G:[-1,-0.03,-0.35],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
+function setCam(){if(q.has('lv')){const v=q.get('lv').split(',').map(Number);cam.lookAt(cam.position.x+v[0],cam.position.y+v[1],cam.position.z+v[2]);return}if(q.has('look')){const k=q.get('look'),v={P:[0.2,-0.3,-1],H:[-0.25,-0.05,1],NP:[0,-0.38,-1],SP:[0,-2.6,1],GZ:[0.55,-1.4,-0.35],G:[-1,-0.03,-0.35],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
 eu.set(b,a,-g,'YXZ');tq.setFromEuler(eu);tq.multiply(q1);tq.multiply(new T.Quaternion().setFromAxisAngle(zee,-so));const ang=cam.quaternion.angleTo(tq)/D;if(ang>20)cam.quaternion.copy(tq);else if(ang>.3)cam.quaternion.slerp(tq,.2)}const tq=new T.Quaternion();
 async function start(){document.getElementById('start').remove();
 try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){}
@@ -184,7 +191,7 @@ addEventListener('resize',()=>(window.FATLINES||[]).forEach(m=>m.resolution.set(
 // desk
 
 // desktop mode: no compass/camera -> mouse/keys look, dark sky, location picker
-let desk=false,yaw=0,pitch=-10;
+let desk=false,yaw=+(q.get('dy')||0),pitch=q.has('dp')?+q.get('dp'):-10;
 function setLoc(a,l){built=null;L0=null;sm=null;build(a,l);updLocal(a,l,5);MYPOS={lat:a,lon:l,acc:5}}
 window.setLoc=setLoc;
 TARGETS.forEach((t,i)=>locSel.insertAdjacentHTML('beforeend',`<option value=${i}>${t[0]}</option>`));
@@ -215,9 +222,9 @@ function flowStep(t){if(!PLOCK||!camA.checked||!vid.videoWidth||t-flowT<125)retu
   const gy=wrap(yaw-prevYaw);if(Math.abs(gy)<3){const drift=gy-camYaw;manYaw-=drift*.5;flowR.textContent='flow '+camYaw.toFixed(1)+'° gyro '+gy.toFixed(1)+'°'}}prevL=L;prevYaw=yaw}
 
 ghostB.onclick=()=>{if(!window.GHOST)return;GHOST.visible=!GHOST.visible;localStorage.eearGhost=GHOST.visible?'on':'off';ghostB.textContent=GHOST.visible?'Ghost bot: on':'Ghost bot: off'};
-function spawnGhost(){const M=window.MPM;if(!M||!L0)return;if(window.GHOST)local.remove(GHOST);const g=M.stick('Ghost (bot)','#9fdcff',false);const f=new T.Vector3();cam.getWorldDirection(f);f.y=0;if(f.lengthSq()<1e-4)f.set(0,0,-1);f.normalize();const r=new T.Vector3(-f.z,0,f.x);
- const w=f.multiplyScalar(8).add(r.multiplyScalar(2));g.position.set(w.x-local.position.x,-1.6+1.0,w.z-local.position.z);local.add(g);window.GHOST=g;g.visible=localStorage.eearGhost!=='off';ghostB.style.display='';sumB.style.display='';ghostB.textContent=g.visible?'Ghost bot: on':'Ghost bot: off'}
-let poseT=0;function ghostAnim(t){if(!window.GHOST&&L0&&(ori||desk)){if(!poseT)poseT=t;if(t-poseT>1500)spawnGhost()}const g=window.GHOST;if(!g||!g.visible)return;const tp=new T.Vector3();cam.getWorldPosition(tp);const gp=g.getWorldPosition(new T.Vector3());g.rotation.y=Math.atan2(tp.x-gp.x,tp.z-gp.z);g.userData.body.rotation.z=Math.sin(t/1400)*.04;const p=.75+.25*Math.sin(t/1000*Math.PI*2*1.2);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*p})}
+function spawnGhost(){const M=window.MPM;if(!M||!L0)return;if(window.GHOST)local.remove(GHOST);const g=X.makeGhostBot(T,window.GHOST_CFG||{});const f=new T.Vector3();cam.getWorldDirection(f);f.y=0;if(f.lengthSq()<1e-4)f.set(0,0,-1);f.normalize();const r=new T.Vector3(-f.z,0,f.x);
+ const w=f.multiplyScalar(8).add(r.multiplyScalar(2));g.position.set(w.x-local.position.x,-1.6,w.z-local.position.z);local.add(g);window.GHOST=g;g.visible=localStorage.eearGhost!=='off';ghostB.style.display='';sumB.style.display='';ghostB.textContent=g.visible?'Ghost bot: on':'Ghost bot: off'}
+let poseT=0;function ghostAnim(t){if(!window.GHOST&&L0&&(ori||desk)){if(!poseT)poseT=t;if(t-poseT>1500)spawnGhost()}const g=window.GHOST;if(!g||!g.visible)return;if(g.userData.ex){const me=new T.Vector3();cam.getWorldPosition(me);local.worldToLocal(me);X.ghostFrame(T,g,t,me,-1.6);return}const tp=new T.Vector3();cam.getWorldPosition(tp);const gp=g.getWorldPosition(new T.Vector3());g.rotation.y=Math.atan2(tp.x-gp.x,tp.z-gp.z);g.userData.body.rotation.z=Math.sin(t/1400)*.04;const p=.75+.25*Math.sin(t/1000*Math.PI*2*1.2);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*p})}
 sumB.onclick=()=>{spawnGhost();if(window.GHOST){GHOST.visible=true;localStorage.eearGhost='on';ghostB.textContent='Ghost bot: on'}};
 // update notice
 let VER=null;const chkV=()=>fetch('version.json?'+Date.now()).then(r=>r.json()).then(j=>{if(VER&&j.v!==VER)upd.style.display='block';VER=VER||j.v}).catch(()=>{});chkV();setInterval(chkV,60000);upd.onclick=()=>location.reload();
@@ -267,5 +274,6 @@ function xrPads(){const ss=ren.xr.getSession();const src=ss?Array.from(ss.inputS
 layP.innerHTML=Object.entries(LAYERS).map(([k,v])=>`<label><input type=checkbox data-l=${k} ${LAY[k]?'checked':''} style='width:22px;height:22px'> ${v}</label>`).join('<br>')+'<br><small>Streets are always on</small>';
 layB.onclick=()=>layP.style.display=layP.style.display==='none'?'block':'none';layP.onchange=e=>{const k=e.target.dataset.l;LAY[k]=e.target.checked?1:0;if(k==='ghost'&&window.GHOST){GHOST.visible=!!LAY.ghost;localStorage.eearGhost=LAY.ghost?'on':'off'}applyLayers()};
 let pfT=0;
-ren.setAnimationLoop(t=>{gpsBlend(t);if(ren.xr.isPresenting&&t-pfT>1000){pfT=t;xrPassFix()}SHT.value=t/1000;for(const r of RINGS){const k=(t/1000*.8+r.id*.13)%1;r.scale.setScalar(.6+k*1.4);r.material.opacity=.8*(1-k)}if(window.FLAGMAT)FLAGMAT.uniforms.t.value=t/1000;if(ren.xr.isPresenting){xrPads();layoutLabels();ghostAnim(t);window._mp&&window._mp.frame(t);ren.render(scene,cam);return}ghostAnim(t);setCam();applyMan();flowStep(t);deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
+fetch('ghost.json').then(r=>r.json()).then(j=>window.GHOST_CFG=j).catch(()=>{});
+ren.setAnimationLoop(t=>{gpsBlend(t);X.frame(t);for(const v of VORT)v.rotation.y=t/2500;if(window.OCEAN)OCEAN.userData.oceanMat.uniforms.me.value.set(-local.position.x,-local.position.z);if(ren.xr.isPresenting&&t-pfT>1000){pfT=t;xrPassFix()}SHT.value=t/1000;for(const r of RINGS){const k=(t/1000*.8+r.id*.13)%1;r.scale.setScalar(.6+k*1.4);r.material.opacity=.8*(1-k)}if(window.FLAGMAT)FLAGMAT.uniforms.t.value=t/1000;if(ren.xr.isPresenting){xrPads();layoutLabels();ghostAnim(t);window._mp&&window._mp.frame(t);ren.render(scene,cam);return}ghostAnim(t);setCam();applyMan();flowStep(t);deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
 </script></body></html>

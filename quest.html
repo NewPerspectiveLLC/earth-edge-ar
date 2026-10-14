@@ -2,7 +2,7 @@
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <style>body{margin:0;background:transparent;font:16px sans-serif}#hud{position:fixed;left:8px;top:8px;z-index:9;background:#000c;color:#fff;padding:10px;border-radius:10px;max-width:440px}
 #hud button{font-size:16px;padding:10px 14px;margin:3px}#mpc{display:none;position:fixed;inset:0;z-index:20;background:#000e;color:#fff;padding:24px;font-size:18px}#mpc input,#mpc select{font-size:18px}</style></head><body>
-<div id=hud><b>Earth Edge AR · Quest</b> (location: Ready Athletics, no GPS)<br>1) Tap <b>AR</b> (bottom right). 2) Face real north, press <b>A</b> or trigger to set north (<b>B</b> unlocks).<br>Left stick moves, right stick up/down = floor height.<br>
+<div id=hud><button id=ocB>Ocean: on</button><button id=sxB>Saucers/roads/ghost: on</button><br><b>Earth Edge AR · Quest</b> (location: Ready Athletics, no GPS)<br>1) Tap <b>AR</b> (bottom right). 2) Face real north, press <b>A</b> or trigger to set north (<b>B</b> unlocks).<br>Left stick moves, right stick up/down = floor height.<br>
 <button id=joinB>Join live tracking</button><button id=leaveB style=display:none>Leave and stop tracking</button><button id=delB style=display:none>Delete my recorded data</button> <span id=trk style="display:none;background:#c00;padding:3px 6px;border-radius:5px">● Tracking ON</span></div>
 <div id=mpc><h2>Join live tracking</h2><p><b>This is a GPS game. While you're in, your position is recorded continuously and shown to other players in the game. It is not shown to the public.</b></p>
 <p style=font-size:15px>On Quest your position is Ready Athletics plus how far you walk in the headset. We store only your display name, mode, entrance, and position fixes (lat, lon, accuracy, time). The game organizer (GM) can see all joined players, including stealth players. Anyone with the link can join.</p>
@@ -77,4 +77,17 @@ AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'
  const t=document.createElement('a-text');t.setAttribute('value',this.data.name);t.setAttribute('align','center');t.setAttribute('color',this.data.color);t.setAttribute('width',3);t.setAttribute('position','0 1.05 0');t.setAttribute('look-at-cam','');this.el.appendChild(t)},
  tick(t){this.el.object3D.children[0]&&(this.el.object3D.children[0].rotation.z=Math.sin(t/900)*.04)}});
 if(S?.live)on();else ui();
+
+// ---- extras shared with the main build: ocean (masked OSM coastline, 8 km fade), coastline, road paths, saucers + pads, GhostBot
+const QL=Object.assign({ocean:1,more:1},JSON.parse(localStorage.eearQLayers||'{}'));
+import('./extras.js').then(async X=>{const T=THREE,f=document.getElementById('floor').object3D,HOMEc=[HOME[0],HOME[1]];const oc=new T.Group(),more=new T.Group();f.add(oc);f.add(more);
+ const fix=g=>g.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.userData.pf=1)});
+ try{const{mesh,coast}=await X.makeOcean(T,HOMEc,0);oc.add(mesh);oc.add(X.makeCoast(T,HOMEc,0,coast));window.QOCEAN=mesh}catch(e){console.warn(e)}
+ try{const[st,sh]=await Promise.all([fetch('streets.json').then(r=>r.json()),fetch('sheridan.json').then(r=>r.json())]);for(const l of st.lines)more.add(X.makeRoad(T,HOMEc,0,l.points,l.color));more.add(X.makeRoad(T,HOMEc,0,sh.points,'#ff00cc'))}catch(e){console.warn(e)}
+ const mPq=111320*Math.cos(HOME[0]*D);for(const[n,a,l,c]of PLACES){const hero=/Ready Athletics/.test(n);const sc=X.makeSaucer(T,c,hero);sc.position.set((l-HOME[1])*mPq+(hero?30:18),0,-(a-HOME[0])*111320+(hero?30:18));more.add(sc)}
+ let cfg={};try{cfg=await (await fetch('ghost.json')).json()}catch(e){}const gh=X.makeGhostBot(T,cfg);gh.position.set(2,0,-6);more.add(gh);window.QGHOST=gh;fix(oc);fix(more);
+ const ap=()=>{oc.visible=!!QL.ocean;more.visible=!!QL.more;ocB.textContent='Ocean: '+(QL.ocean?'on':'off');sxB.textContent='Saucers/roads/ghost: '+(QL.more?'on':'off');localStorage.eearQLayers=JSON.stringify(QL)};ap();
+ ocB.onclick=()=>{QL.ocean=QL.ocean?0:1;ap()};sxB.onclick=()=>{QL.more=QL.more?0:1;ap()};
+ AFRAME.registerComponent('qx-tick',{tick(t,dt){X.frame(t);const c=this.el.camera;if(!c)return;const me=new T.Vector3();c.getWorldPosition(me);f.worldToLocal(me);if(window.QOCEAN)QOCEAN.userData.oceanMat.uniforms.me.value.set(me.x,me.z);if(gh.visible)X.ghostFrame(T,gh,t,me,0,Math.min(.05,(dt||16)/1000))}});
+ document.querySelector('a-scene').setAttribute('qx-tick','')});
 </script></body></html>
