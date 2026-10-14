@@ -1,11 +1,11 @@
 <!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR</title>
 <style>html,body{margin:0;height:100%;overflow:hidden;background:#000;font:14px -apple-system,sans-serif;color:#fff}video,canvas{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}#ui{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;padding:8px;background:#0008;z-index:5}button{font-size:18px;padding:12px 18px;margin:4px;border-radius:10px;border:0;background:#fc3;color:#000}#start{position:fixed;inset:0;margin:auto;width:220px;height:70px;z-index:6}</style>
 <script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head><body>
-<video id=v playsinline muted autoplay></video><div id=ui2 style='position:fixed;bottom:8px;left:8px;z-index:5;background:#0008;padding:4px;font-size:12px'>Local grid &amp; target lines: approximate (GPS+compass, smoothed). iPhone Safari has no world tracking.</div><div id=zoom style='position:fixed;right:8px;top:100px;z-index:7'><button data-z=1>1x</button><br><button data-z=2>2x</button><br><button data-z=4>4x</button></div><div id=card style='display:none;position:fixed;left:0;right:0;bottom:0;z-index:8;background:#000e;padding:18px 18px 28px;font-size:22px;border-top:3px solid #fff'></div><style>#hpD{position:fixed;left:8px;top:150px;z-index:20;background:#000a;padding:6px;border-radius:8px}#hpP{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:calc(env(safe-area-inset-bottom) + 100px);z-index:50;background:#000b;border-radius:14px;padding:8px;text-align:center;color:#fff;touch-action:none;user-select:none}
+<video id=v playsinline muted autoplay></video><div id=ui2 style='position:fixed;bottom:8px;left:8px;z-index:5;background:#0008;padding:4px;font-size:12px'>Local grid &amp; target lines: approximate (GPS+compass, smoothed). iPhone Safari has no world tracking.</div><div id=zoom style='position:fixed;right:8px;top:210px;z-index:7'><button data-z=1>1x</button><br><button data-z=2>2x</button><br><button data-z=4>4x</button></div><div id=card style='display:none;position:fixed;left:0;right:0;bottom:0;z-index:8;background:#000e;padding:18px 18px 28px;font-size:22px;border-top:3px solid #fff'></div><style>#hpD{position:fixed;left:8px;top:150px;z-index:20;background:#000a;padding:6px;border-radius:8px}#hpP{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:calc(env(safe-area-inset-bottom) + 100px);z-index:50;background:#000b;border-radius:14px;padding:8px;text-align:center;color:#fff;touch-action:none;user-select:none}
 #hpP button{width:64px;height:64px;font-size:28px;margin:4px 0}#hpT{width:56px;height:220px;margin:6px auto;background:#fff2;border-radius:28px;position:relative}#hpK{position:absolute;left:4px;width:48px;height:48px;border-radius:24px;background:#9ff}#hpR{font-size:24px;font-weight:bold}
 @media (pointer:coarse){#hpP{display:block}#hpD{display:none}}</style>
 <div id=hpD>Floor height <input id=hpS type=range min=-10 max=10 step=.1 value=0> <span id=hpV>0.0 m</span></div>
-<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>floor height (double-tap to reset)</small></div><div id=desk style='display:none;position:fixed;left:8px;top:64px;z-index:21;background:#000b;padding:6px;border-radius:8px'>Heading <b id=hdg>0°</b> <button data-h=0>N</button><button data-h=90>E</button><button data-h=180>S</button><button data-h=270>W</button><br>Location <select id=locSel><option value=gps>Use GPS</option></select><br><small>drag or arrow keys to look</small></div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
+<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>floor height (double-tap to reset)</small></div><div id=desk style='display:none;position:fixed;left:8px;top:64px;z-index:21;background:#000b;padding:6px;border-radius:8px'>Heading <b id=hdg>0°</b> <button data-h=0>N</button><button data-h=90>E</button><button data-h=180>S</button><button data-h=270>W</button><br>Location <select id=locSel><option value=gps>Use GPS</option></select><br><small>drag or arrow keys to look</small></div><div id=cbad style='display:none;position:fixed;left:8px;top:64px;z-index:22;background:#a60;padding:6px 10px;border-radius:8px;font-size:15px'>Compass unsteady: calibrate by waving the phone in a figure 8</div><button id=hlock style='position:fixed;right:8px;top:60px;z-index:22;font-size:14px;padding:10px'>Lock heading</button><button id=ghostB style='display:none;position:fixed;right:8px;top:108px;z-index:22;font-size:14px;padding:10px'>Ghost bot: on</button><button id=sumB style='display:none;position:fixed;right:8px;top:156px;z-index:22;font-size:14px;padding:10px'>Summon ghost</button><div id=upd style='display:none;position:fixed;left:0;right:0;top:0;z-index:60;background:#0a6;color:#fff;text-align:center;padding:14px;font-size:18px'>Update ready - tap to reload</div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
 <script>window.EEAR_API=location.hostname.endsWith('github.io')?'':''</script><script type=module>
 import*as T from'three';import{Line2}from'three/addons/lines/Line2.js';import{LineMaterial}from'three/addons/lines/LineMaterial.js';import{LineGeometry}from'three/addons/lines/LineGeometry.js';
 const R=6371e3,D=Math.PI/180,q=new URLSearchParams(location.search);
@@ -62,7 +62,7 @@ if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outsi
 local.position.set(-sm.x,window.GH_OFF||0,-sm.z);// user stays at origin, world shifts
 for(const o of local.children){if(o.isLine&&o.userData.t){const a=o.geometry.attributes.position;a.setXYZ(0,sm.x,-1.6,sm.z);a.needsUpdate=true}
 if(o.userData.lb){const km=o.userData.t.clone().setY(0).distanceTo(new T.Vector3(sm.x,0,sm.z));const[n,c]=o.userData.lb;o.position.y=o.userData.t.y+125;if(Math.abs((o.userData.km||0)-km)>5){o.userData.km=km;const tmpL=label(n+'\n'+(km>1000?(km/1000).toFixed(2)+' km':km.toFixed(0)+' m')+' (approx)','#'+c.toString(16).padStart(6,'0'));LABELS.splice(LABELS.indexOf(tmpL),1);o.material.map=tmpL.material.map}o.userData.meta.distM=km;}}}
-let built=null;let MYPOS=null;import('./mp.js').then(M=>{window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
+let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
 async function build(la,lo){if(built&&Math.abs(built[0]-la)<.01&&Math.abs(built[1]-lo)<.01)return;built=[la,lo];
 world.clear();markers=[];for(let i=LABELS.length-1;i>=0;i--)if(!LABELS[i].parent)LABELS.splice(i,1);
 // translucent wireframe Earth, center at -R up
@@ -83,15 +83,24 @@ place(a,l).then(n=>{lb.userData.meta.title+=' · '+n;const l2=label(n,cols[k],lb
 ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
 // orientation
 let ori=null,headOff=0;const zee=new T.Vector3(0,0,1),q1=new T.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),eu=new T.Euler();
-function onOri(e){if(e.alpha==null&&e.beta==null)return;ori=e;if(e.webkitCompassHeading!=null){/* align alpha to true north */const h=(360-e.webkitCompassHeading)-e.alpha;let dd=((h-headOff+540)%360)-180;if(Math.abs(dd)>2)headOff+=dd*.05}}
+// complementary filter: gyro-fused attitude each frame + slow, gated compass heading correction
+let hInit=false,lastA=null,lastT=0,rejT=0,HLOCK=false;const hBuf=[];const wrap=d=>((d+540)%360)-180;
+function onOri(e){if(e.alpha==null&&e.beta==null)return;ori=e;const now=performance.now();
+ const rate=lastA!=null?Math.abs(wrap(e.alpha-lastA))/Math.max(.001,(now-lastT)/1000):0;const dt=lastT?(now-lastT)/1000:0;lastA=e.alpha;lastT=now;
+ if(e.webkitCompassHeading==null||HLOCK)return;const h=(360-e.webkitCompassHeading)-e.alpha,acc=e.webkitCompassAccuracy;
+ hBuf.push({h,t:now});while(hBuf.length&&now-hBuf[0].t>1500)hBuf.shift();
+ let sx=0,sy=0;for(const o of hBuf){sx+=Math.cos(o.h*D);sy+=Math.sin(o.h*D)}const R=Math.hypot(sx,sy)/hBuf.length,mean=Math.atan2(sy,sx)/D;
+ const good=acc!=null&&acc>=0&&acc<20;document.getElementById('cbad').style.display=(!good||now-rejT<3000)?'block':'none';
+ if(!hInit){if(acc==null||acc<45){headOff=mean;hInit=true}return}
+ if(!good||R<0.995||rate>30)return;const d=wrap(mean-headOff);if(Math.abs(d)>15){rejT=now;return}headOff+=d*Math.min(1,dt/7)}
 function setCam(){if(q.has('look')){const k=q.get('look'),v={P:[0.2,-0.3,-1],H:[-0.25,-0.05,1],G:[-1,-0.03,-0.35],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
-eu.set(b,a,-g,'YXZ');cam.quaternion.setFromEuler(eu);cam.quaternion.multiply(q1);cam.quaternion.multiply(new T.Quaternion().setFromAxisAngle(zee,-so))}
+eu.set(b,a,-g,'YXZ');tq.setFromEuler(eu);tq.multiply(q1);tq.multiply(new T.Quaternion().setFromAxisAngle(zee,-so));const ang=cam.quaternion.angleTo(tq)/D;if(ang>20)cam.quaternion.copy(tq);else if(ang>.3)cam.quaternion.slerp(tq,.2)}const tq=new T.Quaternion();
 async function start(){document.getElementById('start').remove();
 try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){}
 addEventListener('deviceorientation',onOri);addEventListener('deviceorientationabsolute',e=>{if(e.webkitCompassHeading==null)onOri(e)});
 try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message;setTimeout(enterDesk,0)}
 if(q.has('lat')){build(+q.get('lat'),+q.get('lon'));updLocal(+q.get('lat'),+q.get('lon'),5);MYPOS={lat:+q.get('lat'),lon:+q.get('lon'),acc:5}}
-else navigator.geolocation.watchPosition(p=>{build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
+else navigator.geolocation.watchPosition(p0=>{if(p0.coords.accuracy>30&&MYPOS)return;if(!window._gf)window._gf={lat:p0.coords.latitude,lon:p0.coords.longitude};const gf=window._gf;gf.lat+=(p0.coords.latitude-gf.lat)*.3;gf.lon+=(p0.coords.longitude-gf.lon)*.3;const p={coords:{latitude:gf.lat,longitude:gf.lon,accuracy:p0.coords.accuracy}};build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
 document.getElementById('start').onclick=start;
 if(q.has('auto')){start();if(q.has('pitch')){ori={alpha:+q.get('yaw')||0,beta:+q.get('pitch'),gamma:0}}}
 
@@ -110,7 +119,7 @@ function updArrow(){const a=document.getElementById('arr');if(!a||!cardFor)retur
 document.querySelectorAll('#zoom button').forEach(b=>b.onclick=()=>{cam.fov=2*Math.atan(Math.tan(65*D/2)/+b.dataset.z)/D;cam.updateProjectionMatrix()});
 
 // grid height: one shared state for desktop slider + phone thumb panel
-const HMIN=-10,HMAX=10;function setGH(v,buzz){v=Math.round(Math.max(HMIN,Math.min(HMAX,v))*10)/10;if(v===window.GH_OFF)return;window.GH_OFF=v;local.position.y=v;
+const HMIN=-10,HMAX=10;function setGH(v,buzz){v=Math.round(Math.max(HMIN,Math.min(HMAX,v))*10)/10;if(v===window.GH_OFF)return;window.GH_OFF=v;local.position.y=v;localStorage.eearFloor=v;
  const t=(v>0?'+':'')+v.toFixed(1)+' m';hpV.textContent=t;hpR.textContent="Floor "+t;hpS.value=v;hpK.style.top=((HMAX-v)/(HMAX-HMIN)*172)+'px';if(buzz&&navigator.vibrate)navigator.vibrate(8)}
 window.GH_OFF=0.1;setGH(0);hpS.oninput=()=>setGH(+hpS.value);
 hpT.onpointerdown=e=>{hpT.setPointerCapture(e.pointerId);const mv=ev=>{const r=hpT.getBoundingClientRect();setGH(HMAX-(ev.clientY-r.top-24)/172*(HMAX-HMIN),true)};mv(e);hpT.onpointermove=mv;hpT.onpointerup=()=>hpT.onpointermove=null};
@@ -134,5 +143,15 @@ addEventListener('pointerup',()=>{drag=null});
 addEventListener('keydown',e=>{if(!desk)return;if(e.key==='ArrowLeft')yaw=(yaw-3+360)%360;if(e.key==='ArrowRight')yaw=(yaw+3)%360;if(e.key==='ArrowUp')pitch=Math.min(89,pitch+3);if(e.key==='ArrowDown')pitch=Math.max(-89,pitch-3)});
 function deskCam(){if(!desk||ori||q.has('look'))return;cam.rotation.set(pitch*D,-yaw*D,0,'YXZ');hdg.textContent=Math.round(yaw)+'°'}
 setTimeout(()=>{if(!ori)enterDesk()},2500);
-ren.setAnimationLoop(t=>{setCam();deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
+hlock.onclick=()=>{HLOCK=!HLOCK;hlock.textContent=HLOCK?'Heading locked':'Lock heading';hlock.style.background=HLOCK?'#0c8':''};
+ghostB.onclick=()=>{if(!window.GHOST)return;GHOST.visible=!GHOST.visible;localStorage.eearGhost=GHOST.visible?'on':'off';ghostB.textContent=GHOST.visible?'Ghost bot: on':'Ghost bot: off'};
+function spawnGhost(){const M=window.MPM;if(!M||!L0)return;if(window.GHOST)local.remove(GHOST);const g=M.stick('Ghost (bot)','#9fdcff',false);const f=new T.Vector3();cam.getWorldDirection(f);f.y=0;if(f.lengthSq()<1e-4)f.set(0,0,-1);f.normalize();const r=new T.Vector3(-f.z,0,f.x);
+ const w=f.multiplyScalar(8).add(r.multiplyScalar(2));g.position.set(w.x-local.position.x,-1.6+1.0,w.z-local.position.z);local.add(g);window.GHOST=g;g.visible=localStorage.eearGhost!=='off';ghostB.style.display='';sumB.style.display='';ghostB.textContent=g.visible?'Ghost bot: on':'Ghost bot: off'}
+let poseT=0;function ghostAnim(t){if(!window.GHOST&&L0&&(ori||desk)){if(!poseT)poseT=t;if(t-poseT>1500)spawnGhost()}const g=window.GHOST;if(!g||!g.visible)return;const tp=new T.Vector3();cam.getWorldPosition(tp);const gp=g.getWorldPosition(new T.Vector3());g.rotation.y=Math.atan2(tp.x-gp.x,tp.z-gp.z);g.userData.body.rotation.z=Math.sin(t/1400)*.04;const p=.75+.25*Math.sin(t/1000*Math.PI*2*1.2);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*p})}
+sumB.onclick=()=>{spawnGhost();if(window.GHOST){GHOST.visible=true;localStorage.eearGhost='on';ghostB.textContent='Ghost bot: on'}};
+// update notice
+let VER=null;const chkV=()=>fetch('version.json?'+Date.now()).then(r=>r.json()).then(j=>{if(VER&&j.v!==VER)upd.style.display='block';VER=VER||j.v}).catch(()=>{});chkV();setInterval(chkV,60000);upd.onclick=()=>location.reload();
+// restore floor height
+if(localStorage.eearFloor)setGH(+localStorage.eearFloor);
+ren.setAnimationLoop(t=>{ghostAnim(t);setCam();deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
 </script></body></html>
