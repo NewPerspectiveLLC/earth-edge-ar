@@ -32,7 +32,7 @@ async function place(la,lo){const k=la.toFixed(2)+','+lo.toFixed(2);if(cache[k])
 try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=5&lat=${la}&lon=${lo}`,{headers:{'Accept-Language':'en'}});const j=await r.json();const n=j.display_name?j.display_name.split(',').slice(-2).join(',').trim():'Open ocean';cache[k]=n;localStorage.eeNames=JSON.stringify(cache);return n}catch(e){return'Open ocean / unknown'}}
 
 // ---- local layer: finite grid + target lines (approximate on iOS: GPS+compass, smoothed) ----
-const TARGETS=[['Ready Athletics (997800502)',48.11035,-122.80591,0xffc800],['Cappy\'s Trails garden (998002802)',48.13165,-122.79921,0x30ff60],['Memory\'s Vault, Fort Worden',48.1384642,-122.7647029,0xc060ff],['Port Townsend City Hall',48.1161771,-122.753612,0x40e0ff],['Jefferson County Sheriff\'s Office',48.0241638,-122.764488,0xff7020],['Jefferson Healthcare Hospital',48.1060007,-122.7889962,0xff4060]];
+const TARGETS=[['Ready Athletics (997800502)',48.11035,-122.80591,0xffc800],['Cappy\'s Trails garden (998002802)',48.13165,-122.79921,0x30ff60],['Memory\'s Vault, Fort Worden',48.1384642,-122.7647029,0xc060ff],['Port Townsend City Hall',48.1161771,-122.753612,0x40e0ff],['Jefferson County Sheriff\'s Office',48.0241638,-122.764488,0xff7020],['Jefferson Healthcare Hospital',48.1060007,-122.7889962,0xff4060],['Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St)',48.1139683,-122.7628233,0xe0c080]];
 const local=new T.Group();scene.add(local);let L0=null,sm=null;
 function mPer(la){return[111320,111320*Math.cos(la*D)]}
 function buildLocal(la,lo){L0=[Math.round(la*1000)/1000,Math.round(lo*1000)/1000];// grid origin snapped to rounded lat/lon (~100 m)
