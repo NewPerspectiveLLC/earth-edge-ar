@@ -24,6 +24,6 @@ ren.setAnimationLoop(t=>{gpsBlend(t);SHT.value=t/1000;for(const r of RINGS){cons
 R("closest('button,#mpc,#mpb,#zoom,#hpP,#hpD,#card')","closest('button,#mpc,#mpb,#zoom,#hpP,#hpD,#card,#layP,#desk,#pairP,#lockP')")
 open('index.html','w').write(s)
 g=open('gm.html').read()
-g=g.replace("fetch('sheridan.json')","fetch('streets.json').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:4}).addTo(map).bindTooltip(l.name))));fetch('sheridan.json')",1)
+g=g.replace("fetch('sheridan.json')","fetch('streets.json').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:4}).addTo(map).bindTooltip(l.name)));fetch('sheridan.json')",1)
 open('gm.html','w').write(g)
 print('applied')
