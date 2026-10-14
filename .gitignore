@@ -1,0 +1,3 @@
+server/gm-key.txt
+server/*.sqlite*
+server/data.json

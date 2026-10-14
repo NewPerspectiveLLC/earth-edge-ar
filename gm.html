@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Earth Edge AR GM</title>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>body{margin:0;font:13px sans-serif;display:flex;height:100vh}#map{flex:1}#side{width:260px;overflow:auto;padding:8px;background:#111;color:#eee}.p{padding:6px;border-bottom:1px solid #333;display:flex;gap:6px}#lock{position:fixed;inset:0;background:#000d;z-index:2000;color:#fff;padding:40px}</style></head><body>
+<div id=map></div><div id=side><b>Players (live)</b> <label><input type=checkbox id=tr> trails</label><div id=list></div></div>
+<div id=lock>GM key: <input id=k type=password> <button id=go>Unlock</button> <span id=err></span></div>
+<script>
+const API=(window.EEAR_API||'')+'/api/gm';let KEY=localStorage.eearGM||'';
+const map=L.map('map').setView([48.117,-122.78],14);
+const street=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+L.control.layers({Street:street,Satellite:sat}).addTo(map);
+const T=[['Ready Athletics (997800502)',48.11035,-122.80591,'#ffc800'],["Cappy's Trails garden (998002802)",48.13165,-122.79921,'#30ff60'],["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff']];
+T.forEach(t=>L.circleMarker([t[1],t[2]],{radius:8,color:t[3]}).addTo(map).bindTooltip(t[0],{permanent:true}));
+const lay=L.layerGroup().addTo(map);const grid=L.layerGroup().addTo(map);function drawGrid(a,l){grid.clearLayers();a=Math.round(a*1000)/1000;l=Math.round(l*1000)/1000;const dy=20/111320,dx=20/(111320*Math.cos(a*Math.PI/180));for(let i=-10;i<=10;i++){L.polyline([[a+i*dy,l-10*dx],[a+i*dy,l+10*dx]],{color:'#fff',weight:1,opacity:.6}).addTo(grid);L.polyline([[a-10*dy,l+i*dx],[a+10*dy,l+i*dx]],{color:'#fff',weight:1,opacity:.6}).addTo(grid)}}
+const col=id=>'hsl('+(parseInt(id.slice(0,4),16)%360)+',100%,45%)';
+const icon=(c,st)=>`<svg width=22 height=26 viewBox="0 0 22 26" fill=none stroke="${c}" stroke-width=2 ${st?'stroke-dasharray="2 2" opacity=.6':''}><circle cx=11 cy=5 r=4 ${st?'':`fill="${c}"`}/><path d="M11 9V20M4 20H18M11 11L4 18M11 11L18 18"/></svg>`;
+function age(t){const s=(Date.now()-t)/1000|0;return s<60?s+'s':(s/60|0)+'m'}
+async function poll(){if(!KEY)return;const r=await fetch(API+(tr.checked?'?trails=1':''),{headers:{'x-gm-key':KEY}});if(r.status===403){lock.style.display='block';err.textContent='bad key';return}
+lock.style.display='none';const{players}=await r.json();const f=players.find(p=>p.last);if(f&&!grid.getLayers().length)drawGrid(f.last.lat,f.last.lon);lay.clearLayers();list.innerHTML='';
+for(const p of players){const c=col(p.id),st=p.mode==='stealth';
+if(p.track&&p.track.length>1)L.polyline(p.track.map(f=>[f.lat,f.lon]),{color:c,weight:2,opacity:.6,dashArray:st?'4 4':null}).addTo(lay);
+if(p.last){const ll=[p.last.lat,p.last.lon];L.circle(ll,{radius:p.last.acc||5,color:c,weight:1,fillOpacity:.05}).addTo(lay);
+L.marker(ll,{icon:L.divIcon({html:icon(c,st),className:'',iconSize:[22,26]})}).addTo(lay).bindTooltip(p.name+(st?' (stealth)':''),{permanent:true,direction:'right'});
+// lines from player to the three places
+T.forEach(t=>L.polyline([ll,[t[1],t[2]]],{color:t[3],weight:1,opacity:.5}).addTo(lay))}
+list.insertAdjacentHTML('beforeend',`<div class=p>${icon(c,st)}<div><b>${p.name.replace(/</g,'&lt;')}</b> ${st?'stealth':'regular'}<br>entrance: ${p.entrance}<br>${p.last?`updated ${age(p.last.t)} ago, ±${Math.round(p.last.acc)} m`:'no fix yet'}</div></div>`)}}
+go.onclick=()=>{KEY=k.value.trim();localStorage.eearGM=KEY;poll()};if(KEY){lock.style.display='none';poll()}setInterval(poll,3000);
+</script></body></html>
