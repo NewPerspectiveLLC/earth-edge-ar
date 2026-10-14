@@ -119,3 +119,14 @@ export function ghostFrame(T,g,t,me,ground,dt=.016){const st=g.userData.ghost,B=
 // ---------- per-frame
 export function frame(t,dt=.016){U.t.value=t/1000;const s=t/1000;for(const S of SAUCERS){S.sc.position.y+=Math.sin(s*1.2+S.ph)*.01;S.sc.rotation.y+=S.hero?.02:.01;S.port.forEach((p,i)=>p.material.opacity=.4+.6*(Math.sin(s*4+i)>.3?1:0));S.lights.forEach((l,i)=>l.material.opacity=((Math.floor(s*8)%8)===i)?1:.25);if(S.beam)S.beam.material.opacity=.08+.06*Math.sin(s*3)}}
 export function spin(g,t){g.traverse(o=>{if(o.userData.spin)o.rotation.y=t/1000*.4})}
+// ENU projection from a home point, metres (x=E, y=U, z=-N), full-Earth (through the planet).
+export function enuProj(T,la0,lo0){const R=6371e3,e=(a,l)=>{a*=D;l*=D;return[R*Math.cos(a)*Math.cos(l),R*Math.cos(a)*Math.sin(l),R*Math.sin(a)]},o=e(la0,lo0),sl=Math.sin(lo0*D),cl=Math.cos(lo0*D),sp=Math.sin(la0*D),cp=Math.cos(la0*D);
+ return(a,l)=>{const p=e(a,l),d=[p[0]-o[0],p[1]-o[1],p[2]-o[2]];const E=-sl*d[0]+cl*d[1],N=-sp*cl*d[0]-sp*sl*d[1]+cp*d[2],U=cp*cl*d[0]+cp*sl*d[1]+sp*d[2];return new T.Vector3(E,U,-N)}}
+// XR-safe world great circles: every point is pushed onto a sphere of radius `shell` around the viewer origin
+// (same on-screen direction as the true through-Earth position, but always inside the camera far plane).
+// Drawn as tubes so they are thick on Quest (WebGL lines are 1 px there).
+export function makeVortexWorldTubes(T,la,lo,col,proj,shell=3000,rad=7){const g=new T.Group();g.userData.layer='vortexW';
+ const m=passMat(T,new T.MeshBasicMaterial({color:col,transparent:true,opacity:.9,depthTest:false,side:T.DoubleSide}));const core=passMat(T,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9,depthTest:false}));
+ for(const C of vortexWorldCircles(la,lo,proj)){let run=[];const flush=()=>{if(run.length>3){const cv=new T.CatmullRomCurve3(run);for(const[mm,r]of[[m,rad],[core,rad*.35]]){const t=new T.Mesh(new T.TubeGeometry(cv,run.length*2,r,5,false),mm);t.frustumCulled=false;t.renderOrder=9;g.add(t)}}run=[]};
+  for(let i=0;i<C.length;i+=3){const v=new T.Vector3(C[i],C[i+1],C[i+2]);if(v.length()<8000){flush();continue}run.push(v.setLength(shell))}flush()}
+ return g}
