@@ -1,0 +1,78 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000;font:14px -apple-system,sans-serif;color:#fff}video,canvas{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}#ui{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;padding:8px;background:#0008;z-index:5}button{font-size:18px;padding:12px 18px;margin:4px;border-radius:10px;border:0;background:#fc3;color:#000}#start{position:fixed;inset:0;margin:auto;width:220px;height:70px;z-index:6}</style>
+<script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script></head><body>
+<video id=v playsinline muted autoplay></video><div id=ui2 style='position:fixed;bottom:8px;left:8px;z-index:5;background:#0008;padding:4px;font-size:12px'>Local grid &amp; target lines: approximate (GPS+compass, smoothed). iPhone Safari has no world tracking.</div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
+<script type=module>
+import*as T from'three';
+const R=6371e3,D=Math.PI/180,q=new URLSearchParams(location.search);
+const ui=document.getElementById('ui'),vid=document.getElementById('v');
+const ren=new T.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));ren.setSize(innerWidth,innerHeight);ren.setClearColor(0,0);document.body.appendChild(ren.domElement);
+const scene=new T.Scene(),cam=new T.PerspectiveCamera(65,innerWidth/innerHeight,1,1e8);
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight)});
+// world frame: ENU -> three: x=East, y=Up, z=-North
+const enu=(e,n,u)=>new T.Vector3(e,u,-n);
+function dest(la,lo,b){la*=D;lo*=D;b*=D;const la2=Math.asin(Math.cos(la)*Math.cos(b));const dl=Math.atan2(Math.sin(b)*Math.cos(la),-Math.sin(la)*Math.sin(la2));let l=(lo+dl)/D;l=((l+540)%360)-180;return[la2/D,l]}
+const ecef=(la,lo,h=0)=>{la*=D;lo*=D;const r=R+h;return[r*Math.cos(la)*Math.cos(lo),r*Math.cos(la)*Math.sin(lo),r*Math.sin(la)]};
+function toENU(p,la,lo){const o=ecef(la,lo),d=[p[0]-o[0],p[1]-o[1],p[2]-o[2]];la*=D;lo*=D;const sl=Math.sin(lo),cl=Math.cos(lo),sp=Math.sin(la),cp=Math.cos(la);
+return enu(-sl*d[0]+cl*d[1],-sp*cl*d[0]-sp*sl*d[1]+cp*d[2],cp*cl*d[0]+cp*sl*d[1]+sp*d[2])}
+const world=new T.Group();scene.add(world);
+const SC=1e-3;// scene units = km
+let markers=[];
+function label(t,c){const cv=document.createElement('canvas');cv.width=512;cv.height=128;const g=cv.getContext('2d');g.fillStyle='#000a';g.fillRect(0,0,512,128);g.fillStyle=c;g.font='bold 34px sans-serif';t.split('\n').forEach((s,i)=>g.fillText(s,12,44+i*42));
+const s=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(cv),depthTest:false,transparent:true}));s.renderOrder=10;return s}
+const cache=JSON.parse(localStorage.eeNames||'{}');
+async function place(la,lo){const k=la.toFixed(2)+','+lo.toFixed(2);if(cache[k])return cache[k];
+try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=5&lat=${la}&lon=${lo}`,{headers:{'Accept-Language':'en'}});const j=await r.json();const n=j.display_name?j.display_name.split(',').slice(-2).join(',').trim():'Open ocean';cache[k]=n;localStorage.eeNames=JSON.stringify(cache);return n}catch(e){return'Open ocean / unknown'}}
+
+// ---- local layer: finite grid + target lines (approximate on iOS: GPS+compass, smoothed) ----
+const TARGETS=[['Ready Athletics (997800502)',48.11035,-122.80591,0xffc800],['Cappy\'s Trails garden (998002802)',48.13165,-122.79921,0x30ff60],['Memory\'s Vault, Fort Worden',48.1384642,-122.7647029,0xc060ff]];
+const local=new T.Group();scene.add(local);let L0=null,sm=null;
+function mPer(la){return[111320,111320*Math.cos(la*D)]}
+function buildLocal(la,lo){L0=[Math.round(la*1000)/1000,Math.round(lo*1000)/1000];// grid origin snapped to rounded lat/lon (~100 m)
+local.clear();const pts=[],H=-1.6;for(let i=-10;i<=10;i++){pts.push(i*20,H,-200,i*20,H,200,-200,H,i*20,200,H,i*20)}
+const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pts,3));local.add(new T.LineSegments(g,new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.35})));
+const[my,mx]=mPer(L0[0]);
+for(const[n,a,l,c]of TARGETS){const p=new T.Vector3((l-L0[1])*mx,H,-(a-L0[0])*my);
+const pil=new T.Mesh(new T.CylinderGeometry(1.5,1.5,120,8),new T.MeshBasicMaterial({color:c,transparent:true,opacity:.7,depthTest:false}));pil.position.copy(p).y+=60;pil.renderOrder=7;local.add(pil);
+const ln=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),p]),new T.LineBasicMaterial({color:c,depthTest:false}));ln.renderOrder=7;ln.userData={t:p};local.add(ln);
+const lb=label(n+'\n',  '#'+c.toString(16).padStart(6,'0'));lb.scale.set(160,40,1);lb.position.copy(p).y+=135;lb.userData={lb:[n,c],t:p};local.add(lb)}}
+function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
+if(!sm)sm=tgt.clone();const d=tgt.distanceTo(sm),dead=Math.max(3,(acc||10)*.5);// dead-band ~half accuracy
+if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outside dead-band
+local.position.set(-sm.x,0,-sm.z);// user stays at origin, world shifts
+for(const o of local.children){if(o.isLine&&o.userData.t){const a=o.geometry.attributes.position;a.setXYZ(0,sm.x,-1.6,sm.z);a.needsUpdate=true}
+if(o.userData.lb){const km=o.userData.t.clone().setY(0).distanceTo(new T.Vector3(sm.x,0,sm.z));const[n,c]=o.userData.lb;o.scale.set(km*.12,km*.03,1);o.position.y=o.userData.t.y+km*.04;if(Math.abs((o.userData.km||0)-km)>5){o.userData.km=km;o.material.map=label(n+'\n'+(km>1000?(km/1000).toFixed(2)+' km':km.toFixed(0)+' m')+' (approx)','#'+c.toString(16).padStart(6,'0')).material.map}}}}
+let built=null;
+async function build(la,lo){if(built&&Math.abs(built[0]-la)<.01&&Math.abs(built[1]-lo)<.01)return;built=[la,lo];
+world.clear();markers=[];
+// translucent wireframe Earth, center at -R up
+const earth=new T.Mesh(new T.SphereGeometry(R*SC,48,32),new T.MeshBasicMaterial({color:0x33aaff,wireframe:true,transparent:true,opacity:.18,depthTest:false}));
+// orient globe: build from ECEF axes
+const m=new T.Matrix4(),o=toENU([0,0,0],la,lo).multiplyScalar(SC),ax=toENU(ecef(0,0),la,lo).multiplyScalar(SC).sub(o).normalize(),ay=toENU(ecef(0,90),la,lo).multiplyScalar(SC).sub(o).normalize(),az=toENU(ecef(90,0),la,lo).multiplyScalar(SC).sub(o).normalize();
+// three sphere: poles along y; map y->az, x->ax, z->-ay... use basis(ax,az,-ay)
+m.makeBasis(ax,az,ay.clone().negate());earth.quaternion.setFromRotationMatrix(m);earth.position.copy(o);earth.renderOrder=1;world.add(earth);
+// horizon ring
+const hz=new T.Mesh(new T.RingGeometry(9990,10000,128),new T.MeshBasicMaterial({color:0xffffff,side:2,transparent:true,opacity:.5,depthTest:false}));hz.rotation.x=-Math.PI/2;world.add(hz);
+const cols={N:'#ff4040',E:'#40ff60',S:'#40a0ff',W:'#ffd040'};const info=[];
+for(const[k,b]of[['N',0],['E',90],['S',180],['W',270]]){const[a,l]=dest(la,lo,b);const p=toENU(ecef(a,l),la,lo).multiplyScalar(SC);
+const dist=p.length(),el=Math.asin(p.y/dist)/D;const dot=new T.Mesh(new T.SphereGeometry(150,16,12),new T.MeshBasicMaterial({color:cols[k],depthTest:false}));dot.position.copy(p);dot.renderOrder=9;world.add(dot);
+const ln=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(0,-2,0),p]),new T.LineBasicMaterial({color:cols[k],depthTest:false}));ln.renderOrder=8;world.add(ln);
+const lb=label(`${k}  ${a.toFixed(3)}, ${l.toFixed(3)}\n${dist.toFixed(0)} km  el ${el.toFixed(1)}°`,cols[k]);lb.scale.set(2400,600,1);lb.position.copy(p).add(new T.Vector3(0,500,0));world.add(lb);
+console.log(k,dist.toFixed(0),el.toFixed(1),p.x.toFixed(0),p.y.toFixed(0),p.z.toFixed(0));info.push(`${k}: ${a.toFixed(3)},${l.toFixed(3)}`);
+place(a,l).then(n=>{const l2=label(n,cols[k]);l2.scale.set(2400,600,1);l2.position.copy(p).add(new T.Vector3(0,-500,0));world.add(l2)})}
+ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
+// orientation
+let ori=null,headOff=0;const zee=new T.Vector3(0,0,1),q1=new T.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),eu=new T.Euler();
+function onOri(e){ori=e;if(e.webkitCompassHeading!=null){/* align alpha to true north */const h=(360-e.webkitCompassHeading)-e.alpha;let dd=((h-headOff+540)%360)-180;if(Math.abs(dd)>2)headOff+=dd*.05}}
+function setCam(){if(q.has('look')){const k=q.get('look'),v={G:[-1,-0.04,-0.15],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
+eu.set(b,a,-g,'YXZ');cam.quaternion.setFromEuler(eu);cam.quaternion.multiply(q1);cam.quaternion.multiply(new T.Quaternion().setFromAxisAngle(zee,-so))}
+async function start(){document.getElementById('start').remove();
+try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){}
+addEventListener('deviceorientation',onOri);addEventListener('deviceorientationabsolute',e=>{if(e.webkitCompassHeading==null)onOri(e)});
+try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message}
+if(q.has('lat')){build(+q.get('lat'),+q.get('lon'));updLocal(+q.get('lat'),+q.get('lon'),5)}
+else navigator.geolocation.watchPosition(p=>{build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy)},e=>{ui.textContent='GPS error: '+e.message;build(48.117,-122.76)},{enableHighAccuracy:true})}
+document.getElementById('start').onclick=start;
+if(q.has('auto')){start();if(q.has('pitch')){ori={alpha:+q.get('yaw')||0,beta:+q.get('pitch'),gamma:0}}}
+ren.setAnimationLoop(()=>{setCam();ren.render(scene,cam)});
+</script></body></html>
