@@ -66,6 +66,31 @@ if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outsi
 local.position.set(-sm.x-(window.nudge?nudge.x:0),window.GH_OFF||0,-sm.z-(window.nudge?nudge.z:0));// user stays at origin, world shifts
 for(const o of local.children){if(o.isLine&&o.userData.t){const a=o.geometry.attributes.position;a.setXYZ(0,sm.x,-1.6,sm.z);a.needsUpdate=true}
 if(o.userData.lb){const km=o.userData.t.clone().setY(0).distanceTo(new T.Vector3(sm.x,0,sm.z));const[n,c]=o.userData.lb;o.position.y=o.userData.t.y+125;if(Math.abs((o.userData.km||0)-km)>5){o.userData.km=km;const tmpL=label(n+'\n'+(km>1000?(km/1000).toFixed(2)+' km':km.toFixed(0)+' m')+' (approx)','#'+c.toString(16).padStart(6,'0'));LABELS.splice(LABELS.indexOf(tmpL),1);o.material.map=tmpL.material.map}o.userData.meta.distM=km;}}}
+
+// ---- far markers: poles (North flag, Antarctica ice island) + pyramids; true ENU through the Earth
+const gcKm=(a1,o1,a2,o2)=>{a1*=D;o1*=D;a2*=D;o2*=D;return 6371*2*Math.asin(Math.sqrt(Math.sin((a2-a1)/2)**2+Math.cos(a1)*Math.cos(a2)*Math.sin((o2-o1)/2)**2))};
+const brg=(a1,o1,a2,o2)=>{a1*=D;o1*=D;a2*=D;o2*=D;return((Math.atan2(Math.sin(o2-o1)*Math.cos(a2),Math.cos(a1)*Math.sin(a2)-Math.sin(a1)*Math.cos(a2)*Math.cos(o2-o1))/D)+360)%360};
+const FAR=[['North Pole',90,0,'#ffffff','flag'],['Antarctica · South Pole',-90,0,'#bff4ff','ice'],['Great Pyramid of Giza',29.9792,31.1342,'#ffd27a','pyr'],['Pyramid of Khafre',29.9761,31.1308,'#ffb84d','pyr'],['Great Pyramid of Cholula',19.0578,-98.3019,'#7dff9a','pyr'],['Pyramid of the Sun, Teotihuacan',19.6925,-98.8438,'#ff8a5c','pyr']];
+let ANT=null;fetch('antarctica.json').then(r=>r.json()).then(j=>{ANT=j;if(built){const b=built;built=null;build(b[0],b[1])}});
+const glowMat=(c,op=.6)=>new T.MeshBasicMaterial({color:c,transparent:true,opacity:op,blending:T.AdditiveBlending,depthTest:false,depthWrite:false,side:T.DoubleSide});
+function frameAt(a,l,la,lo){const p=toENU(ecef(a,l),la,lo).multiplyScalar(SC),up=toENU(ecef(a,l,1e5),la,lo).multiplyScalar(SC).sub(p).normalize();
+ let n=toENU(ecef(Math.min(89.9,a+.1),l),la,lo).multiplyScalar(SC).sub(p);if(Math.abs(a)>89.8)n=toENU(ecef(a>0?89.5:-89.5,0),la,lo).multiplyScalar(SC).sub(p);n.sub(up.clone().multiplyScalar(n.dot(up))).normalize();const e=new T.Vector3().crossVectors(n,up).normalize();
+ const m=new T.Matrix4().makeBasis(e,up,n.clone().negate());return{p,q:new T.Quaternion().setFromRotationMatrix(m),up}}
+function buildFar(la,lo){for(const[name,a,l,col,kind]of FAR){const{p,q,up}=frameAt(a,l,la,lo),g=new T.Group();g.position.copy(p);g.quaternion.copy(q);g.renderOrder=9;world.add(g);
+ const d=p.length(),S=d/9010;// keep readable: scale with render distance
+ const pil=new T.Mesh(new T.CylinderGeometry(12*S,12*S,700*S,8),glowMat(col,.5));pil.position.y=350*S;g.add(pil);
+ if(kind==='pyr'){const m=new T.Mesh(new T.ConeGeometry(160*S,220*S,4),glowMat(col,.55));m.position.y=110*S;m.rotation.y=Math.PI/4;g.add(m);const ed=new T.LineSegments(new T.EdgesGeometry(m.geometry),new T.LineBasicMaterial({color:col,depthTest:false,transparent:true}));ed.position.copy(m.position);ed.rotation.copy(m.rotation);g.add(ed)}
+ if(kind==='flag'){const pole=new T.Mesh(new T.CylinderGeometry(6*S,6*S,600*S,6),glowMat('#ffffff',.8));pole.position.y=300*S;g.add(pole);
+  const fm=new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,uniforms:{t:{value:0}},
+   vertexShader:'uniform float t;varying vec2 vU;void main(){vU=uv;vec3 p=position;p.z+=sin(uv.x*6.+t*3.)*uv.x*0.08*'+(300*S).toFixed(1)+';gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}',
+   fragmentShader:'varying vec2 vU;void main(){vec3 c=mod(floor(vU.y*7.),2.)<1.?vec3(1.,.15,.2):vec3(1.);gl_FragColor=vec4(c*.75,1.);}'});
+  const fl=new T.Mesh(new T.PlaneGeometry(300*S,190*S,16,4),fm);fl.position.set(150*S,505*S,0);g.add(fl);window.FLAGMAT=fm}
+ if(kind==='ice'&&ANT){const sh=new T.Shape(ANT.map(([ta,tl])=>{const r=(90+ta)*111*.35*S;return new T.Vector2(r*Math.cos(tl*D),r*Math.sin(tl*D))}));
+  const geo=new T.ExtrudeGeometry(sh,{depth:30*S,bevelEnabled:true,bevelThickness:25*S,bevelSize:20*S,bevelSegments:2});geo.rotateX(-Math.PI/2);
+  const im=new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,vertexShader:'varying vec3 vN;varying vec3 vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+   fragmentShader:'varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(vN,vV)),2.);gl_FragColor=vec4(vec3(.75,.95,1.)*(.18+.8*f),1.);}'});
+  const ice=new T.Mesh(geo,im);ice.position.x=-300*S;g.add(ice)}
+ const km=gcKm(la,lo,a,l),b=brg(la,lo,a,l);const lb=label(name+'\n'+Math.round(km).toLocaleString()+' km · '+b.toFixed(0)+'°',col,{title:name,color:col,distM:km*1000,el:Math.asin(p.y/d)/D});lb.position.copy(p).add(up.clone().multiplyScalar(800*S));world.add(lb)}}
 let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
 async function build(la,lo){if(built&&Math.abs(built[0]-la)<.01&&Math.abs(built[1]-lo)<.01)return;built=[la,lo];
 world.clear();markers=[];for(let i=LABELS.length-1;i>=0;i--)if(!LABELS[i].parent)LABELS.splice(i,1);
@@ -84,7 +109,7 @@ const ln=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(0,-2,0),
 const lb=label(`${k}  ${a.toFixed(3)}, ${l.toFixed(3)}\n${dist.toFixed(0)} km  el ${el.toFixed(1)}°`,cols[k],{title:`${k} edge of Earth (${a.toFixed(3)}, ${l.toFixed(3)})`,color:cols[k],distM:dist*1000,el});lb.scale.set(2400,600,1);lb.position.copy(p).add(new T.Vector3(0,500,0));world.add(lb);
 console.log(k,dist.toFixed(0),el.toFixed(1),p.x.toFixed(0),p.y.toFixed(0),p.z.toFixed(0));info.push(`${k}: ${a.toFixed(3)},${l.toFixed(3)}`);
 place(a,l).then(n=>{lb.userData.meta.title+=' · '+n;const l2=label(n,cols[k],lb.userData.meta);l2.scale.set(2400,600,1);l2.position.copy(p).add(new T.Vector3(0,-500,0));world.add(l2)})}
-ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
+buildFar(la,lo);ui.textContent=`You ${la.toFixed(4)},${lo.toFixed(4)} | `+info.join(' | ')}
 // orientation
 let ori=null,headOff=0;const zee=new T.Vector3(0,0,1),q1=new T.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),eu=new T.Euler();
 // complementary filter: gyro-fused attitude each frame + slow, gated compass heading correction
@@ -97,7 +122,7 @@ function onOri(e){if(e.alpha==null&&e.beta==null)return;ori=e;const now=performa
  const good=acc!=null&&acc>=0&&acc<20;document.getElementById('cbad').style.display=(!good||now-rejT<3000)?'block':'none';
  if(!hInit){if(acc==null||acc<45){headOff=mean;hInit=true}return}
  if(!good||R<0.995||rate>30)return;const d=wrap(mean-headOff);if(Math.abs(d)>15){rejT=now;return}headOff+=d*Math.min(1,dt/7)}
-function setCam(){if(q.has('look')){const k=q.get('look'),v={P:[0.2,-0.3,-1],H:[-0.25,-0.05,1],G:[-1,-0.03,-0.35],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
+function setCam(){if(q.has('look')){const k=q.get('look'),v={P:[0.2,-0.3,-1],H:[-0.25,-0.05,1],NP:[0,-0.38,-1],SP:[0,-2.6,1],GZ:[0.55,-1.4,-0.35],G:[-1,-0.03,-0.35],N:[0,-1,-1],E:[1,-1,0],S:[0,-1,1],W:[-1,-1,0]}[k];cam.lookAt(...v);return}if(!ori)return;const a=((ori.alpha||0)+headOff)*D,b=(ori.beta||0)*D,g=(ori.gamma||0)*D,so=(screen.orientation?.angle||window.orientation||0)*D;
 eu.set(b,a,-g,'YXZ');tq.setFromEuler(eu);tq.multiply(q1);tq.multiply(new T.Quaternion().setFromAxisAngle(zee,-so));const ang=cam.quaternion.angleTo(tq)/D;if(ang>20)cam.quaternion.copy(tq);else if(ang>.3)cam.quaternion.slerp(tq,.2)}const tq=new T.Quaternion();
 async function start(){document.getElementById('start').remove();
 try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){}
@@ -204,5 +229,5 @@ function xrSelect(c){const[o,d]=xrRay(c);let best=null,ba=4*D;for(const s of LAB
 function xrSnapHeading(h){const e=new T.Euler().setFromQuaternion(ren.xr.getCamera().quaternion,'YXZ');scene.rotation.y=-(h*D)-e.y*0+0;xrMsg('Snapped to phone heading '+Math.round(h)+'°')}
 function xrMsg(t){if(xrCard){scene.remove(xrCard);LABELS.splice(LABELS.indexOf(xrCard),1)}xrCard=label(t,'#ffffff');const c=ren.xr.getCamera(),f=new T.Vector3(0,-.2,-1.5).applyQuaternion(c.quaternion);xrCard.position.copy(c.position).add(f);scene.add(xrCard);setTimeout(()=>{if(xrCard){scene.remove(xrCard)}},6000)}
 function xrPads(){const ss=ren.xr.getSession();const src=ss?Array.from(ss.inputSources):[];window.XRDBG=src.map(i=>i.gamepad?Array.from(i.gamepad.axes):null);let y=0;for(const i of src){const g=i.gamepad;if(g&&g.axes&&Math.abs(g.axes[3]||0)>.3)y=g.axes[3]}if(y){window._xf=(window._xf??(window.GH_OFF||0))-y*.03;setGH(window._xf)}else window._xf=null}
-ren.setAnimationLoop(t=>{gpsBlend(t);if(ren.xr.isPresenting){xrPads();layoutLabels();ghostAnim(t);window._mp&&window._mp.frame(t);ren.render(scene,cam);return}ghostAnim(t);setCam();applyMan();flowStep(t);deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
+ren.setAnimationLoop(t=>{gpsBlend(t);if(window.FLAGMAT)FLAGMAT.uniforms.t.value=t/1000;if(ren.xr.isPresenting){xrPads();layoutLabels();ghostAnim(t);window._mp&&window._mp.frame(t);ren.render(scene,cam);return}ghostAnim(t);setCam();applyMan();flowStep(t);deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
 </script></body></html>
