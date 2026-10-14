@@ -30,7 +30,7 @@ for(const k in others){const{g,o,born}=others[k];const target=toLocal(o.last.lat
 anim(g,o.entrance,(t-born)/1000,t);g.position.add(g.userData.pos);
 tmp.copy(cam.position).sub(g.position);g.rotation.y=Math.atan2(tmp.x,tmp.z);// billboard around vertical
 const d=Math.max(1,tmp.length()),s=Math.max(1,d/60);g.scale.setScalar(s);// min on-screen size
-const pulse=.75+.25*Math.sin(t/1000*Math.PI*2*1.5);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*pulse});
+if(g.userData.label)g.userData.label.userData.meta.distM=Math.hypot(g.position.x,g.position.z);const pulse=.75+.25*Math.sin(t/1000*Math.PI*2*1.5);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*pulse});
 const rr=Math.min(110,Math.hypot(target.x,target.z)/10);const a=Math.atan2(target.x,-target.z);rc.fillStyle=g.userData.col;rc.beginPath();rc.arc(120+rr*Math.sin(a),120-rr*Math.cos(a),5,0,7);rc.fill()}}
 return{frame}}
 export const colorOf=id=>'hsl('+(parseInt(id.slice(0,4),16)%360)+',100%,60%)';
@@ -47,7 +47,7 @@ const ring=new T.Mesh(new T.TorusGeometry(.12,.025,6,20),new T.MeshBasicMaterial
 const halo=new T.Mesh(new T.CircleGeometry(.2,20),ring.material.clone());halo.material.opacity=.15;halo.userData.base=.15*(stealth?.4:1);halo.position.y=.7;halo.renderOrder=998;body.add(halo);
 if(stealth)body.traverse(m=>{if(m.isMesh&&m.geometry.type==='CylinderGeometry')m.scale.y=.5});// dashed look: shortened segments
 const cv=document.createElement('canvas');cv.width=256;cv.height=64;const x=cv.getContext('2d');x.font='bold 36px sans-serif';x.fillStyle=col;x.textAlign='center';x.fillText(name+(stealth?' (stealth)':''),128,44);
-const sp=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(cv),depthTest:false,depthWrite:false,transparent:true}));sp.scale.set(1,.25,1);sp.position.y=1.05;sp.renderOrder=1000;g.add(sp);return g}
+const sp=window.mkLabel?window.mkLabel(name+(stealth?' (stealth)':''),col,{title:'Player '+name,color:col}):new T.Sprite();sp.position.y=1.05;g.add(sp);g.userData.label=sp;return g}
 // entrances; figure floats at waist height ~1.0 m
 export function anim(g,e,s,t){const b=g.userData.body,L=g.userData.armL,R=g.userData.armR;g.position.set(0,1,0);b.rotation.set(0,0,0);let sw=Math.sin(t/300)*.15;
 if(e==='walk'&&s<3){g.position.z=-(3-s)*1.2;sw=Math.sin(s*7)*.6}
