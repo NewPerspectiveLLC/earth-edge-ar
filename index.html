@@ -42,7 +42,7 @@ const gmat=new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:fal
  vertexShader:`varying vec2 vP;varying float vD;void main(){vP=position.xz;vec4 mv=modelViewMatrix*vec4(position,1.);vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
  fragmentShader:`varying vec2 vP;varying float vD;
  float ln(float s,float px){vec2 c=vP/s;vec2 w=fwidth(c);vec2 g=abs(fract(c-.5)-.5)/w;float l=1.-min(min(g.x,g.y)/px,1.);float dens=max(w.x,w.y);return l*(1.-smoothstep(.15,.5,dens));}
- void main(){float a=ln(20.,1.5)*.55+ln(100.,3.)*.8+ln(1000.,3.)*.9;float fade=1.-smoothstep(3000.,10000.,vD);float glow=smoothstep(4000.,10000.,vD)*.12;
+ void main(){float a=max(max(ln(20.,.8)*.55,ln(100.,1.2)*.8),ln(1000.,1.5)*.9);float fade=1.-smoothstep(3000.,10000.,vD);float glow=smoothstep(4000.,10000.,vD)*.12;
  vec3 col=vec3(.6,1.,1.);gl_FragColor=vec4(col*min(a*fade*1.2,.92)+vec3(.3,.8,1.)*glow*(1.-fade*.5),1.);}`});
 const gm=new T.Mesh(new T.PlaneGeometry(20000,20000,4,4).rotateX(-Math.PI/2).translate(0,H,0),gmat);gm.renderOrder=6;gm.frustumCulled=false;local.add(gm);
 const[my,mx]=mPer(L0[0]);
@@ -53,7 +53,7 @@ const lb=label(n+'\n',  '#'+c.toString(16).padStart(6,'0'),{title:n,color:'#'+c.
 fetch('sheridan.json').then(r=>r.json()).then(J=>{if(Math.hypot((L0[0]-48.117)*111,(L0[1]+122.78)*74)>15)return;// only within ~15 km of Port Townsend
  const[my,mx]=mPer(L0[0]),P=[];for(const[a,l]of J.points)P.push((l-L0[1])*mx,-1.55,-(a-L0[0])*my);
  const mk=(w,op,col)=>{const g=new LineGeometry();g.setPositions(P);const m=new LineMaterial({color:col,linewidth:w,transparent:true,opacity:op,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,resolution:new T.Vector2(innerWidth,innerHeight)});const l=new Line2(g,m);l.computeLineDistances();l.renderOrder=8;l.frustumCulled=false;local.add(l);window.FATLINES=(window.FATLINES||[]).concat(m)};
- mk(16,.25,0xff00cc);mk(6,.9,0xff00cc);mk(2,1,0xffc0f0);// glow, ribbon, core
+ mk(7,.22,0xff00cc);mk(3,.9,0xff00cc);mk(1,1,0xffc0f0);// glow, ribbon, core
  for(let i=0,acc=0;i<J.points.length;i++){if(i%30===15){const lb=label('Sheridan St','#ff40e0',{title:'Sheridan Street',color:'#ff40e0'});lb.position.set(P[i*3],1,P[i*3+2]);local.add(lb)}}});
 }}
 function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
