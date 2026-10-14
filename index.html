@@ -54,7 +54,7 @@ fetch('sheridan.json').then(r=>r.json()).then(J=>{if(Math.hypot((L0[0]-48.117)*1
  const[my,mx]=mPer(L0[0]),P=[];for(const[a,l]of J.points)P.push((l-L0[1])*mx,-1.55,-(a-L0[0])*my);
  const mk=(w,op,col)=>{const g=new LineGeometry();g.setPositions(P);const m=new LineMaterial({color:col,linewidth:w,transparent:true,opacity:op,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,resolution:new T.Vector2(innerWidth,innerHeight)});const l=new Line2(g,m);l.computeLineDistances();l.renderOrder=8;l.frustumCulled=false;local.add(l);window.FATLINES=(window.FATLINES||[]).concat(m)};
  mk(16,.25,0xff00cc);mk(6,.9,0xff00cc);mk(2,1,0xffc0f0);// glow, ribbon, core
- for(let i=0,acc=0;i<J.points.length;i++){if(i%12===0){const lb=label('Sheridan St','#ff40e0',{title:'Sheridan Street',color:'#ff40e0'});lb.position.set(P[i*3],1,P[i*3+2]);local.add(lb)}}});
+ for(let i=0,acc=0;i<J.points.length;i++){if(i%30===15){const lb=label('Sheridan St','#ff40e0',{title:'Sheridan Street',color:'#ff40e0'});lb.position.set(P[i*3],1,P[i*3+2]);local.add(lb)}}});
 }}
 function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
 if(!sm)sm=tgt.clone();const d=tgt.distanceTo(sm),dead=Math.max(3,(acc||10)*.5);// dead-band ~half accuracy
@@ -99,7 +99,7 @@ if(q.has('auto')){start();if(q.has('pitch')){ori={alpha:+q.get('yaw')||0,beta:+q
 const PXH=36,pv=new T.Vector3();
 function layoutLabels(){const h=innerHeight,placed=[];for(const s of LABELS){if(!s.parent){continue}const sh=PXH*2.6/h*2*Math.tan(cam.fov*D/2)/2;s.scale.set(sh*8,sh,1);s.center.x=(s.userData.tw||512)/2048;
  s.getWorldPosition(pv);pv.project(cam);if(pv.z>1){s.userData.scr=null;continue}let x=(pv.x+1)/2*innerWidth,y=(1-pv.y)/2*h,dy=0;
- for(const p of placed)if(Math.abs(p.x-x)<PXH*8&&Math.abs(p.y-(y-dy))<PXH*2.6)dy+=PXH*2.7;s.visible=dy<=PXH*2.7*2;if(!s.visible){s.userData.scr=null;continue}s.center.y=dy/(PXH*2.6);s.userData.scr={x,y:y-dy-PXH*1.3};placed.push({x,y:y-dy})}}
+ for(const p of placed)if(Math.abs(p.x-x)<PXH*8&&Math.abs(p.y-(y-dy))<PXH*2.6)dy+=PXH*2.7;s.visible=dy===0;if(!s.visible){s.userData.scr=null;continue}s.center.y=dy/(PXH*2.6);s.userData.scr={x,y:y-dy-PXH*1.3};placed.push({x,y:y-dy})}}
 const card=document.getElementById('card');let cardFor=null;
 function showCard(s){const m=s.userData.meta,wp=s.getWorldPosition(new T.Vector3()),b=((Math.atan2(wp.x,-wp.z)/D)+360)%360;
  const d=m.distM!=null?m.distM:null;card.innerHTML=`<div style="color:${m.color};font-weight:bold">${m.title}</div><div>${d==null?'':(d>1000?(d/1000).toFixed(d>1e5?0:2)+' km':d.toFixed(0)+' m')} &nbsp; bearing ${b.toFixed(0)}° ${m.el!=null?' · '+m.el.toFixed(0)+'° below horizon':''}</div><div id=arr style="font-size:44px;display:inline-block">↑</div> <small>(tap again or swipe down to close)</small>`;card.style.display='block';cardFor=s}
