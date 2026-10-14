@@ -12,7 +12,7 @@ const $=id=>document.getElementById(id);
 $('mpa').onchange=()=>$('mpj').disabled=!$('mpa').checked||!$('mpn').value.trim();$('mpn').oninput=$('mpa').onchange;
 $('joinB').onclick=()=>{$('mpa').checked=false;$('mpj').disabled=true;$('mpc').style.display='block'};$('mpx').onclick=()=>$('mpc').style.display='none';
 const call=(p,b)=>fetch(API+p,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+(S?.token||'')},body:JSON.stringify(b||{})}).then(r=>r.json());
-$('mpj').onclick=async()=>{if(!$('mpa').checked)return;const r=await call('/join',{consent:true,name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value});
+$('mpj').onclick=async()=>{if(!$('mpa').checked)return;const r=await call('/join',{consent:true,name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,device:'phone'});
 if(!r.token)return alert('Join failed: '+(r.error||'server unreachable'));S={...r,live:true};localStorage.eearSession=JSON.stringify(S);$('mpc').style.display='none';on()};
 $('leaveB').onclick=async()=>{await call('/leave');S.live=false;localStorage.eearSession=JSON.stringify(S);off()};
 $('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))return;await call('/delete');S=null;localStorage.removeItem('eearSession');off()};
@@ -21,7 +21,7 @@ function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}
 function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};ui()}
 async function tick(){if(!S?.live)return;const p=getPos();if(p)call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc}).catch(()=>{});
 try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}
-const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;if(!others[o.id]){others[o.id]={g:stick(o.name,colorOf(o.id),false),o,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
+const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;if(!others[o.id]){others[o.id]={g:stick(o.name+(o.device==='quest'?' (Quest)':''),colorOf(o.id),false),o,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}
 if(S?.live)on();else ui();
 const tmp=new T.Vector3();

@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Earth Edge AR · Quest</title>
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<style>body{margin:0;background:transparent;font:16px sans-serif}#hud{position:fixed;left:8px;top:8px;z-index:9;background:#000c;color:#fff;padding:10px;border-radius:10px;max-width:440px}
+#hud button{font-size:16px;padding:10px 14px;margin:3px}#mpc{display:none;position:fixed;inset:0;z-index:20;background:#000e;color:#fff;padding:24px;font-size:18px}#mpc input,#mpc select{font-size:18px}</style></head><body>
+<div id=hud><b>Earth Edge AR · Quest</b> (location: Ready Athletics, no GPS)<br>1) Tap <b>AR</b> (bottom right). 2) Face real north, press <b>A</b> or trigger to set north (<b>B</b> unlocks).<br>Left stick moves, right stick up/down = floor height.<br>
+<button id=joinB>Join live tracking</button><button id=leaveB style=display:none>Leave and stop tracking</button><button id=delB style=display:none>Delete my recorded data</button> <span id=trk style="display:none;background:#c00;padding:3px 6px;border-radius:5px">● Tracking ON</span></div>
+<div id=mpc><h2>Join live tracking</h2><p><b>This is a GPS game. While you're in, your position is recorded continuously and shown to other players in the game. It is not shown to the public.</b></p>
+<p style=font-size:15px>On Quest your position is Ready Athletics plus how far you walk in the headset. We store only your display name, mode, entrance, and position fixes (lat, lon, accuracy, time). The game organizer (GM) can see all joined players, including stealth players. Anyone with the link can join.</p>
+<p>Display name <input id=mpn maxlength=24></p><p>Mode <select id=mpm><option value=regular>Regular</option><option value=stealth>Stealth (hidden from players, visible to GM)</option></select> Entrance <select id=mpe><option>walk</option><option>jump</option><option>dance</option><option>run</option></select></p>
+<p><label><input type=checkbox id=mpa> I agree</label></p><button id=mpj disabled>Join</button> <button id=mpx>Cancel</button></div>
+<a-scene renderer="alpha:true;antialias:true;colorManagement:true" xr-mode-ui="enabled:true;enterAREnabled:true;enterVREnabled:true" webxr="optionalFeatures:local-floor,hit-test" background="color:#000;transparent:true" vr-mode-ui="enabled:true">
+ <a-entity id=rig movement-ctl><a-entity id=head camera look-controls position="0 1.6 0"></a-entity>
+  <a-entity id=lh oculus-touch-controls="hand:left"></a-entity><a-entity id=rh oculus-touch-controls="hand:right" laser-controls="hand:right" raycaster="far:60;objects:.none"></a-entity></a-entity>
+ <a-entity id=world><a-entity id=floor position="0 0 0"><a-entity id=grid grid-plane></a-entity></a-entity><a-entity id=places></a-entity><a-entity id=others></a-entity></a-entity>
+ <a-text id=msg value="" align=center width=2.2 color="#fff" position="0 1.3 -1.6" visible=false></a-text>
+</a-scene>
+<script>
+const D=Math.PI/180,R=6371e3,HOME=[48.11035,-122.80591];
+// ---- never write framebuffer alpha (keeps passthrough visible in AR)
+function noAlpha(m){m.blending=THREE.CustomBlending;m.blendEquation=THREE.AddEquation;m.blendSrc=THREE.SrcAlphaFactor;m.blendDst=m.userData.add?THREE.OneFactor:THREE.OneMinusSrcAlphaFactor;m.blendSrcAlpha=THREE.ZeroFactor;m.blendDstAlpha=THREE.OneFactor;m.transparent=true;m.needsUpdate=true}
+AFRAME.registerComponent('grid-plane',{init(){const m=new THREE.ShaderMaterial({depthWrite:false,depthTest:false,extensions:{derivatives:true},
+ vertexShader:`varying vec2 vP;varying float vD;void main(){vec4 w=modelMatrix*vec4(position,1.);vP=position.xz;vec4 mv=viewMatrix*w;vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+ fragmentShader:`varying vec2 vP;varying float vD;float ln(float s,float px){vec2 c=vP/s;vec2 w=fwidth(c);vec2 g=abs(fract(c-.5)-.5)/w;float l=1.-min(min(g.x,g.y)/px,1.);return l*(1.-smoothstep(.15,.5,max(w.x,w.y)));}
+ void main(){float a=max(max(ln(20.,.8)*.55,ln(100.,1.2)*.8),ln(1000.,1.5)*.9);float f=1.-smoothstep(3000.,10000.,vD);gl_FragColor=vec4(vec3(.6,1.,1.)*min(a*f*1.2,.92),1.);}`});
+ m.userData.add=1;noAlpha(m);const g=new THREE.PlaneGeometry(20000,20000,4,4).rotateX(-Math.PI/2);const mesh=new THREE.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=1;this.el.setObject3D('mesh',mesh)}});
+// ---- ENU math from Ready Athletics
+const ecef=(la,lo,h=0)=>{la*=D;lo*=D;const r=R+h;return[r*Math.cos(la)*Math.cos(lo),r*Math.cos(la)*Math.sin(lo),r*Math.sin(la)]};
+function enu(la,lo,h=0){const o=ecef(...HOME),p=ecef(la,lo,h),d=[p[0]-o[0],p[1]-o[1],p[2]-o[2]];const a=HOME[0]*D,b=HOME[1]*D;
+ const e=-Math.sin(b)*d[0]+Math.cos(b)*d[1],n=-Math.sin(a)*Math.cos(b)*d[0]-Math.sin(a)*Math.sin(b)*d[1]+Math.cos(a)*d[2],u=Math.cos(a)*Math.cos(b)*d[0]+Math.cos(a)*Math.sin(b)*d[1]+Math.sin(a)*d[2];return[e,u,-n]}
+function dest(b){const la=HOME[0]*D,lo=HOME[1]*D;b*=D;const la2=Math.asin(Math.cos(la)*Math.cos(b));const dl=Math.atan2(Math.sin(b)*Math.cos(la),-Math.sin(la)*Math.sin(la2));return[la2/D,((lo+dl)/D+540)%360-180]}
+const PLACES=[['Ready Athletics',48.11035,-122.80591,'#ffc800'],["Cappy's Trails garden",48.13165,-122.79921,'#30ff60'],["Memory's Vault",48.1384642,-122.7647029,'#c060ff'],['City Hall',48.1161771,-122.753612,'#40e0ff'],["Sheriff's Office",48.0241638,-122.764488,'#ff7020'],['Jefferson Healthcare',48.1060007,-122.7889962,'#ff4060'],['Masonic Lodge',48.1139683,-122.7628233,'#e0c080'],
+ ['North Pole',90,0,'#ffffff'],['South Pole',-90,0,'#bff4ff'],['Great Pyramid of Giza',29.9792,31.1342,'#ffd27a'],['Pyramid of the Sun',19.6925,-98.8438,'#ff8a5c']];
+[['N edge',0,'#ff4040'],['E edge',90,'#40ff60'],['S edge',180,'#40a0ff'],['W edge',270,'#ffd040']].forEach(([n,b,c])=>{const[a,l]=dest(b);PLACES.push([n,a,l,c])});
+const placesEl=document.getElementById('places');
+for(const[n,a,l,c]of PLACES){const p=enu(a,l,0),d=Math.hypot(...p);if(d<5)continue;const dir=p.map(v=>v/d);const show=Math.min(d,400);// labels at true direction, max 400 m render distance
+ const pos=dir.map(v=>v*show),s=show/12,km=d>1e5?Math.round(d/1000).toLocaleString()+' km':(d/1000).toFixed(2)+' km';const brg=((Math.atan2(p[0],-p[2])/D)+360)%360,el=Math.asin(dir[1])/D;
+ const t=document.createElement('a-text');t.setAttribute('value',`${n}\n${km} · ${brg.toFixed(0)}° · el ${el.toFixed(0)}°`);t.setAttribute('color',c);t.setAttribute('align','center');t.setAttribute('width',s*6);t.setAttribute('look-at-cam','');t.setAttribute('position',pos.map((v,i)=>i==1?v+s*.6:v).join(' '));t.setAttribute('side','double');placesEl.appendChild(t);
+ const pole=document.createElement('a-cylinder');pole.setAttribute('radius',s*.03);pole.setAttribute('height',s);pole.setAttribute('position',pos.map((v,i)=>i==1?v:v).join(' '));pole.setAttribute('material',`shader:flat;color:${c};opacity:.7;transparent:true`);placesEl.appendChild(pole)}
+AFRAME.registerComponent('look-at-cam',{tick(){const c=this.el.sceneEl.camera;if(!c)return;const p=new THREE.Vector3();c.getWorldPosition(p);const o=this.el.object3D;o.rotation.y=Math.atan2(p.x-o.getWorldPosition(new THREE.Vector3()).x,p.z-o.getWorldPosition(new THREE.Vector3()).z)}});
+// ---- set north, floor height, locomotion
+let northLocked=false,floorY=0;const world=document.getElementById('world'),rig=document.getElementById('rig'),msg=document.getElementById('msg');
+function say(t){msg.setAttribute('value',t);msg.setAttribute('visible',true);clearTimeout(say.t);say.t=setTimeout(()=>msg.setAttribute('visible',false),4000)}
+function camYaw(){const c=document.querySelector('a-scene').camera;const e=new THREE.Euler().setFromQuaternion(c.getWorldQuaternion(new THREE.Quaternion()),'YXZ');return e.y}
+function setNorth(){if(northLocked)return say('North already locked (B to unlock)');world.object3D.rotation.y=camYaw();northLocked=true;say('North set. You are facing north.');window.NORTH_YAW=world.object3D.rotation.y}
+['abuttondown','triggerdown'].forEach(ev=>document.getElementById('rh').addEventListener(ev,setNorth));
+document.getElementById('rh').addEventListener('bbuttondown',()=>{northLocked=false;say('North unlocked: face north, press A')});
+document.addEventListener('keydown',e=>{if(e.key==='n')setNorth()});
+AFRAME.registerComponent('movement-ctl',{init(){this.ax={l:[0,0],r:[0,0]};document.getElementById('lh').addEventListener('thumbstickmoved',e=>this.ax.l=[e.detail.x,e.detail.y]);document.getElementById('rh').addEventListener('thumbstickmoved',e=>this.ax.r=[e.detail.x,e.detail.y])},
+ tick(t,dt){dt=Math.min(dt||16,50)/1000;const[lx,ly]=this.ax.l;if(Math.abs(lx)+Math.abs(ly)>.15){const y=camYaw(),f=new THREE.Vector3(lx,0,ly).applyAxisAngle(new THREE.Vector3(0,1,0),y).multiplyScalar(2.5*dt);this.el.object3D.position.add(f)}
+ const ry=this.ax.r[1];if(Math.abs(ry)>.3){floorY-=ry*dt*.8;document.getElementById('floor').object3D.position.y=floorY;if(!this._s||t-this._s>400){this._s=t;say('Floor '+floorY.toFixed(1)+' m')}}}});
+// ---- passthrough-safe materials each second
+setInterval(()=>{const s=document.querySelector('a-scene');s.object3D.background=null;s.object3D.traverse(o=>{const ms=o.material?[].concat(o.material):[];for(const m of ms){if(m.userData.pf)continue;m.userData.pf=1;if(m.blending!==THREE.CustomBlending){m.userData.add=m.blending===THREE.AdditiveBlending;noAlpha(m)}}})},1000);
+document.querySelector('a-scene').addEventListener('enter-vr',()=>{document.getElementById('hud').style.display='none';const s=document.querySelector('a-scene').xrSession;fetch('/api/clientlog',{method:'POST',body:JSON.stringify({ev:'quest-aframe-xr',environmentBlendMode:s&&s.environmentBlendMode})}).catch(()=>{});setTimeout(()=>say('Mode: '+(s&&s.environmentBlendMode)+'. Face north, press A.'),800)});
+document.querySelector('a-scene').addEventListener('exit-vr',()=>document.getElementById('hud').style.display='');
+// ---- multiplayer: same Monster protocol as the main build
+const $=id=>document.getElementById(id);let S=JSON.parse(localStorage.eearQSession||'null'),timer=null,others={};
+$('mpa').onchange=$('mpn').oninput=()=>$('mpj').disabled=!$('mpa').checked||!$('mpn').value.trim();
+$('joinB').onclick=()=>{$('mpa').checked=false;$('mpj').disabled=true;$('mpc').style.display='block'};$('mpx').onclick=()=>$('mpc').style.display='none';
+const call=(p,b)=>fetch('/api'+p,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+(S?.token||'')},body:JSON.stringify(b||{})}).then(r=>r.json());
+$('mpj').onclick=async()=>{const r=await call('/join',{consent:true,name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,device:'quest'}).catch(()=>({}));if(!r.token)return alert('Join failed');S={...r,live:true};localStorage.eearQSession=JSON.stringify(S);$('mpc').style.display='none';on()};
+$('leaveB').onclick=async()=>{await call('/leave');S.live=false;localStorage.eearQSession=JSON.stringify(S);off()};
+$('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))return;await call('/delete');S=null;localStorage.removeItem('eearQSession');off()};
+function ui(){const l=S&&S.live;$('joinB').style.display=l?'none':'';$('leaveB').style.display=l?'':'none';$('delB').style.display=S?'':'none';$('trk').style.display=l?'':'none'}
+function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}function off(){clearInterval(timer);for(const k in others)others[k].remove();others={};ui()}
+function myLatLon(){// rig + head offset in the north-aligned world frame -> metres east/north of Ready Athletics
+ const c=document.querySelector('a-scene').camera,p=new THREE.Vector3();c.getWorldPosition(p);world.object3D.worldToLocal(p);const mx=111320*Math.cos(HOME[0]*D);return{lat:HOME[0]-p.z/111320,lon:HOME[1]+p.x/mx,acc:northLocked?5:50}}
+window.myLatLon=myLatLon;
+async function tick(){if(!S?.live)return;const m=myLatLon();call('/pos',m).catch(()=>{});
+ try{const r=await fetch('/api/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}const seen={};
+ for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;const p=enu(o.last.lat,o.last.lon,0);let el=others[o.id];if(!el){el=document.createElement('a-entity');el.setAttribute('stick-fig',`name:${o.name}${o.device==='quest'?' (Quest)':''};color:hsl(${parseInt(o.id.slice(0,4),16)%360},100%,60%)`);$('others').appendChild(el);others[o.id]=el}
+  el.setAttribute('position',`${p[0]} ${floorY+1} ${p[2]}`)}for(const k in others)if(!seen[k]){others[k].remove();delete others[k]}}catch(e){}}
+AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'#0ff'}},init(){const g=new THREE.Group(),c=new THREE.Color(this.data.color);
+ const mk=(a,b,r,op)=>{const v1=new THREE.Vector3(...a),v2=new THREE.Vector3(...b);const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,v1.distanceTo(v2),6),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:op,depthTest:false,depthWrite:false}));m.material.userData.add=1;noAlpha(m.material);m.material.userData.pf=1;m.position.copy(v1).add(v2).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v2.clone().sub(v1).normalize());m.renderOrder=999;g.add(m)};
+ for(const[a,b]of[[[0,0,0],[0,.55,0]],[[-.18,0,0],[.18,0,0]],[[0,.5,0],[-.15,.08,0]],[[0,.5,0],[.15,.08,0]]]){mk(a,b,.025,.4);mk(a,b,.07,.15)}
+ const head=new THREE.Mesh(new THREE.TorusGeometry(.12,.025,6,20),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.4,depthTest:false}));head.material.userData.add=1;noAlpha(head.material);head.material.userData.pf=1;head.position.y=.7;g.add(head);this.el.setObject3D('mesh',g);
+ const t=document.createElement('a-text');t.setAttribute('value',this.data.name);t.setAttribute('align','center');t.setAttribute('color',this.data.color);t.setAttribute('width',3);t.setAttribute('position','0 1.05 0');t.setAttribute('look-at-cam','');this.el.appendChild(t)},
+ tick(t){this.el.object3D.children[0]&&(this.el.object3D.children[0].rotation.z=Math.sin(t/900)*.04)}});
+if(S?.live)on();else ui();
+</script></body></html>

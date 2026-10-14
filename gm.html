@@ -23,6 +23,6 @@ if(p.last){const ll=[p.last.lat,p.last.lon];L.circle(ll,{radius:p.last.acc||5,co
 L.marker(ll,{icon:L.divIcon({html:icon(c,st),className:'',iconSize:[22,26]})}).addTo(lay).bindTooltip(p.name+(st?' (stealth)':''),{permanent:true,direction:'right'});
 // lines from player to the three places
 T.forEach(t=>L.polyline([ll,[t[1],t[2]]],{color:t[3],weight:1,opacity:.5}).addTo(lay))}
-list.insertAdjacentHTML('beforeend',`<div class=p>${icon(c,st)}<div><b>${p.name.replace(/</g,'&lt;')}</b> ${st?'stealth':'regular'}<br>entrance: ${p.entrance}<br>${p.last?`updated ${age(p.last.t)} ago, ±${Math.round(p.last.acc)} m`:'no fix yet'}</div></div>`)}}
+list.insertAdjacentHTML('beforeend',`<div class=p>${icon(c,st)}<div><b>${p.name.replace(/</g,'&lt;')}</b> ${st?'stealth':'regular'}${p.device==='quest'?' <b style="color:#9cf">Quest</b>':''}<br>entrance: ${p.entrance}<br>${p.last?`updated ${age(p.last.t)} ago, ±${Math.round(p.last.acc)} m`:'no fix yet'}</div></div>`)}}
 go.onclick=()=>{KEY=k.value.trim();localStorage.eearGM=KEY;poll()};if(KEY){lock.style.display='none';poll()}setInterval(poll,3000);
 </script></body></html>
