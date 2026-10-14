@@ -69,7 +69,7 @@ const VORT=[];function buildX(){const o=L0,G=-1.6,[my,mx]=mPer(o[0]);VORT.length
  X.makeOcean(T,o,G).then(({mesh,coast})=>{if(L0!==o)return;local.add(mesh);window.OCEAN=mesh;local.add(X.makeCoast(T,o,G,coast));applyLayers()}).catch(e=>console.warn('ocean',e));
  Promise.all([fetch('streets.json').then(r=>r.json()),fetch('sheridan.json').then(r=>r.json())]).then(([st,sh])=>{if(L0!==o||Math.hypot((o[0]-48.117)*111,(o[1]+122.78)*74)>15)return;for(const l of st.lines)local.add(X.makeRoad(T,o,G,l.points,l.color));local.add(X.makeRoad(T,o,G,sh.points,'#ff00cc'));applyLayers()});
  for(const[n,a,l,c]of TARGETS){const x=(l-o[1])*mx,z=-(a-o[0])*my,hero=/Ready Athletics/.test(n);const sc=X.makeSaucer(T,c,hero);sc.position.set(x+(hero?30:18),G,z+(hero?30:18));local.add(sc);
-  if(/Ready Athletics|Cappy/.test(n)){const v=X.makeVortexLocal(T,/Cappy/.test(n)?0x30ff60:0xffc800);v.position.set(x,G,z);local.add(v);VORT.push(v)}}applyLayers()}
+  if(/Ready Athletics|Cappy/.test(n)){const v=X.makeVortexLocal(T,/Cappy/.test(n)?0x30ff60:0xffc800,40);v.scale.setScalar(.6);v.position.set(x,G,z);local.add(v);VORT.push(v);const wd=X.makeVortexWedges(T,1500);wd.position.set(x,G,z);local.add(wd)}}applyLayers()}
 function updLocal(la,lo,acc){if(!L0)buildLocal(la,lo);const[my,mx]=mPer(L0[0]);const tgt=new T.Vector3((lo-L0[1])*mx,0,-(la-L0[0])*my);
 if(!sm)sm=tgt.clone();const d=tgt.distanceTo(sm),dead=Math.max(3,(acc||10)*.5);// dead-band ~half accuracy
 if(d>dead)sm.lerp(tgt,Math.min(1,.15*(d-dead)/dead+.05));// heavy low-pass outside dead-band
@@ -102,7 +102,9 @@ function buildFar(la,lo){for(const[name,a,l,col,kind]of FAR){const{p,q,up}=frame
   const ice=new T.Mesh(geo,im);ice.position.x=-300*S;g.add(ice)}
  const km=gcKm(la,lo,a,l),b=brg(la,lo,a,l);const lb=label(name+'\n'+Math.round(km).toLocaleString()+' km · '+b.toFixed(0)+'°',col,{title:name,color:col,distM:km*1000,el:Math.asin(p.y/d)/D});lb.position.copy(p).add(up.clone().multiplyScalar(800*S));lb.userData.layer='far';world.add(lb)}applyLayers()}
 
-function buildVW(la,lo){for(const[n,a,l,c]of TARGETS.filter(t=>/Ready Athletics|Cappy/.test(t[0]))){const g=X.makeVortexWorld(T,a,l,c,(A,O)=>toENU(ecef(A,O),la,lo).multiplyScalar(SC),8,/Cappy/.test(n)?22.5:0);world.add(g);
+function buildVW(la,lo){for(const[n,a,l,c]of TARGETS.filter(t=>/Ready Athletics|Cappy/.test(t[0]))){const g=new T.Group();g.userData.layer='vortexW';world.add(g);
+ const runs=[];for(const C of X.vortexWorldCircles(a,l,(A,O)=>toENU(ecef(A,O),la,lo).multiplyScalar(SC))){let r=[];for(let i=0;i<C.length;i+=3){if(Math.hypot(C[i],C[i+1],C[i+2])<8){if(r.length>5)runs.push(r);r=[]}else r.push(C[i],C[i+1],C[i+2])}if(r.length>5)runs.push(r)}
+ for(const P of runs){for(const[w,op,cc]of[[9,.35,c],[3.5,1,c],[1.2,1,0xffffff]]){const lg=new LineGeometry();lg.setPositions(P);const m=new LineMaterial({color:cc,linewidth:w,transparent:true,opacity:op,depthTest:false,depthWrite:false,blending:T.AdditiveBlending,resolution:new T.Vector2(innerWidth,innerHeight)});const L2=new Line2(lg,m);L2.renderOrder=9;L2.frustumCulled=false;g.add(L2);window.FATLINES=(window.FATLINES||[]).concat(m)}}
  const[aa,ao]=X.antipode(a,l),p=toENU(ecef(aa,ao),la,lo).multiplyScalar(SC),hx='#'+c.toString(16).padStart(6,'0');const lb=label('Antipode of '+n.split(' (')[0]+'\n'+aa.toFixed(3)+', '+ao.toFixed(3)+' · '+Math.round(gcKm(la,lo,aa,ao)).toLocaleString()+' km',hx,{title:'Antipode of '+n,color:hx,distM:gcKm(la,lo,aa,ao)*1000});lb.position.copy(p);lb.userData.layer='vortexW';world.add(lb)}applyLayers()}
 // ---- light beams + ground shapes by type (shared per-place materials)
 const SHT={value:0};window.SHT=SHT;const RINGS=[];
