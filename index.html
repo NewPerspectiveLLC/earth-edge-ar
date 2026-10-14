@@ -1,11 +1,11 @@
 <!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR</title>
 <style>html,body{margin:0;height:100%;overflow:hidden;background:#000;font:14px -apple-system,sans-serif;color:#fff}video,canvas{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}#ui{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;padding:8px;background:#0008;z-index:5}button{font-size:18px;padding:12px 18px;margin:4px;border-radius:10px;border:0;background:#fc3;color:#000}#start{position:fixed;inset:0;margin:auto;width:220px;height:70px;z-index:6}</style>
 <script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head><body>
-<video id=v playsinline muted autoplay></video><div id=ui2 style='position:fixed;bottom:8px;left:8px;z-index:5;background:#0008;padding:4px;font-size:12px'>Local grid &amp; target lines: approximate (GPS+compass, smoothed). iPhone Safari has no world tracking.</div><div id=zoom style='position:fixed;right:8px;top:100px;z-index:7'><button data-z=1>1x</button><br><button data-z=2>2x</button><br><button data-z=4>4x</button></div><div id=card style='display:none;position:fixed;left:0;right:0;bottom:0;z-index:8;background:#000e;padding:18px 18px 28px;font-size:22px;border-top:3px solid #fff'></div><style>#hpD{position:fixed;left:8px;top:110px;z-index:20;background:#000a;padding:6px;border-radius:8px}#hpP{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:calc(env(safe-area-inset-bottom) + 100px);z-index:50;background:#000b;border-radius:14px;padding:8px;text-align:center;color:#fff;touch-action:none;user-select:none}
+<video id=v playsinline muted autoplay></video><div id=ui2 style='position:fixed;bottom:8px;left:8px;z-index:5;background:#0008;padding:4px;font-size:12px'>Local grid &amp; target lines: approximate (GPS+compass, smoothed). iPhone Safari has no world tracking.</div><div id=zoom style='position:fixed;right:8px;top:100px;z-index:7'><button data-z=1>1x</button><br><button data-z=2>2x</button><br><button data-z=4>4x</button></div><div id=card style='display:none;position:fixed;left:0;right:0;bottom:0;z-index:8;background:#000e;padding:18px 18px 28px;font-size:22px;border-top:3px solid #fff'></div><style>#hpD{position:fixed;left:8px;top:150px;z-index:20;background:#000a;padding:6px;border-radius:8px}#hpP{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:calc(env(safe-area-inset-bottom) + 100px);z-index:50;background:#000b;border-radius:14px;padding:8px;text-align:center;color:#fff;touch-action:none;user-select:none}
 #hpP button{width:64px;height:64px;font-size:28px;margin:4px 0}#hpT{width:56px;height:220px;margin:6px auto;background:#fff2;border-radius:28px;position:relative}#hpK{position:absolute;left:4px;width:48px;height:48px;border-radius:24px;background:#9ff}#hpR{font-size:24px;font-weight:bold}
-@media (pointer:coarse),(max-width:819px){#hpP{display:block}#hpD{display:none}}</style>
+@media (pointer:coarse){#hpP{display:block}#hpD{display:none}}</style>
 <div id=hpD>Grid height <input id=hpS type=range min=-10 max=10 step=.1 value=0> <span id=hpV>0.0 m</span></div>
-<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>grid</small></div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
+<div id=hpP><button id=hpU>▲</button><div id=hpT><div id=hpK></div></div><button id=hpDn>▼</button><div id=hpR>0.0 m</div><small>grid</small></div><div id=desk style='display:none;position:fixed;left:8px;top:64px;z-index:21;background:#000b;padding:6px;border-radius:8px'>Heading <b id=hdg>0°</b> <button data-h=0>N</button><button data-h=90>E</button><button data-h=180>S</button><button data-h=270>W</button><br>Location <select id=locSel><option value=gps>Use GPS</option></select><br><small>drag or arrow keys to look</small></div><div id=ui>Earth Edge AR — tap Start</div><button id=start>Start AR</button>
 <script>window.EEAR_API=location.hostname.endsWith('github.io')?'':''</script><script type=module>
 import*as T from'three';import{Line2}from'three/addons/lines/Line2.js';import{LineMaterial}from'three/addons/lines/LineMaterial.js';import{LineGeometry}from'three/addons/lines/LineGeometry.js';
 const R=6371e3,D=Math.PI/180,q=new URLSearchParams(location.search);
@@ -89,9 +89,9 @@ eu.set(b,a,-g,'YXZ');cam.quaternion.setFromEuler(eu);cam.quaternion.multiply(q1)
 async function start(){document.getElementById('start').remove();
 try{if(DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(e){}
 addEventListener('deviceorientation',onOri);addEventListener('deviceorientationabsolute',e=>{if(e.webkitCompassHeading==null)onOri(e)});
-try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message}
+try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message;setTimeout(enterDesk,0)}
 if(q.has('lat')){build(+q.get('lat'),+q.get('lon'));updLocal(+q.get('lat'),+q.get('lon'),5);MYPOS={lat:+q.get('lat'),lon:+q.get('lon'),acc:5}}
-else navigator.geolocation.watchPosition(p=>{build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='GPS error: '+e.message;build(48.117,-122.76)},{enableHighAccuracy:true})}
+else navigator.geolocation.watchPosition(p=>{build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
 document.getElementById('start').onclick=start;
 if(q.has('auto')){start();if(q.has('pitch')){ori={alpha:+q.get('yaw')||0,beta:+q.get('pitch'),gamma:0}}}
 
@@ -117,5 +117,22 @@ hpT.onpointerdown=e=>{hpT.setPointerCapture(e.pointerId);const mv=ev=>{const r=h
 const rep=(b,d)=>{let t1,t2;b.onpointerdown=e=>{e.preventDefault();setGH(window.GH_OFF+d,true);t1=setTimeout(()=>t2=setInterval(()=>setGH(window.GH_OFF+d,true),80),350)};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>{clearTimeout(t1);clearInterval(t2)}};rep(hpU,.1);rep(hpDn,-.1);
 let lastTap=0;hpR.onpointerup=()=>{const n=Date.now();if(n-lastTap<350)setGH(0,true);lastTap=n};
 addEventListener('resize',()=>(window.FATLINES||[]).forEach(m=>m.resolution.set(innerWidth,innerHeight)));
-ren.setAnimationLoop(t=>{setCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
+// desk
+
+// desktop mode: no compass/camera -> mouse/keys look, dark sky, location picker
+let desk=false,yaw=0,pitch=-10;
+function setLoc(a,l){built=null;L0=null;sm=null;build(a,l);updLocal(a,l,5);MYPOS={lat:a,lon:l,acc:5}}
+window.setLoc=setLoc;
+TARGETS.forEach((t,i)=>locSel.insertAdjacentHTML('beforeend',`<option value=${i}>${t[0]}</option>`));
+locSel.onchange=()=>{if(locSel.value==='gps')navigator.geolocation.getCurrentPosition(p=>setLoc(p.coords.latitude,p.coords.longitude),()=>alert('No GPS fix'));else{const t=TARGETS[+locSel.value];setLoc(t[1],t[2])}};
+function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#000)';vid.style.display='none';
+ if(!MYPOS){ui.textContent='No GPS yet, using Ready Athletics';setLoc(48.11035,-122.80591);locSel.value='0'}}
+document.querySelectorAll('#desk button').forEach(b=>b.onclick=()=>{yaw=+b.dataset.h});
+let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('button,select,#mpc,#hpP,#hpD,#card,#zoom'))drag=[e.clientX,e.clientY,yaw,pitch,0]});
+addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag[0],dy=e.clientY-drag[1];drag[4]=Math.max(drag[4],Math.abs(dx)+Math.abs(dy));yaw=(drag[2]-dx*.2+3600)%360;pitch=Math.max(-89,Math.min(89,drag[3]+dy*.2))}});
+addEventListener('pointerup',()=>{drag=null});
+addEventListener('keydown',e=>{if(!desk)return;if(e.key==='ArrowLeft')yaw=(yaw-3+360)%360;if(e.key==='ArrowRight')yaw=(yaw+3)%360;if(e.key==='ArrowUp')pitch=Math.min(89,pitch+3);if(e.key==='ArrowDown')pitch=Math.max(-89,pitch-3)});
+function deskCam(){if(!desk||ori||q.has('look'))return;cam.rotation.set(pitch*D,-yaw*D,0,'YXZ');hdg.textContent=Math.round(yaw)+'°'}
+setTimeout(()=>{if(!ori)enterDesk()},2500);
+ren.setAnimationLoop(t=>{setCam();deskCam();window._mp&&window._mp.frame(t);layoutLabels();updArrow();ren.render(scene,cam)});
 </script></body></html>
