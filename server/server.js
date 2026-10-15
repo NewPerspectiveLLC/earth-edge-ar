@@ -16,7 +16,7 @@ create table if not exists games(id text primary key,name text,owner text,code t
 create table if not exists teams(id text primary key,game_id text,name text,color text);
 create table if not exists gplayers(id text primary key,game_id text,user_id text,token text,name text,mode text,entrance text,team_id text,joined int,live int,seen int);
 create table if not exists gfixes(pid text,lat real,lon real,acc real,t int);create index if not exists gfx on gfixes(pid,t);`);
-try{sq.exec('alter table gfixes add column hdg real')}catch(e){}// heading (deg true, from client camera) - optional
+try{sq.exec('alter table gfixes add column hdg real')}catch(e){}try{sq.exec('alter table gplayers add column device text')}catch(e){}// device: phone|quest|desktop (shown as a tag to other players)// heading (deg true, from client camera) - optional
 // default public game so the plain link still works
 if(!sq.prepare("select 1 from games where id='public'").get())sq.prepare("insert into games values('public','Open game','gm','OPEN','{}',?)").run(Date.now());
 const H=s=>crypto.createHash('sha256').update(String(s)).digest('hex'),rid=n=>crypto.randomBytes(n).toString('hex');
@@ -48,7 +48,7 @@ const teamOf=id=>id?one('select id,name,color from teams where id=?',id):null;
 // dummy ghost players: server-side test fixtures (see ghosts block below + /api/gm/ghost). Hex pids so gm.html colours them.
 const GHOSTS={'Ghost-1':{pid:'ab0001',lat:48.11035,lon:-122.80591,place:'Ready Athletics'},'Ghost-2':{pid:'5e0002',lat:48.13165,lon:-122.79921,place:"Cappy's Trails garden"}};
 const isGhost=id=>Object.values(GHOSTS).some(g=>g.pid===id);
-const pubP=p=>({id:p.id,name:p.name,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id,...(isGhost(p.id)?{dummy:true}:{})});
+const pubP=p=>({id:p.id,name:p.name,device:p.device||null,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id,...(isGhost(p.id)?{dummy:true}:{})});
 // ---- federation: Ed25519 identity, registry (Monster runs it), signed heartbeats with stats. Share agreements: NOT built yet.
 const TRUST_LABEL=cfg('TRUST_LABEL')||'Matt Ready Trusted';
 sq.exec(`create table if not exists instances(id text primary key,name text,url text,owner text,pubkey text,area text,lat real,lon real,last_seen int,trusted int default 0,stats text,history text default '[]');
@@ -112,7 +112,7 @@ function gmSnap(u){const now=Date.now(),win=Math.min(864e5,Math.max(5000,+u.sear
 const GHF=path.join(__dirname,'ghosts.json'),GS={},MLAT=111320;try{Object.assign(GS,JSON.parse(fs.readFileSync(GHF,'utf8')))}catch(e){}
 const ghSave=()=>{try{fs.writeFileSync(GHF,JSON.stringify(Object.fromEntries(Object.entries(GS).map(([n,s])=>[n,{tlat:s.tlat,tlon:s.tlon,place:s.place,wander:s.wander,updated:s.updated}]))),{mode:0o600})}catch(e){console.error('ghosts save',e.message)}};
 for(const[n,d]of Object.entries(GHOSTS)){const s=GS[n]=Object.assign({tlat:d.lat,tlon:d.lon,place:d.place,wander:true,updated:Date.now()},GS[n]||{});s.lat=s.tlat;s.lon=s.tlon;s.hdg=Math.random()*360;s.spd=1.5;
- if(!one('select 1 from gplayers where id=?',d.pid))run('insert into gplayers values(?,?,?,?,?,?,?,?,?,1,?)',d.pid,'public',null,rid(24),n,'regular','walk',null,Date.now(),Date.now());
+ if(!one('select 1 from gplayers where id=?',d.pid))run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,1,?)',d.pid,'public',null,rid(24),n,'regular','walk',null,Date.now(),Date.now());
  else run("update gplayers set name=?,game_id='public',live=1,mode='regular' where id=?",n,d.pid)}
 function ghStep(n){const d=GHOSTS[n],s=GS[n],now=Date.now();
  if(s.wander){const k=Math.cos(s.tlat*D2)*MLAT;let dy=(s.lat-s.tlat)*MLAT,dx=(s.lon-s.tlon)*k;s.hdg=(s.hdg+(Math.random()-.5)*60+360)%360;
@@ -184,7 +184,8 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  // ---- players (consent per game)
  case'/api/join':{if(CONSENT_REQUIRED&&j.consent!==true)return send(r,{error:'consent required'},400);const g=gameByCode(j.game);if(!g)return send(r,{error:'no such game'},404);
   if(limited('j:'+ip,30))return send(r,{error:'too many joins'},429);
-  const id=rid(6),token=rid(24);run('insert into gplayers values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),j.mode==='stealth'?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
+  const id=rid(6),token=rid(24);run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),j.mode==='stealth'?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
+  {const dv=['phone','quest','desktop','bot'].includes(j.device)?j.device:null;if(dv)run('update gplayers set device=? where id=?',dv,id)}
   return send(r,{id,token,game:{id:g.id,name:g.name,code:g.code}})}
  case'/api/pos':{if(!P||!P.live)return send(r,{error:'not joined'},401);const lat=+j.lat,lon=+j.lon,acc=+j.acc||0;if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90)return send(r,{error:'bad'},400);
   if(limited('p:'+P.id,40,60000))return send(r,{error:'slow down'},429);const hdg=isFinite(+j.hdg)&&j.hdg!==null&&j.hdg!==''?((+j.hdg%360)+360)%360:null;run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',P.id,lat,lon,acc,now,hdg);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,team:teamOf(P.team_id)})}
