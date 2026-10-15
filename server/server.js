@@ -136,6 +136,9 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   let f=path.normalize(path.join(root,dp));if(!f.startsWith(path.normalize(root)+path.sep))return r.writeHead(404),r.end();
   if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,'index.html');
   return fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end('not found')}r.writeHead(200,{'content-type':types[path.extname(f)]||'application/octet-stream'});r.end(d)})}
+ // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&u.pathname==='/api/gm'){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+  if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key','access-control-allow-methods':'GET','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
  if(u.pathname.startsWith('/api/registry')){if(await registry(u,q,r,j,b,U,ip)!==false)return}

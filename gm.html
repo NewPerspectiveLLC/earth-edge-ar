@@ -1,28 +1,123 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Earth Edge AR GM</title>
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR GM - live satellite</title>
 <link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>body{margin:0;font:13px sans-serif;display:flex;height:100vh}#map{flex:1}#side{width:260px;overflow:auto;padding:8px;background:#111;color:#eee}.p{padding:6px;border-bottom:1px solid #333;display:flex;gap:6px}#lock{position:fixed;inset:0;background:#000d;z-index:2000;color:#fff;padding:40px}</style></head><body>
-<div id=map></div><div id=side><b>Players (live)</b> <label><input type=checkbox id=tr> trails</label><div id=list></div></div>
-<div id=lock>GM key: <input id=k type=password> <button id=go>Unlock</button> <span id=err></span></div>
+<style>
+html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;background:#000;color:#eee;overflow:hidden}
+#map{position:fixed;inset:0;background:#111}
+#bar{position:fixed;top:calc(8px + env(safe-area-inset-top));left:56px;right:8px;z-index:1000;display:flex;gap:6px;align-items:center;flex-wrap:wrap;pointer-events:none}
+#bar>*{pointer-events:auto}
+.btn{background:#111d;color:#fff;border:1px solid #fff4;border-radius:8px;padding:7px 11px;font:600 13px system-ui;cursor:pointer;backdrop-filter:blur(4px)}
+.btn.on{background:#2a6cff;border-color:#8af}
+#stat{background:#000a;border-radius:8px;padding:6px 10px;font-size:12px}
+#stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#888;margin-right:6px}
+#side{position:fixed;z-index:1000;top:calc(52px + env(safe-area-inset-top));right:8px;width:290px;max-height:calc(100% - 70px);overflow:auto;background:#0b0b0fe6;border:1px solid #fff2;border-radius:10px;backdrop-filter:blur(6px)}
+#side h3{margin:0;padding:9px 11px;font-size:13px;border-bottom:1px solid #fff2;display:flex;justify-content:space-between;align-items:center}
+.p{padding:8px 11px;border-bottom:1px solid #ffffff14;cursor:pointer;display:flex;gap:9px;align-items:center}
+.p:hover{background:#ffffff10}.p.fol{background:#2a6cff33}
+.sw{width:12px;height:12px;border-radius:50%;flex:none;border:2px solid #fff}
+.p .nm{font-weight:700}.p .sub{color:#aaa;font-size:11.5px;line-height:1.35}
+.p .fb{margin-left:auto;font-size:11px;padding:4px 7px}
+.tag{font:700 9.5px system-ui;padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:1px}
+.tag.test{background:#ffd23f;color:#000}.tag.st{background:#888;color:#000}
+.pm{position:relative;width:0;height:0}
+.pm .ar{position:absolute;left:-17px;top:-17px;width:34px;height:34px;transition:transform .4s}
+.pm .lb{position:absolute;left:14px;top:-11px;white-space:nowrap;background:#000c;color:#fff;font:700 12px system-ui;padding:2px 6px;border-radius:5px;border-left:3px solid var(--c)}
+.pm.stealth .lb{color:#bbb;font-style:italic}
+.lm{position:relative;width:0;height:0}.lm .i{position:absolute;left:-7px;top:-7px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 4px #000}
+.lm.vx .i{left:-9px;top:-9px;width:14px;height:14px;border-radius:3px;transform:rotate(45deg)}
+.lm .t{position:absolute;left:10px;top:-8px;white-space:nowrap;color:#fff;font:600 11px system-ui;text-shadow:0 0 3px #000,0 0 3px #000,0 0 2px #000}
+.hidelm .lm .t{display:none}
+#lock{position:fixed;inset:0;background:#000e;z-index:3000;display:none;align-items:center;justify-content:center}
+#lock div{background:#151519;border:1px solid #fff3;border-radius:12px;padding:22px;max-width:340px;width:86%}
+#lock input{width:100%;box-sizing:border-box;padding:10px;font-size:16px;margin:10px 0;border-radius:8px;border:1px solid #555;background:#000;color:#fff}
+#err{color:#f77;min-height:1.2em}
+.leaflet-control-layers{font-size:12.5px}
+@media (max-width:700px){
+ #bar{left:52px}#bar .wide{display:none}
+ #side{top:auto;bottom:0;left:0;right:0;width:auto;max-height:42%;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+ #side.min .list{display:none}
+ .leaflet-bottom.leaflet-right{bottom:44px}
+}
+</style></head><body>
+<div id=map></div>
+<div id=bar><button class=btn id=fit title="Zoom to show every live player">Fit all</button><button class=btn id=unf style="display:none">Stop following</button>
+<span id=stat><span class=dot id=dot></span><span id=st>connecting…</span></span>
+<button class="btn wide" id=lmlab>Landmark labels</button><button class=btn id=sideb>Players</button></div>
+<div id=side><h3><span>Live players (<span id=n>0</span>)</span><label style="font-weight:400;font-size:12px"><input type=checkbox id=tr> trails</label></h3><div class=list id=list></div></div>
+<div id=lock><div><b>Earth Edge AR - Game master</b><br><span style="color:#aaa">Paste the GM key to see live players.</span>
+<input id=k type=password autocomplete=off placeholder="GM key"><button class=btn id=go style="width:100%">Unlock</button><div id=err></div></div></div>
 <script>
-const API=(window.EEAR_API||'')+'/api/gm';let KEY=localStorage.eearGM||'';
-const map=L.map('map').setView([48.117,-122.78],14);
-const street=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
-const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
-L.control.layers({Street:street,Satellite:sat}).addTo(map);
-const T=[['Ready Athletics (997800502)',48.11035,-122.80591,'#ffc800'],["Cappy's Trails garden (998002802)",48.13165,-122.79921,'#30ff60'],["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff'],['Port Townsend City Hall',48.1161771,-122.753612,'#40e0ff'],["Jefferson County Sheriff's Office",48.0241638,-122.764488,'#ff7020'],['Jefferson Healthcare Hospital',48.1060007,-122.7889962,'#ff4060'],['Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St)',48.1139683,-122.7628233,'#e0c080']];
-T.forEach(t=>L.circleMarker([t[1],t[2]],{radius:8,color:t[3]}).addTo(map).bindTooltip(t[0],{permanent:true}));
-const lay=L.layerGroup().addTo(map);fetch('streets.json').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:4}).addTo(map).bindTooltip(l.name)));fetch('sheridan.json').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:5}).addTo(map).bindTooltip('Sheridan St'));const grid=L.layerGroup().addTo(map);function drawGrid(a,l){grid.clearLayers();a=Math.round(a*1000)/1000;l=Math.round(l*1000)/1000;const dy=20/111320,dx=20/(111320*Math.cos(a*Math.PI/180));for(let i=-10;i<=10;i++){L.polyline([[a+i*dy,l-10*dx],[a+i*dy,l+10*dx]],{color:'#fff',weight:1,opacity:.6}).addTo(grid);L.polyline([[a-10*dy,l+i*dx],[a+10*dy,l+i*dx]],{color:'#fff',weight:1,opacity:.6}).addTo(grid)}}
-const col=id=>'hsl('+(parseInt(id.slice(0,4),16)%360)+',100%,45%)';
-const icon=(c,st)=>`<svg width=22 height=26 viewBox="0 0 22 26" fill=none stroke="${c}" stroke-width=2 ${st?'stroke-dasharray="2 2" opacity=.6':''}><circle cx=11 cy=5 r=4 ${st?'':`fill="${c}"`}/><path d="M11 9V20M4 20H18M11 11L4 18M11 11L18 18"/></svg>`;
-function age(t){const s=(Date.now()-t)/1000|0;return s<60?s+'s':(s/60|0)+'m'}
-async function poll(){if(!KEY)return;const r=await fetch(API+(tr.checked?'?trails=1':''),{headers:{'x-gm-key':KEY}});if(r.status===403){lock.style.display='block';err.textContent='bad key';return}
-lock.style.display='none';const{players}=await r.json();const f=players.find(p=>p.last);if(f&&!grid.getLayers().length)drawGrid(f.last.lat,f.last.lon);lay.clearLayers();list.innerHTML='';
-for(const p of players){const c=col(p.id),st=p.mode==='stealth';
-if(p.track&&p.track.length>1)L.polyline(p.track.map(f=>[f.lat,f.lon]),{color:c,weight:2,opacity:.6,dashArray:st?'4 4':null}).addTo(lay);
-if(p.last){const ll=[p.last.lat,p.last.lon];L.circle(ll,{radius:p.last.acc||5,color:c,weight:1,fillOpacity:.05}).addTo(lay);
-L.marker(ll,{icon:L.divIcon({html:icon(c,st),className:'',iconSize:[22,26]})}).addTo(lay).bindTooltip(p.name+(st?' (stealth)':''),{permanent:true,direction:'right'});
-// lines from player to the three places
-T.forEach(t=>L.polyline([ll,[t[1],t[2]]],{color:t[3],weight:1,opacity:.5}).addTo(lay))}
-list.insertAdjacentHTML('beforeend',`<div class=p>${icon(c,st)}<div><b>${p.name.replace(/</g,'&lt;')}</b> ${st?'stealth':'regular'}${p.device==='quest'?' <b style="color:#9cf">Quest</b>':''}<br>entrance: ${p.entrance}<br>${p.last?`updated ${age(p.last.t)} ago, ±${Math.round(p.last.acc)} m`:'no fix yet'}</div></div>`)}}
-go.onclick=()=>{KEY=k.value.trim();localStorage.eearGM=KEY;poll()};if(KEY){lock.style.display='none';poll()}setInterval(poll,3000);
+// API: same origin on Monster/tunnel/LAN; from the GitHub Pages copy, call the live tunnel (server allows that origin for /api/gm only)
+const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://verse-concerning-summit-equipped.trycloudflare.com':'');
+const API=BASE+'/api/gm',POLL_MS=1500,TRAIL_MS=10000;let KEY=localStorage.eearGM||'';
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const map=L.map('map',{zoomControl:true,maxZoom:21}).setView([48.122,-122.785],14);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'}).addTo(map);
+const street=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:21,maxNativeZoom:19,attribution:'© OpenStreetMap'});
+const labels=L.layerGroup([L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,opacity:.85}),
+ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19})]).addTo(map);
+const lmG=L.layerGroup().addTo(map),vxG=L.layerGroup().addTo(map),appStreets=L.layerGroup(),trailG=L.layerGroup().addTo(map),accG=L.layerGroup().addTo(map),plG=L.layerGroup().addTo(map);
+L.control.layers({Satellite:sat,Street:street},{'Labels (roads & places)':labels,'Vortex centers':vxG,'Landmarks':lmG,'Accuracy circles':accG,'App streets / Sheridan':appStreets},{position:'bottomright',collapsed:innerWidth<700}).addTo(map);
+L.control.scale({imperial:true,position:'bottomleft'}).addTo(map);
+const VX=[['Ready Athletics vortex',48.11035,-122.80591,'#ffc800'],["Cappy's Trails vortex",48.13165,-122.79921,'#30ff60'],["Matt's Meditation Garden vortex",48.1316475,-122.7992293,'#ff60d0']];
+const LM=[["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff'],['Port Townsend City Hall',48.1161771,-122.753612,'#40e0ff'],["Jefferson County Sheriff's Office",48.0241638,-122.764488,'#ff7020'],
+ ['Jefferson Healthcare Hospital',48.1060007,-122.7889962,'#ff4060'],['Masonic Lodge No. 6',48.1139683,-122.7628233,'#e0c080']];
+const pin=(t,cls,g,dy)=>L.marker([t[1],t[2]],{icon:L.divIcon({className:'',html:`<div class="lm ${cls}"><div class=i style="background:${t[3]}"></div><div class=t style="${dy?'top:'+dy+'px':''}">${esc(t[0])}</div></div>`,iconSize:[0,0]}),keyboard:false}).addTo(g).bindTooltip(esc(t[0]));
+VX.forEach((t,i)=>pin(t,'vx',vxG,i===2?-22:0));LM.forEach(t=>pin(t,'',lmG));
+$('lmlab').onclick=()=>{document.body.classList.toggle('hidelm');$('lmlab').classList.toggle('on',!document.body.classList.contains('hidelm'))};$('lmlab').classList.add('on');
+fetch('streets.json').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
+fetch('sheridan.json').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
+// ---- players
+const RA=[48.11035,-122.80591];
+function hcol(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+(h%360)+',95%,55%)'}
+const colOf=p=>p.mode==='stealth'?'#9a9a9a':(p.team&&p.team.color)||hcol(p.id);
+const arrowSvg=(c,hasH)=>hasH?`<svg viewBox="0 0 34 34"><path d="M17 2 L25 24 L17 19 L9 24 Z" fill="${c}" stroke="#000" stroke-width="1.5" stroke-linejoin=round/><circle cx=17 cy=17 r=4 fill="#fff" stroke="#000"/></svg>`
+ :`<svg viewBox="0 0 34 34"><circle cx=17 cy=17 r=8 fill="${c}" stroke="#fff" stroke-width=2.5/></svg>`;
+const P={};let followHold=0,follow=null,firstFit=false,lastOk=0,trailsAt=0;
+function dist(a,b){const R=6371000,d=Math.PI/180,x=Math.sin((b[0]-a[0])*d/2)**2+Math.cos(a[0]*d)*Math.cos(b[0]*d)*Math.sin((b[1]-a[1])*d/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+const fmtD=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km',age=t=>{const s=Math.max(0,(Date.now()-t)/1000|0);return s<60?s+'s':(s/60|0)+'m'};
+function lbl(p){return esc(p.name)+(p.dummy?'<span class="tag test">TEST</span>':'')+(p.mode==='stealth'?'<span class="tag st">STEALTH</span>':'')}
+function iconHtml(p,c){return `<div class="pm${p.mode==='stealth'?' stealth':''}" style="--c:${c}"><div class=ar>${arrowSvg(c,p.last&&p.last.hdg!=null)}</div><div class=lb>${lbl(p)}</div></div>`}
+function sig(p,c){return [p.name,p.mode,p.dummy,c,p.last&&p.last.hdg!=null].join('|')}
+// smooth movement: tween each marker from its drawn position to the newest fix
+function tween(o,to,dt){o.from=o.m.getLatLng();o.to=L.latLng(to);o.t0=performance.now();o.dur=Math.max(700,Math.min(2500,dt||1300));// spread the move over the gap between fixes -> continuous glide
+ if(o.from.distanceTo(o.to)>3000){o.from=o.to}}// teleports (ghost moves) jump instead of sliding across town
+function frame(now){for(const id in P){const o=P[id];if(!o.to)continue;const k=Math.min(1,(now-o.t0)/o.dur),e=k;
+ const ll=L.latLng(o.from.lat+(o.to.lat-o.from.lat)*e,o.from.lng+(o.to.lng-o.from.lng)*e);o.m.setLatLng(ll);o.acc.setLatLng(ll);if(follow===id&&now>followHold)map.panTo(ll,{animate:false});if(k>=1)o.to=null}
+ requestAnimationFrame(frame)}requestAnimationFrame(frame);
+function upsert(p){const c=colOf(p),ll=[p.last.lat,p.last.lon];let o=P[p.id];
+ if(!o){o=P[p.id]={m:L.marker(ll,{icon:L.divIcon({className:'',html:iconHtml(p,c),iconSize:[0,0]}),zIndexOffset:1000}).addTo(plG),acc:L.circle(ll,{radius:p.last.acc||5,color:c,weight:1,fillOpacity:.08,interactive:false}).addTo(accG),sig:sig(p,c)};
+  o.m.on('click',()=>setFollow(p.id))}
+ else{if(o.sig!==sig(p,c)){o.m.setIcon(L.divIcon({className:'',html:iconHtml(p,c),iconSize:[0,0]}));o.sig=sig(p,c);o.acc.setStyle({color:c})}
+  if(o.lastT!==p.last.t)tween(o,ll,p.last.t-o.lastT)}
+ o.acc.setRadius(Math.max(2,p.last.acc||5));o.lastT=p.last.t;o.p=p;o.c=c;
+ const el=o.m.getElement();if(el&&p.last.hdg!=null){const a=el.querySelector('.ar');if(a)a.style.transform=`rotate(${p.last.hdg}deg)`}}
+function setFollow(id){follow=follow===id?null:id;$('unf').style.display=follow?'':'none';if(follow&&P[follow]){followHold=performance.now()+1100;map.flyTo(P[follow].m.getLatLng(),Math.max(map.getZoom(),17),{duration:.8})}renderList()}
+$('unf').onclick=()=>setFollow(follow);map.on('dragstart',()=>{if(follow)setFollow(follow)});
+function fitAll(){const L_=Object.values(P).map(o=>o.m.getLatLng());if(!L_.length)return;if(L_.length===1)return map.flyTo(L_[0],18,{duration:.8});map.flyToBounds(L.latLngBounds(L_).pad(.25),{duration:.8,maxZoom:18})}
+$('fit').onclick=()=>{if(follow)setFollow(follow);fitAll()};
+function renderList(){const L_=Object.entries(P).sort((a,b)=>(a[1].p.dummy-b[1].p.dummy)||a[1].p.name.localeCompare(b[1].p.name));$('n').textContent=L_.length;
+ $('list').innerHTML=L_.length?L_.map(([id,o])=>{const p=o.p,f=p.last;return `<div class="p${follow===id?' fol':''}" data-id="${esc(id)}"><span class=sw style="background:${o.c}"></span><div><div class=nm>${lbl(p)}</div><div class=sub>${p.team?esc(p.team.name)+' · ':''}${fmtD(dist(RA,[f.lat,f.lon]))} from Ready Athletics<br>${f.lat.toFixed(5)}, ${f.lon.toFixed(5)} · ±${Math.round(f.acc||0)} m${f.hdg!=null?' · '+Math.round(f.hdg)+'°':''} · ${age(f.t)} ago</div></div><button class="btn fb${follow===id?' on':''}" data-f="${esc(id)}">${follow===id?'Following':'Follow'}</button></div>`}).join('')
+  :'<div class=p style="color:#999;cursor:default">No live players right now.</div>'}
+$('list').onclick=e=>{const f=e.target.closest('[data-f]');if(f){e.stopPropagation();return setFollow(f.dataset.f)}const r=e.target.closest('.p[data-id]');if(!r)return;const o=P[r.dataset.id];if(!o)return;if(follow&&follow!==r.dataset.id)setFollow(follow);
+ map.flyTo(o.m.getLatLng(),Math.max(map.getZoom(),17),{duration:.8});if(innerWidth<700)$('side').classList.add('min')};
+$('sideb').onclick=()=>{const s=$('side');if(innerWidth<700)s.classList.toggle('min');else s.style.display=s.style.display==='none'?'':'none'};
+if(innerWidth<700)$('side').classList.add('min');
+async function trails(ids){if(!$('tr').checked){trailG.clearLayers();return}if(Date.now()-trailsAt<TRAIL_MS)return;trailsAt=Date.now();
+ try{const r=await fetch(API+'?trails=1',{headers:{'x-gm-key':KEY},cache:'no-store'});if(!r.ok)return;const{players}=await r.json();trailG.clearLayers();
+  for(const p of players)if(p.track&&p.track.length>1)L.polyline(p.track.map(f=>[f.lat,f.lon]),{color:colOf(p),weight:2.5,opacity:.7,dashArray:p.mode==='stealth'?'4 4':null,interactive:false}).addTo(trailG)}catch(e){}}
+$('tr').onchange=()=>{trailsAt=0;trails()};
+let busy=false;
+async function poll(){if(!KEY||busy||document.hidden)return;busy=true;
+ try{const r=await fetch(API,{headers:{'x-gm-key':KEY},cache:'no-store'});
+  if(r.status===403){$('lock').style.display='flex';$('err').textContent=localStorage.eearGM?'That key was not accepted.':'';busy=false;return}
+  if(!r.ok)throw new Error('HTTP '+r.status);const{players}=await r.json();$('lock').style.display='none';lastOk=Date.now();
+  const seen=new Set();for(const p of players){if(!p.last)continue;seen.add(p.id);upsert(p)}
+  for(const id in P)if(!seen.has(id)){plG.removeLayer(P[id].m);accG.removeLayer(P[id].acc);delete P[id];if(follow===id)setFollow(id)}
+  if(!firstFit&&seen.size){firstFit=true;fitAll()}renderList();trails();
+ }catch(e){$('st').textContent='connection problem, retrying…';$('dot').style.background='#f55'}
+ busy=false}
+setInterval(()=>{if(!lastOk)return;const s=(Date.now()-lastOk)/1000;$('dot').style.background=s<5?'#3f6':'#fb3';
+ $('st').textContent=(s<5?'live':'stale '+Math.round(s)+'s')+' · '+new Date(lastOk).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'})},500);
+$('go').onclick=()=>{KEY=$('k').value.trim();if(!KEY)return;localStorage.eearGM=KEY;$('err').textContent='checking…';poll()};$('k').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+if(KEY)poll();else $('lock').style.display='flex';setInterval(poll,POLL_MS);document.addEventListener('visibilitychange',poll);
 </script></body></html>
