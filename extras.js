@@ -163,14 +163,14 @@ function iaeq(x,y,la0,lo0){const rho=Math.hypot(x,y),c=rho/RE,p0=la0*D,l0=lo0*D;
 // every vertex then placed on the sphere (h metres up) through proj. Returns {mesh, outlines:[[x,y,z,...]]}.
 export function makeLandmass(T,rings,la0,lo0,proj,{color=0xbff4ff,opacity=.22,maxKm=150,h=0}={}){
  const pos=[],outlines=[];
- for(const ring of rings){const P=ring.map(([a,l])=>aeq(a,l,la0,lo0)),V=P.map(([x,y])=>new T.Vector2(x,y));
-  const tris=T.ShapeUtils.triangulateShape(V,[]);
+ for(const rg of rings){const ring=rg.o||rg,hs=rg.h||[];const P=ring.map(([a,l])=>aeq(a,l,la0,lo0)),V=P.map(([x,y])=>new T.Vector2(x,y));
+  const HP=hs.map(h=>h.map(([a,l])=>aeq(a,l,la0,lo0)));const tris=T.ShapeUtils.triangulateShape(V,HP.map(h=>h.map(([x,y])=>new T.Vector2(x,y))));for(const h of HP)P.push(...h);
   const emit=(A,B,C,dep)=>{const ab=Math.hypot(A[0]-B[0],A[1]-B[1]),bc=Math.hypot(B[0]-C[0],B[1]-C[1]),ca=Math.hypot(C[0]-A[0],C[1]-A[1]),m=Math.max(ab,bc,ca);
    if(m<=maxKm||dep>14){for(const Q of[A,B,C]){const[a,l]=iaeq(Q[0],Q[1],la0,lo0),v=proj(a,l,h);pos.push(v.x,v.y,v.z)}return}
    const mid=(U,W)=>[(U[0]+W[0])/2,(U[1]+W[1])/2];
    if(m===ab){const M=mid(A,B);emit(A,M,C,dep+1);emit(M,B,C,dep+1)}else if(m===bc){const M=mid(B,C);emit(A,B,M,dep+1);emit(A,M,C,dep+1)}else{const M=mid(C,A);emit(A,B,M,dep+1);emit(M,B,C,dep+1)}};
   for(const[i,j,k]of tris)emit(P[i],P[j],P[k],0);
-  const o=[];for(let i=0;i<=ring.length;i++){const[a,l]=ring[i%ring.length];const v=proj(a,l,h);o.push(v.x,v.y,v.z)}outlines.push(o)}
+  for(const rr of[ring,...hs]){const o=[];for(let i=0;i<=rr.length;i++){const[a,l]=rr[i%rr.length];const v=proj(a,l,h);o.push(v.x,v.y,v.z)}outlines.push(o)}}
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));
  const m=passMat(T,new T.MeshBasicMaterial({color,transparent:true,opacity,depthTest:false,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending}));
  const mesh=new T.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=9;return{mesh,outlines,tris:pos.length/9}}
