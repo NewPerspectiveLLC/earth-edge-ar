@@ -129,7 +129,7 @@ export function enuProj(T,la0,lo0){const R=6371e3,e=(a,l)=>{a*=D;l*=D;return[R*M
 export function makeVortexWorldTubes(T,la,lo,col,proj,shell=3000,rad=7){const g=new T.Group();g.userData.layer='vortexW';
  const m=passMat(T,new T.MeshBasicMaterial({color:col,transparent:true,opacity:.9,depthTest:false,side:T.DoubleSide}));const core=passMat(T,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9,depthTest:false}));
  for(const C of vortexWorldCircles(la,lo,proj)){let run=[];const flush=()=>{if(run.length>3){const cv=new T.CatmullRomCurve3(run);for(const[mm,r]of[[m,rad],[core,rad*.35]]){const t=new T.Mesh(new T.TubeGeometry(cv,run.length*2,r,5,false),mm);t.frustumCulled=false;t.renderOrder=9;g.add(t)}}run=[]};
-  for(let i=0;i<C.length;i+=3){const v=new T.Vector3(C[i],C[i+1],C[i+2]);if(v.length()<8000){flush();continue}run.push(v.setLength(shell))}flush()}
+  for(let i=0;i<C.length;i+=3){const v=new T.Vector3(C[i],C[i+1],C[i+2]);if(v.length()<60000){flush();continue}/* near part: floor-level ground lines take over */run.push(v.setLength(shell))}flush()}
  return g}
 
 // tall centre pillar so the vortex reads as 'over there'
