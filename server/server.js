@@ -166,6 +166,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   let L=all('select * from gplayers where game_id=? and live=1 and id<>? and mode<>? and seen>?',P.game_id,P.id,'stealth',now-LIVE_MS);
   if(s.teamOnly)L=L.filter(o=>P.team_id&&o.team_id===P.team_id);// team-only: only teammates; no team => see nobody
   return send(r,{me:{team:teamOf(P.team_id)},teamOnly:!!s.teamOnly,players:L.map(pubP)})}
+ case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);const m=j.mode==='stealth'?'stealth':'regular';run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
  case'/api/leave':{if(P)run('update gplayers set live=0 where id=?',P.id);return send(r,{ok:1})}
  case'/api/delete':{if(P){run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
  // ---- read-only GM watcher (GM key header only; watcher never joins, so it never appears as a player)

@@ -188,7 +188,7 @@ function layoutLabels(){const h=innerHeight,placed=[];for(const s of LABELS){if(
 const card=document.getElementById('card');let cardFor=null;
 function showCard(s){const m=s.userData.meta,wp=s.getWorldPosition(new T.Vector3()),b=((Math.atan2(wp.x,-wp.z)/D)+360)%360;
  const d=m.distM!=null?m.distM:null;card.innerHTML=`<div style="color:${m.color};font-weight:bold">${m.title}</div><div>${d==null?'':(d>1000?(d/1000).toFixed(d>1e5?0:2)+' km':d.toFixed(0)+' m')} &nbsp; bearing ${b.toFixed(0)}° ${m.el!=null?' · '+m.el.toFixed(0)+'° below horizon':''}</div><div id=arr style="font-size:44px;display:inline-block">↑</div> <small>(tap again or swipe down to close)</small>`;card.style.display='block';cardFor=s}
-addEventListener('pointerup',e=>{if(e.target.closest&&e.target.closest('button,#camB,#manL,#mpkOv,#mpc,#mpb,#zoom,#hpP,#hpD,#card,#layP,#desk,#pairP,#lockP'))return;if(card.style.display==='block'){card.style.display='none';cardFor=null;return}
+addEventListener('pointerup',e=>{if(e.target.closest&&e.target.closest('button,#camB,#manL,#mpkOv,#mpc,#mpb,#trk,#trkM,#zoom,#hpP,#hpD,#card,#layP,#desk,#pairP,#lockP'))return;if(card.style.display==='block'){card.style.display='none';cardFor=null;return}
  let best=null,bd=60;for(const s of LABELS){const c=s.userData.scr;if(!s.parent||!c)continue;const d=Math.hypot(c.x-e.clientX,c.y-e.clientY);if(d<bd){bd=d;best=s}}if(best)showCard(best)});
 let ty=0;card.addEventListener('touchstart',e=>ty=e.touches[0].clientY);card.addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-ty>40){card.style.display='none';cardFor=null}});
 function updArrow(){const a=document.getElementById('arr');if(!a||!cardFor)return;const wp=cardFor.getWorldPosition(new T.Vector3()).project(cam);let ang=Math.atan2(wp.x,wp.y)/D;if(wp.z>1)ang+=180;a.style.transform=`rotate(${ang}deg)`}
@@ -223,7 +223,7 @@ locSel.onchange=()=>{if(locSel.value==='gps')navigator.geolocation.getCurrentPos
 function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#000)';vid.style.display='none';
  if(!MYPOS){ui.textContent='No GPS yet, using Ready Athletics';setLoc(48.11035,-122.80591);locSel.value='0'}}
 document.querySelectorAll('#desk button').forEach(b=>b.onclick=()=>{yaw=+b.dataset.h});
-let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('button,select,#mpc,#hpP,#hpD,#card,#zoom'))drag=[e.clientX,e.clientY,yaw,pitch,0]});
+let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('button,select,#mpc,#trkM,#hpP,#hpD,#card,#zoom'))drag=[e.clientX,e.clientY,yaw,pitch,0]});
 addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-drag[0],dy=e.clientY-drag[1];drag[4]=Math.max(drag[4],Math.abs(dx)+Math.abs(dy));yaw=(drag[2]-dx*.2+3600)%360;pitch=Math.max(-89,Math.min(89,drag[3]+dy*.2))}});
 addEventListener('pointerup',()=>{drag=null});
 addEventListener('keydown',e=>{if(!desk)return;if(e.key==='ArrowLeft')yaw=(yaw-3+360)%360;if(e.key==='ArrowRight')yaw=(yaw+3)%360;if(e.key==='ArrowUp')pitch=Math.min(89,pitch+3);if(e.key==='ArrowDown')pitch=Math.max(-89,pitch-3)});

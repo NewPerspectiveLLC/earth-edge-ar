@@ -1,13 +1,10 @@
 <!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Earth Edge AR · Quest</title>
 <script>if(/[?&]iwer/.test(location.search))document.write('<script src=tools/iwer.iife.js><\/script><script>window.IWER=new IWERLib.XRDevice(IWERLib.metaQuest3);IWER.installRuntime({forceInstall:true})<\/script>')</script><script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <style>body{margin:0;background:transparent;font:16px sans-serif}#hud{position:fixed;left:8px;top:8px;z-index:9;background:#000c;color:#fff;padding:10px;border-radius:10px;max-width:440px}
-#hud button{font-size:16px;padding:10px 14px;margin:3px}#mpc{display:none;position:fixed;inset:0;z-index:20;background:#000e;color:#fff;padding:24px;font-size:18px}#mpc input,#mpc select{font-size:18px}</style></head><body>
+#hud button{font-size:16px;padding:10px 14px;margin:3px}#mpc input,#mpc select{font-size:18px}</style></head><body>
 <button id=arB style="position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:30;font-size:30px;padding:26px 40px;border-radius:18px;background:#ffc800;border:0;font-weight:bold">Enter AR (passthrough)</button><div id=hud><button id=camQ>Camera passthrough: on</button><button id=vxRAB>Ready Athletics vortex: on</button><button id=vxCappyB>Cappy's vortex: on</button><button id=vxGardenB>Meditation Garden vortex: on</button><button id=ocB>Ocean: on</button><button id=sxB>Saucers/roads/ghost: on</button><br><div style="margin:6px 0"><input id=manI placeholder="lat, lon  or  place / address" style="font-size:24px;width:400px;padding:8px"> <button id=manS style="font-size:22px">Set</button> <button id=manM style="font-size:22px">🗺 Map</button> <button id=manC>Clear</button><br><span id=manV></span><br><span id=manN></span></div><b>Earth Edge AR · Quest</b> (default location: Ready Athletics, no GPS)<br>1) Tap <b>AR</b> (bottom right). 2) Face real north, press <b>A</b> or trigger to set north (<b>B</b> unlocks).<br>Left stick moves, right stick left/right turns, up/down = floor height. X = camera passthrough on/off. Y = cycle vortices (all / RA / Cappy's / Garden / none).<br>
-<button id=joinB>Join live tracking</button><button id=leaveB style=display:none>Leave and stop tracking</button><button id=delB style=display:none>Delete my recorded data</button> <span id=trk style="display:none;background:#c00;padding:3px 6px;border-radius:5px">● Tracking ON</span></div>
-<div id=mpc><h2>Join live tracking</h2><p><b>This is a GPS game. While you're in, your position is recorded continuously and shown to other players in the game. It is not shown to the public.</b></p>
-<p style=font-size:15px>On Quest your position is Ready Athletics plus how far you walk in the headset. We store only your display name, mode, entrance, and position fixes (lat, lon, accuracy, time). The game organizer (GM) can see all joined players, including stealth players. Anyone with the link can join.</p>
-<p>Display name <input id=mpn maxlength=24></p><p>Mode <select id=mpm><option value=regular>Regular</option><option value=stealth>Stealth (hidden from players, visible to GM)</option></select> Entrance <select id=mpe><option>walk</option><option>jump</option><option>dance</option><option>run</option></select></p>
-<p><label><input type=checkbox id=mpa> I agree</label></p><button id=mpj disabled>Join</button> <button id=mpx>Cancel</button></div>
+<span id=mpb></span></div>
+
 <a-scene renderer="alpha:true;antialias:true;colorManagement:true" xr-mode-ui="enabled:true;XRMode:ar;enterAREnabled:true;enterVREnabled:false" webxr="requiredFeatures:local-floor;optionalFeatures:local-floor" vr-mode-ui="enabled:false">
  <a-entity id=rig movement-ctl><a-entity id=head camera look-controls position="0 1.6 0"></a-entity>
   <a-entity id=lh oculus-touch-controls="hand:left"></a-entity><a-entity id=rh oculus-touch-controls="hand:right" laser-controls="hand:right" raycaster="far:60;objects:.none"></a-entity></a-entity>
@@ -66,20 +63,14 @@ const arB0=document.getElementById('arB');arB.onclick=()=>{const sc=document.que
 document.querySelector('a-scene').addEventListener('enter-vr',()=>{const sc=document.querySelector('a-scene');sc.renderer.setClearColor(0x000000,0);sc.object3D.background=null;sc.object3D.fog=null;document.querySelectorAll('a-sky,[environment]').forEach(e=>e.setAttribute('visible',false));document.getElementById('hud').style.display='none';arB.style.display='none';const s=sc.xrSession;const mode=sc.is('ar-mode')?'immersive-ar':'immersive-vr';if(s&&s.environmentBlendMode==='opaque')setTimeout(()=>say('OPAQUE (VR) session - no passthrough. Exit and press Enter AR.'),900);fetch('/api/clientlog',{method:'POST',body:JSON.stringify({ev:'quest-aframe-xr',mode,environmentBlendMode:s&&s.environmentBlendMode,ua:navigator.userAgent})}).catch(()=>{});document.getElementById('bm').setAttribute('value','environmentBlendMode: '+(s&&s.environmentBlendMode));setTimeout(()=>say('Mode: '+(s&&s.environmentBlendMode)+'. Face north, press A.'),800)});
 document.querySelector('a-scene').addEventListener('exit-vr',()=>{document.getElementById('hud').style.display='';arB.style.display=''});
 // ---- multiplayer: same Monster protocol as the main build
-const $=id=>document.getElementById(id);let S=JSON.parse(localStorage.eearQSession||'null'),timer=null,others={};
-$('mpa').onchange=$('mpn').oninput=()=>$('mpj').disabled=!$('mpa').checked||!$('mpn').value.trim();
-$('joinB').onclick=()=>{$('mpa').checked=false;$('mpj').disabled=true;$('mpc').style.display='block'};$('mpx').onclick=()=>$('mpc').style.display='none';
-const call=(p,b)=>fetch('/api'+p,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+(S?.token||'')},body:JSON.stringify(b||{})}).then(r=>r.json());
-$('mpj').onclick=async()=>{const r=await call('/join',{consent:true,name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,device:'quest'}).catch(()=>({}));if(!r.token)return alert('Join failed');S={...r,live:true};localStorage.eearQSession=JSON.stringify(S);$('mpc').style.display='none';on()};
-$('leaveB').onclick=async()=>{await call('/leave');S.live=false;localStorage.eearQSession=JSON.stringify(S);off()};
-$('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))return;await call('/delete');S=null;localStorage.removeItem('eearQSession');off()};
-function ui(){const l=S&&S.live;$('joinB').style.display=l?'none':'';$('leaveB').style.display=l?'':'none';$('delB').style.display=S?'':'none';$('trk').style.display=l?'':'none'}
-function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}function off(){clearInterval(timer);for(const k in others)others[k].remove();others={};ui()}
+const $=id=>document.getElementById(id);let LV=null,timer=null,others={};
+import('./liveui.js').then(M=>{LV=M.liveUI({key:'eearQSession',device:'quest',api:'/api',start:on,stop:off});window.EEAR_LIVE=LV});
+function on(){clearInterval(timer);timer=setInterval(tick,3000);tick()}function off(){clearInterval(timer);for(const k in others)others[k].remove();others={}}
 function myLatLon(){// rig + head offset in the north-aligned world frame -> metres east/north of Ready Athletics
  const c=document.querySelector('a-scene').camera,p=new THREE.Vector3();c.getWorldPosition(p);world.object3D.worldToLocal(p);const mx=111320*Math.cos(HOME[0]*D);const d=new THREE.Vector3();c.getWorldDirection(d);const wq=new THREE.Quaternion();world.object3D.getWorldQuaternion(wq);d.applyQuaternion(wq.invert());const hdg=(Math.atan2(d.x,-d.z)*180/Math.PI+360)%360;return{lat:HOME[0]-p.z/111320,lon:HOME[1]+p.x/mx,acc:northLocked?5:50,hdg:Math.round(hdg)}}
 window.myLatLon=myLatLon;
-async function tick(){if(!S?.live)return;const m=myLatLon();call('/pos',m).catch(()=>{});
- try{const r=await fetch('/api/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}const seen={};
+async function tick(){if(!LV||!LV.active)return;const S=LV.S;const m=myLatLon();LV.call('/pos',m).catch(()=>{});
+ try{const r=await fetch('/api/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){LV.lost();return}const seen={};
  for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;const p=enu(o.last.lat,o.last.lon,0);let el=others[o.id];if(!el){el=document.createElement('a-entity');el.setAttribute('stick-fig',`name:${o.name}${o.device==='quest'?' (Quest)':''};color:hsl(${parseInt(o.id.slice(0,4),16)%360},100%,60%)`);$('others').appendChild(el);others[o.id]=el}
   el.setAttribute('position',`${p[0]} ${floorY+1} ${p[2]}`)}for(const k in others)if(!seen[k]){others[k].remove();delete others[k]}}catch(e){}}
 AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'#0ff'}},init(){const g=new THREE.Group(),c=new THREE.Color(this.data.color);
@@ -88,7 +79,7 @@ AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'
  const head=new THREE.Mesh(new THREE.TorusGeometry(.12,.025,6,20),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.4,depthTest:false}));head.material.userData.add=1;noAlpha(head.material);head.material.userData.pf=1;head.position.y=.7;g.add(head);this.el.setObject3D('mesh',g);
  const t=document.createElement('a-text');t.setAttribute('value',this.data.name);t.setAttribute('align','center');t.setAttribute('color',this.data.color);t.setAttribute('width',3);t.setAttribute('position','0 1.05 0');t.setAttribute('look-at-cam','');this.el.appendChild(t)},
  tick(t){this.el.object3D.children[0]&&(this.el.object3D.children[0].rotation.z=Math.sin(t/900)*.04)}});
-if(S?.live)on();else ui();
+
 // ---- manual location: overrides the default (Ready Athletics); persisted; page recentres on Set
 {const m=JSON.parse(localStorage.eearManLoc||'null');manV.textContent=m?'Applied: '+m.a.toFixed(6)+', '+m.l.toFixed(6)+(m.src&&m.src!=='coords'?' ('+m.src.slice(0,60)+')':''):'Using Ready Athletics (default)';if(m)manI.value=m.a+', '+m.l}
 async function manParse(t){const m=t.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);if(m){const a=+m[1],l=+m[2];if(Math.abs(a)<=90&&Math.abs(l)<=180)return[a,l,'coords']}

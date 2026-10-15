@@ -1,29 +1,18 @@
 // Opt-in multiplayer + glowing x-ray stick figures. Nothing leaves the device until the user consents and joins.
-import*as T from'three';
+import*as T from'three';import{liveUI}from'./liveui.js';
 export function initMP({scene,cam,getPos,toLocal}){
-const API=(window.EEAR_API||'')+'/api';let S=JSON.parse(localStorage.eearSession||'null'),timer=null,others={};
-const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#mpc{position:fixed;inset:0;z-index:9;background:#000e;display:none;padding:24px;font-size:17px}#mpc input[type=text]{font-size:18px;width:90%;padding:8px}#trk{position:fixed;top:60px;right:8px;z-index:7;background:#c00;color:#fff;padding:4px 8px;border-radius:6px;font-weight:bold;display:none}#radar{position:fixed;left:8px;bottom:40px;z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;
+const API=(window.EEAR_API||'')+'/api';let timer=null,others={};
+const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#radar{position:fixed;left:8px;bottom:40px;z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;
 document.head.insertAdjacentHTML('beforeend','<style>'+css+'</style>');
-document.body.insertAdjacentHTML('beforeend',`<div id=mpb><button id=joinB>Join live tracking</button><button id=leaveB style=display:none>Leave and stop tracking</button><button id=delB style=display:none>Delete my recorded data</button></div><div id=trk>● Tracking ON</div><canvas id=radar width=240 height=240></canvas>
-<div id=mpc><h2>Join live tracking</h2><p><b>This is a GPS game. While you're in, your position is recorded continuously and shown to other players in the game. It is not shown to the public.</b></p><p style=font-size:14px>We store only your display name, mode, entrance, and position fixes (lat, lon, accuracy, time). The game organizer (GM) can see all joined players, including stealth players. Anyone with the link can join. You can leave any time and delete your recorded data.</p>
-<p>Display name<br><input type=text id=mpn maxlength=24></p><p>Mode <select id=mpm><option value=regular>Regular (visible to players)</option><option value=stealth>Stealth (hidden from players, visible to GM)</option></select></p><p>Entrance <select id=mpe><option>walk</option><option>jump</option><option>dance</option><option>run</option></select></p>
-<p><label><input type=checkbox id=mpa> I agree</label></p><button id=mpj disabled>Join</button> <button id=mpx>Cancel</button></div>`);
+document.body.insertAdjacentHTML('beforeend',`<div id=mpb></div><canvas id=radar width=240 height=240></canvas>`);
 const $=id=>document.getElementById(id);
-$('mpa').onchange=()=>$('mpj').disabled=!$('mpa').checked||!$('mpn').value.trim();$('mpn').oninput=$('mpa').onchange;
-$('joinB').onclick=()=>{$('mpa').checked=false;$('mpj').disabled=true;$('mpc').style.display='block'};$('mpx').onclick=()=>$('mpc').style.display='none';
-const call=(p,b)=>fetch(API+p,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+(S?.token||'')},body:JSON.stringify(b||{})}).then(r=>r.json());
-$('mpj').onclick=async()=>{if(!$('mpa').checked)return;const r=await call('/join',{consent:true,name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,device:'phone'});
-if(!r.token)return alert('Join failed: '+(r.error||'server unreachable'));S={...r,live:true};localStorage.eearSession=JSON.stringify(S);$('mpc').style.display='none';on()};
-$('leaveB').onclick=async()=>{await call('/leave');S.live=false;localStorage.eearSession=JSON.stringify(S);off()};
-$('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))return;await call('/delete');S=null;localStorage.removeItem('eearSession');off()};
-function ui(){const live=S&&S.live;$('joinB').style.display=live?'none':'';$('leaveB').style.display=live?'':'none';$('delB').style.display=S?'':'none';$('trk').style.display=live?'block':'none';$('radar').style.display=live?'block':'none'}
-function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}
-function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};ui()}
-async function tick(){if(!S?.live)return;const p=getPos();if(p)call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc,hdg:p.hdg}).catch(()=>{});
-try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}
+const LV=liveUI({key:'eearSession',device:'phone',api:API,start:on,stop:off});window.EEAR_LIVE=LV;
+function on(){clearInterval(timer);timer=setInterval(tick,3000);$('radar').style.display='block';tick()}
+function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};$('radar').style.display='none'}
+async function tick(){if(!LV.active)return;const S=LV.S;const p=getPos();if(p)LV.call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc,hdg:p.hdg}).catch(()=>{});
+try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){LV.lost();return}
 const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;if(!others[o.id]){others[o.id]={g:stick(o.name+(o.device==='quest'?' (Quest)':''),colorOf(o.id),false),o,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}
-if(S?.live)on();else ui();
 const tmp=new T.Vector3();
 function frame(t){const me=getPos();const rc=$('radar').getContext('2d');rc.clearRect(0,0,240,240);rc.strokeStyle='#fff6';rc.beginPath();rc.arc(120,120,118,0,7);rc.stroke();rc.fillStyle='#fff';rc.fillRect(117,117,6,6);
 for(const k in others){const{g,o,born}=others[k];const target=toLocal(o.last.lat,o.last.lon);g.userData.pos=g.userData.pos?g.userData.pos.lerp(target,.1):target.clone();

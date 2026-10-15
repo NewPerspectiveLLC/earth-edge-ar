@@ -145,3 +145,37 @@ export function vortexGroundLines(la,lo,proj,maxKm=80){const out=[],ds=[0];for(l
 export function makeDarkSky(T){const m=new T.ShaderMaterial({side:T.BackSide,depthTest:false,depthWrite:false,vertexShader:'varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
  fragmentShader:'varying vec3 vD;void main(){float y=vD.y;vec3 sky=mix(vec3(.04,.10,.23),vec3(.008,.016,.08),smoothstep(0.,.8,y));vec3 gnd=mix(vec3(.03,.05,.09),vec3(0.),smoothstep(0.,-.7,y));gl_FragColor=vec4(y>0.?sky:gnd,1.);}'});
  m.userData.pf=1;m.userData.cpf=1;const s=new T.Mesh(new T.SphereGeometry(60,32,16),m);s.renderOrder=-100;s.frustumCulled=false;s.visible=false;s.name='darkSky';return s}
+
+// ---- true-scale geography (Antarctica, Australia, mountains). `proj(lat,lon,h_m)` -> THREE.Vector3 in the caller's frame
+// (main build: ENU*SC km from the viewer; Quest: ENU metres scaled uniformly about the eye). Uniform scaling about the eye
+// keeps every angle (direction, apparent size, apparent elevation) exactly true.
+export function enuProjH(T,la0,lo0,R=6371e3){const e=(a,l,h)=>{a*=D;l*=D;const r=R+(h||0);return[r*Math.cos(a)*Math.cos(l),r*Math.cos(a)*Math.sin(l),r*Math.sin(a)]},o=e(la0,lo0,0),sl=Math.sin(lo0*D),cl=Math.cos(lo0*D),sp=Math.sin(la0*D),cp=Math.cos(la0*D);
+ return(a,l,h)=>{const p=e(a,l,h),d=[p[0]-o[0],p[1]-o[1],p[2]-o[2]];return new T.Vector3(-sl*d[0]+cl*d[1],cp*cl*d[0]+cp*sl*d[1]+sp*d[2],-(-sp*cl*d[0]-sp*sl*d[1]+cp*d[2]))}}
+const RE=6371.0088;
+function aeq(la,lo,la0,lo0){const p=la*D,l=lo*D,p0=la0*D,l0=lo0*D,c=Math.acos(Math.max(-1,Math.min(1,Math.sin(p0)*Math.sin(p)+Math.cos(p0)*Math.cos(p)*Math.cos(l-l0))));if(c<1e-12)return[0,0];const k=c/Math.sin(c);return[k*Math.cos(p)*Math.sin(l-l0)*RE,k*(Math.cos(p0)*Math.sin(p)-Math.sin(p0)*Math.cos(p)*Math.cos(l-l0))*RE]}
+function iaeq(x,y,la0,lo0){const rho=Math.hypot(x,y),c=rho/RE,p0=la0*D,l0=lo0*D;if(rho<1e-9)return[la0,lo0];const la=Math.asin(Math.cos(c)*Math.sin(p0)+y*Math.sin(c)*Math.cos(p0)/rho),lo=l0+Math.atan2(x*Math.sin(c),rho*Math.cos(p0)*Math.cos(c)-y*Math.sin(p0)*Math.sin(c));return[la/D,((lo/D+540)%360)-180]}
+// Filled landmass: earcut in an azimuthal-equidistant plane around (la0,lo0), triangles subdivided to <= maxKm edges,
+// every vertex then placed on the sphere (h metres up) through proj. Returns {mesh, outlines:[[x,y,z,...]]}.
+export function makeLandmass(T,rings,la0,lo0,proj,{color=0xbff4ff,opacity=.22,maxKm=150,h=0}={}){
+ const pos=[],outlines=[];
+ for(const ring of rings){const P=ring.map(([a,l])=>aeq(a,l,la0,lo0)),V=P.map(([x,y])=>new T.Vector2(x,y));
+  const tris=T.ShapeUtils.triangulateShape(V,[]);
+  const emit=(A,B,C,dep)=>{const ab=Math.hypot(A[0]-B[0],A[1]-B[1]),bc=Math.hypot(B[0]-C[0],B[1]-C[1]),ca=Math.hypot(C[0]-A[0],C[1]-A[1]),m=Math.max(ab,bc,ca);
+   if(m<=maxKm||dep>14){for(const Q of[A,B,C]){const[a,l]=iaeq(Q[0],Q[1],la0,lo0),v=proj(a,l,h);pos.push(v.x,v.y,v.z)}return}
+   const mid=(U,W)=>[(U[0]+W[0])/2,(U[1]+W[1])/2];
+   if(m===ab){const M=mid(A,B);emit(A,M,C,dep+1);emit(M,B,C,dep+1)}else if(m===bc){const M=mid(B,C);emit(A,B,M,dep+1);emit(A,M,C,dep+1)}else{const M=mid(C,A);emit(A,B,M,dep+1);emit(M,B,C,dep+1)}};
+  for(const[i,j,k]of tris)emit(P[i],P[j],P[k],0);
+  const o=[];for(let i=0;i<=ring.length;i++){const[a,l]=ring[i%ring.length];const v=proj(a,l,h);o.push(v.x,v.y,v.z)}outlines.push(o)}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));
+ const m=passMat(T,new T.MeshBasicMaterial({color,transparent:true,opacity,depthTest:false,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending}));
+ const mesh=new T.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=9;return{mesh,outlines,tris:pos.length/9}}
+// DEM mountain: n x n heights (m) over a +-half (m) square centred on lat/lon. Contour + grid glow shader.
+export function makeTerrain(T,M,proj,color=0xffffff){const n=M.n,half=M.half_m,mla=111320,mlo=111320*Math.cos(M.lat*D),pos=[],hh=[],uv=[],idx=[];
+ for(let j=0;j<n;j++)for(let i=0;i<n;i++){const e=-half+2*half*i/(n-1),nn=half-2*half*j/(n-1),h=Math.max(0,M.h[j*n+i]);const v=proj(M.lat+nn/mla,M.lon+e/mlo,h);pos.push(v.x,v.y,v.z);hh.push(h);uv.push(i/(n-1),j/(n-1))}
+ for(let j=0;j<n-1;j++)for(let i=0;i<n-1;i++){const a=j*n+i,b=a+1,c=a+n,d=c+1;idx.push(a,c,b,b,c,d)}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('hm',new T.Float32BufferAttribute(hh,1));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);
+ const top=M.summit_m||4000,cells=(2*half/1000).toFixed(1);
+ const m=passMat(T,new T.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending,uniforms:{c:{value:new T.Color(color)}},
+  vertexShader:'attribute float hm;varying float vH;varying vec2 vU;void main(){vH=hm;vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader:'uniform vec3 c;varying float vH;varying vec2 vU;void main(){float f=vH/'+top.toFixed(1)+';float ct=abs(fract(vH/250.)-.5)*2.;float w=fwidth(vH/250.)*1.5;float cl=1.-smoothstep(1.-w*2.,1.,ct);vec2 gq=abs(fract(vU*'+cells+')-.5)*2.;vec2 gw=fwidth(vU*'+cells+')*2.;float gl=max(1.-smoothstep(1.-gw.x,1.,gq.x),1.-smoothstep(1.-gw.y,1.,gq.y));float edge=smoothstep(0.,.08,min(min(vU.x,1.-vU.x),min(vU.y,1.-vU.y)));float snow=smoothstep(.5,.75,f);vec3 col=mix(c*.6,vec3(1.),snow);float a=(.05+.25*f+.55*cl*(.3+f)+.25*gl)*edge*smoothstep(150.,700.,vH);gl_FragColor=vec4(col,min(1.,a));}'}));
+ m.extensions={derivatives:true};const mesh=new T.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=9;return mesh}
