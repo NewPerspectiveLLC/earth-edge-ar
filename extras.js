@@ -107,6 +107,7 @@ const DANCES=[(B,t)=>{// charleston
 const resetPose=B=>{for(const n in B)B[n].rotation.set(0,0,0);B.LeftArm.rotation.z=-1.25;B.RightArm.rotation.z=1.25};
 // me = viewer position in the ghost's parent frame; ground = floor y in that frame
 export function ghostFrame(T,g,t,me,ground,dt=.016){const st=g.userData.ghost,B=st.B,L=st.L,s=t/1000;if(!st.next)st.next=s+2;
+ if(st.path&&ghostLoop(T,g,st,B,L,s,me,ground,dt))return;
  if(st.mixer&&st.clips&&st.clips.length&&st.mode==='dance'){st.mixer.update(dt)}
  const p=g.position;p.y=ground;
  if(s>st.next){const r=Math.random();if(r<.45){st.mode='walk';const a=Math.random()*Math.PI*2,d=4+Math.random()*7;st.target=new T.Vector3(me.x+Math.cos(a)*d,ground,me.z+Math.sin(a)*d);st.next=s+12}
@@ -119,6 +120,19 @@ export function ghostFrame(T,g,t,me,ground,dt=.016){const st=g.userData.ghost,B=
  if(st.mode==='walk'&&st.target){const dx=st.target.x-p.x,dz=st.target.z-p.z,d=Math.hypot(dx,dz);if(d<.3){st.mode='idle';st.next=s+1.5;resetPose(B)}else{const v=Math.min(d,.9*dt);p.x+=dx/d*v;p.z+=dz/d*v;g.rotation.y=Math.atan2(dx,dz);
    const w=Math.sin(s*7);resetPose(B);B.LeftUpLeg.rotation.x=w*.45;B.RightUpLeg.rotation.x=-w*.45;B.LeftLeg.rotation.x=Math.max(0,w)*.6;B.RightLeg.rotation.x=Math.max(0,-w)*.6;B.LeftArm.rotation.x=-w*.35;B.RightArm.rotation.x=w*.35;B.Hips.position.y=1.0*(L.height/1.9)+Math.abs(w)*.03}}
  else{g.rotation.y+=(Math.atan2(me.x-p.x,me.z-p.z)-g.rotation.y)*.05;if(st.mode==='dance'&&!(st.mixer&&st.clips&&st.clips.length))DANCES[st.dance](B,s);if(st.mode==='idle'){resetPose(B);B.Spine1.rotation.z=Math.sin(s*1.3)*.03;B.Head.rotation.x=Math.sin(s*.7)*.05}}}
+function ghostLoop(T,g,st,B,L,s,me,ground,dt){const P=st.path,p=g.position;p.y=ground;
+ if(st.bubT&&s>st.bubT){st.bub.visible=false;st.bubT=0}
+ if(st.mode==='walk'){const dx=st.target.x-p.x,dz=st.target.z-p.z,d=Math.hypot(dx,dz);if(d<.3){st.mode='loop';st.pathNext=s+8+Math.random()*10}else{const v=Math.min(d,.9*dt);p.x+=dx/d*v;p.z+=dz/d*v;g.rotation.y=Math.atan2(dx,dz);walkPose(B,L,s)}return true}
+ if(!st.pathNext)st.pathNext=s+8+Math.random()*10;
+ if(st.mode==='loop'&&s>st.pathNext){const r=Math.random();st.ev=r<.35?'pause':r<.65?'gesture':r<.85?'dance':'say';st.mode=st.ev==='say'?'loop':st.ev;st.evEnd=s+(st.ev==='dance'?5:st.ev==='gesture'?2.6:2.2);if(st.ev==='dance'){st.dance=(st.dance+1)%DANCES.length;resetPose(B)}
+  if(st.ev==='say'||Math.random()<.5){st.bub.userData.say(L.bubbles[Math.floor(Math.random()*L.bubbles.length)]);st.bubT=s+4}st.pathNext=s+12+Math.random()*14}
+ if(st.mode!=='loop'){g.rotation.y+=(Math.atan2(me.x-p.x,me.z-p.z)-g.rotation.y)*.06;resetPose(B);
+  if(st.mode==='dance')DANCES[st.dance](B,s);else if(st.mode==='gesture'){B.RightArm.rotation.set(0,0,-1.1);B.RightForeArm.rotation.set(0,0,-.5+Math.sin(s*9)*.45);B.Head.rotation.z=.08}else{B.Spine1.rotation.z=Math.sin(s*1.3)*.03;B.Head.rotation.x=Math.sin(s*.7)*.05}
+  if(s>st.evEnd){st.mode='loop';resetPose(B)}return true}
+ st.u=(st.u+P.speed*dt)%P.len;let i=st.i||0;const n=P.Q.length;while(P.cum[i+1]<st.u)i=(i+1)%n;while(P.cum[i]>st.u)i=(i-1+n)%n;st.i=i;
+ const a=P.Q[i],b=P.Q[(i+1)%n],seg=(P.cum[i+1]-P.cum[i])||1,f=(st.u-P.cum[i])/seg;p.x=a[0]+(b[0]-a[0])*f;p.z=a[1]+(b[1]-a[1])*f;
+ const yaw=Math.atan2(b[0]-a[0],b[1]-a[1]);let dy=yaw-g.rotation.y;dy=Math.atan2(Math.sin(dy),Math.cos(dy));g.rotation.y+=dy*Math.min(1,dt*6);walkPose(B,L,s);return true}
+function walkPose(B,L,s){const w=Math.sin(s*6.5);resetPose(B);B.LeftUpLeg.rotation.x=w*.42;B.RightUpLeg.rotation.x=-w*.42;B.LeftLeg.rotation.x=Math.max(0,w)*.55;B.RightLeg.rotation.x=Math.max(0,-w)*.55;B.LeftArm.rotation.set(-w*.35,0,-1.2);B.RightArm.rotation.set(w*.35,0,1.2);B.Hips.position.y=1.0*(L.height/1.9)+Math.abs(w)*.03}
 // ---------- per-frame
 export function frame(t,dt=.016){U.t.value=t/1000;const s=t/1000;for(const S of SAUCERS){S.sc.position.y+=Math.sin(s*1.2+S.ph)*.01;S.sc.rotation.y+=S.hero?.02:.01;S.port.forEach((p,i)=>p.material.opacity=.4+.6*(Math.sin(s*4+i)>.3?1:0));S.lights.forEach((l,i)=>l.material.opacity=((Math.floor(s*8)%8)===i)?1:.25);if(S.beam)S.beam.material.opacity=.08+.06*Math.sin(s*3)}}
 export function spin(g,t){g.traverse(o=>{if(o.userData.spin)o.rotation.y=t/1000*.4})}
@@ -192,3 +206,19 @@ export function shorePolys(J,proj,y=0){const out={coast:[],harbor:[],lagoon:[],l
   for(const P of out[grp])for(let i=0;i<P.length;i+=3){const d=(P[i]-t.x)**2+(P[i+2]-t.z)**2;if(d<bd){bd=d;best=[P[i],P[i+1],P[i+2]]}}
   if(best)out.labels.push({name:n,grp,pos:best,distM:Math.hypot(best[0],best[2])})}
  return out}
+// ---------- GHOST PATH: loop along the user's play-space boundary (Quest Guardian via bounded-floor) or a circle fallback
+// pts: [[x,z],...] in the ghost parent's local frame (closed loop). Ghost walks it at speed m/s, pausing/gesturing/dancing now and then.
+export function circlePts(cx,cz,r,n=64){const P=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2;P.push([cx+Math.cos(a)*r,cz+Math.sin(a)*r])}return P}
+export function insetPoly(P,d){const n=P.length;let A=0;for(let i=0;i<n;i++){const[a,b]=P[i],[c,e]=P[(i+1)%n];A+=a*e-c*b}const s=A>0?1:-1,out=[];// s>0: CCW in x/z
+ for(let i=0;i<n;i++){const p0=P[(i-1+n)%n],p1=P[i],p2=P[(i+1)%n];const e1=[p1[0]-p0[0],p1[1]-p0[1]],e2=[p2[0]-p1[0],p2[1]-p1[1]];const l1=Math.hypot(...e1)||1,l2=Math.hypot(...e2)||1;
+  const n1=[-e1[1]/l1*s,e1[0]/l1*s],n2=[-e2[1]/l2*s,e2[0]/l2*s];let m=[n1[0]+n2[0],n1[1]+n2[1]];const ml=Math.hypot(...m)||1;m=[m[0]/ml,m[1]/ml];const k=Math.min(3,1/Math.max(.35,m[0]*n1[0]+m[1]*n1[1]));out.push([p1[0]+m[0]*d*k,p1[1]+m[1]*d*k])}
+ return out}
+export function resamplePts(P,step=.25){const out=[];const n=P.length;for(let i=0;i<n;i++){const a=P[i],b=P[(i+1)%n],L=Math.hypot(b[0]-a[0],b[1]-a[1]),k=Math.max(1,Math.ceil(L/step));for(let j=0;j<k;j++)out.push([a[0]+(b[0]-a[0])*j/k,a[1]+(b[1]-a[1])*j/k])}return out}
+export function setGhostPath(g,P,{speed=.6,src='circle'}={}){const st=g.userData.ghost;if(!st)return;const Q=resamplePts(P);const cum=[0];for(let i=1;i<=Q.length;i++){const a=Q[i-1],b=Q[i%Q.length];cum.push(cum[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
+ // start at the path point nearest to where he stands now, walk there first
+ let bi=0,bd=1e9;for(let i=0;i<Q.length;i++){const d=Math.hypot(Q[i][0]-g.position.x,Q[i][1]-g.position.z);if(d<bd){bd=d;bi=i}}
+ st.path={Q,cum,len:cum[Q.length],speed,src};st.u=cum[bi];st.mode='walk';st.target=new (g.position.constructor)(Q[bi][0],g.position.y,Q[bi][1]);st.next=0;st.pathNext=0}
+// play-space polygon from the XR session (bounded-floor), returned in the local-floor frame; null when unavailable
+export async function xrBoundsLocal(session,localSpace){try{const bs=await session.requestReferenceSpace('bounded-floor');const B=bs.boundsGeometry;if(!B||B.length<3)return null;
+  const pose=await new Promise(res=>session.requestAnimationFrame((t,fr)=>{try{res(fr.getPose(bs,localSpace))}catch(e){res(null)}}));const m=pose?pose.transform.matrix:null;
+  return B.map(p=>m?[m[0]*p.x+m[8]*p.z+m[12],m[2]*p.x+m[10]*p.z+m[14]]:[p.x,p.z])}catch(e){return null}}
