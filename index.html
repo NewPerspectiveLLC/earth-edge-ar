@@ -138,7 +138,7 @@ const LAYERS={ocean:'Ocean',coast:'Coastline',roads:'Road paths',saucers:'Saucer
 const LAY=Object.assign({ocean:1,coast:1,roads:1,saucers:1,vortexL:1,vortexW:1,vxRA:1,vxCappy:1,vxGarden:1,places:1,lines:1,edges:1,far:1,grid:1,ghost:1},JSON.parse(localStorage.eearLayers||'{}'));
 function layerOn(o){while(o){if(o.userData&&o.userData.layer&&!LAY[o.userData.layer])return false;o=o.parent}return true}
 function applyLayers(){scene.traverse(o=>{if(o.userData&&o.userData.layer&&!o.isSprite)o.visible=!!LAY[o.userData.layer]});localStorage.eearLayers=JSON.stringify(LAY)}
-let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>MYPOS,toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
+let built=null;let MYPOS=null;import('./mp.js').then(M=>{window.MPM=M;window._mp=M.initMP({scene,cam,getPos:()=>{if(!MYPOS)return MYPOS;const d=new T.Vector3();cam.getWorldDirection(d);const wq=new T.Quaternion();local.getWorldQuaternion(wq);d.applyQuaternion(wq.invert());return{...MYPOS,hdg:Math.round((Math.atan2(d.x,-d.z)*180/Math.PI+360)%360)}},toLocal:(a,l)=>{const[my,mx]=mPer(L0?L0[0]:a);const o=L0||[a,l];return new T.Vector3((l-o[1])*mx,-1.6,-(a-o[0])*my).add(local.position)}})});
 async function build(la,lo){if(built&&Math.abs(built[0]-la)<.01&&Math.abs(built[1]-lo)<.01)return;built=[la,lo];
 world.clear();markers=[];for(let i=LABELS.length-1;i>=0;i--)if(!LABELS[i].parent)LABELS.splice(i,1);
 // translucent wireframe Earth, center at -R up

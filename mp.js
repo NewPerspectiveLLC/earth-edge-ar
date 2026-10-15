@@ -19,7 +19,7 @@ $('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))r
 function ui(){const live=S&&S.live;$('joinB').style.display=live?'none':'';$('leaveB').style.display=live?'':'none';$('delB').style.display=S?'':'none';$('trk').style.display=live?'block':'none';$('radar').style.display=live?'block':'none'}
 function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}
 function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};ui()}
-async function tick(){if(!S?.live)return;const p=getPos();if(p)call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc}).catch(()=>{});
+async function tick(){if(!S?.live)return;const p=getPos();if(p)call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc,hdg:p.hdg}).catch(()=>{});
 try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}
 const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;if(!others[o.id]){others[o.id]={g:stick(o.name+(o.device==='quest'?' (Quest)':''),colorOf(o.id),false),o,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}

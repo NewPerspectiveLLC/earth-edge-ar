@@ -14,6 +14,7 @@ create table if not exists games(id text primary key,name text,owner text,code t
 create table if not exists teams(id text primary key,game_id text,name text,color text);
 create table if not exists gplayers(id text primary key,game_id text,user_id text,token text,name text,mode text,entrance text,team_id text,joined int,live int,seen int);
 create table if not exists gfixes(pid text,lat real,lon real,acc real,t int);create index if not exists gfx on gfixes(pid,t);`);
+try{sq.exec('alter table gfixes add column hdg real')}catch(e){}// heading (deg true, from client camera) - optional
 // default public game so the plain link still works
 if(!sq.prepare("select 1 from games where id='public'").get())sq.prepare("insert into games values('public','Open game','gm','OPEN','{}',?)").run(Date.now());
 const H=s=>crypto.createHash('sha256').update(String(s)).digest('hex'),rid=n=>crypto.randomBytes(n).toString('hex');
@@ -40,7 +41,7 @@ function newSession(r,uid,redirect){const s=rid(32);run('insert into sessions va
 const canManage=(u,g)=>u&&g&&(u.role==='gm'||(u.role==='host'&&g.owner===u.id));
 const gameByCode=c=>one('select * from games where code=? or id=?',String(c||'OPEN').toUpperCase(),String(c||''));
 const settings=g=>{try{return JSON.parse(g.settings||'{}')}catch(e){return{}}};
-const lastFix=pid=>one('select lat,lon,acc,t from gfixes where pid=? order by t desc limit 1',pid)||null;
+const lastFix=pid=>one('select lat,lon,acc,hdg,t from gfixes where pid=? order by t desc limit 1',pid)||null;
 const teamOf=id=>id?one('select id,name,color from teams where id=?',id):null;
 const pubP=p=>({id:p.id,name:p.name,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id});
 // ---- federation: Ed25519 identity, registry (Monster runs it), signed heartbeats with stats. Share agreements: NOT built yet.
@@ -96,10 +97,20 @@ async function registry(u,q,r,j,b,U,ip){const now=Date.now();
   r.writeHead(200,{'content-type':'application/json','cache-control':'no-store','x-registry-sig':sig(out)});return r.end(out)}
  return false}
 const D2=Math.PI/180;
+function gmSnap(u){const now=Date.now(),win=Math.min(864e5,Math.max(5000,+u.searchParams.get('window')||LIVE_MS)),all_=!!u.searchParams.get('all');
+ const G=Object.fromEntries(all('select id,name,code from games').map(g=>[g.id,g]));
+ const L=all(all_?'select * from gplayers where seen>?':'select * from gplayers where live=1 and seen>?',now-win);
+ return{server_time:now,server_time_iso:new Date(now).toISOString(),window_ms:win,count:L.length,players:L.map(p=>{const f=lastFix(p.id),t=teamOf(p.team_id),g=G[p.game_id]||{};
+  return{id:p.id,name:p.name,lat:f?f.lat:null,lon:f?f.lon:null,accuracy:f?f.acc:null,heading:f&&f.hdg!=null?f.hdg:null,last_fix:f?f.t:null,last_seen:p.seen,last_seen_age_s:Math.round((now-p.seen)/1000),
+   stealth:p.mode==='stealth',live:!!p.live,entrance:p.entrance,team:t?{id:t.id,name:t.name,color:t.color}:null,game:{id:p.game_id,name:g.name||null,code:g.code||null}}})}}
 const types={'.html':'text/html','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
- if(!u.pathname.startsWith('/api/')){if(u.pathname.includes('/server/'))return r.writeHead(404),r.end();let f=path.normalize(path.join(root,decodeURIComponent(u.pathname)));if(!f.startsWith(path.normalize(root)))return r.end();
+ if(!u.pathname.startsWith('/api/')){let dp;try{dp=decodeURIComponent(u.pathname)}catch(e){return r.writeHead(400),r.end()}
+  // static allowlist: decoded + normalized + case-insensitive (macOS FS is case-insensitive). Never serve server/, cert/, logs/, dotfiles, db/key/log files.
+  const rel=path.posix.normalize('/'+dp.replace(/\\/g,'/')).toLowerCase();
+  if(rel.includes('\0')||/(^|\/)(server|cert|logs|node_modules)(\/|$)/.test(rel)||/(^|\/)\./.test(rel)||(!rel.endsWith('/')&&!/\.(html|js|json|png|jpg|jpeg|webp|css|glb|gltf|svg|ico|txt|mp3|wav)$/.test(rel))||/\.(pem|key|sqlite|log|err|bak.*)$/.test(rel)||/gm-key|config\.json|ed25519/.test(rel))return r.writeHead(404),r.end('not found');
+  let f=path.normalize(path.join(root,dp));if(!f.startsWith(path.normalize(root)+path.sep))return r.writeHead(404),r.end();
   if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,'index.html');
   return fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end('not found')}r.writeHead(200,{'content-type':types[path.extname(f)]||'application/octet-stream'});r.end(d)})}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
@@ -150,13 +161,20 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   const id=rid(6),token=rid(24);run('insert into gplayers values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),j.mode==='stealth'?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
   return send(r,{id,token,game:{id:g.id,name:g.name,code:g.code}})}
  case'/api/pos':{if(!P||!P.live)return send(r,{error:'not joined'},401);const lat=+j.lat,lon=+j.lon,acc=+j.acc||0;if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90)return send(r,{error:'bad'},400);
-  if(limited('p:'+P.id,40,60000))return send(r,{error:'slow down'},429);run('insert into gfixes values(?,?,?,?,?)',P.id,lat,lon,acc,now);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,team:teamOf(P.team_id)})}
+  if(limited('p:'+P.id,40,60000))return send(r,{error:'slow down'},429);const hdg=isFinite(+j.hdg)&&j.hdg!==null&&j.hdg!==''?((+j.hdg%360)+360)%360:null;run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',P.id,lat,lon,acc,now,hdg);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,team:teamOf(P.team_id)})}
  case'/api/players':{if(!P||!P.live)return send(r,{error:'not joined'},401);const g=one('select * from games where id=?',P.game_id),s=settings(g);
   let L=all('select * from gplayers where game_id=? and live=1 and id<>? and mode<>? and seen>?',P.game_id,P.id,'stealth',now-LIVE_MS);
   if(s.teamOnly)L=L.filter(o=>P.team_id&&o.team_id===P.team_id);// team-only: only teammates; no team => see nobody
   return send(r,{me:{team:teamOf(P.team_id)},teamOnly:!!s.teamOnly,players:L.map(pubP)})}
  case'/api/leave':{if(P)run('update gplayers set live=0 where id=?',P.id);return send(r,{ok:1})}
  case'/api/delete':{if(P){run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
+ // ---- read-only GM watcher (GM key header only; watcher never joins, so it never appears as a player)
+ case'/api/gm/snapshot':{if(q.method!=='GET')return send(r,{error:'GET only'},405);if(limited('gw:'+ip,240,60000))return send(r,{error:'rate limited'},429);
+  if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,gmSnap(u))}
+ case'/api/gm/stream':{if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);if(limited('gs:'+ip,30,60000))return send(r,{error:'rate limited'},429);
+  r.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache, no-transform','x-accel-buffering':'no'});r.flushHeaders&&r.flushHeaders();r.write(': '+' '.repeat(2048)+'\n\n');
+  const iv=Math.max(1000,Math.min(30000,+u.searchParams.get('every')||3000));const push=()=>{try{r.write('event: snapshot\ndata: '+JSON.stringify(gmSnap(u))+'\n\n')}catch(e){}};push();
+  const h=setInterval(push,iv),ka=setInterval(()=>r.write(': ka\n\n'),15000),stop=setTimeout(()=>r.end(),30*60000);q.on('close',()=>{clearInterval(h);clearInterval(ka);clearTimeout(stop)});return}
  // ---- GM/host live map: GM sees all games, host sees own games
  case'/api/gm':{if(!U||!['gm','host'].includes(U.role))return send(r,{error:'bad key'},403);const gid=u.searchParams.get('game');
   let G=U.role==='gm'?all('select * from games'):all('select * from games where owner=?',U.id);if(gid)G=G.filter(g=>g.id===gid);const ids=G.map(g=>g.id);

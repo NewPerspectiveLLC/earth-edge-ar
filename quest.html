@@ -76,7 +76,7 @@ $('delB').onclick=async()=>{if(!confirm('Delete all your recorded positions?'))r
 function ui(){const l=S&&S.live;$('joinB').style.display=l?'none':'';$('leaveB').style.display=l?'':'none';$('delB').style.display=S?'':'none';$('trk').style.display=l?'':'none'}
 function on(){ui();clearInterval(timer);timer=setInterval(tick,3000);tick()}function off(){clearInterval(timer);for(const k in others)others[k].remove();others={};ui()}
 function myLatLon(){// rig + head offset in the north-aligned world frame -> metres east/north of Ready Athletics
- const c=document.querySelector('a-scene').camera,p=new THREE.Vector3();c.getWorldPosition(p);world.object3D.worldToLocal(p);const mx=111320*Math.cos(HOME[0]*D);return{lat:HOME[0]-p.z/111320,lon:HOME[1]+p.x/mx,acc:northLocked?5:50}}
+ const c=document.querySelector('a-scene').camera,p=new THREE.Vector3();c.getWorldPosition(p);world.object3D.worldToLocal(p);const mx=111320*Math.cos(HOME[0]*D);const d=new THREE.Vector3();c.getWorldDirection(d);const wq=new THREE.Quaternion();world.object3D.getWorldQuaternion(wq);d.applyQuaternion(wq.invert());const hdg=(Math.atan2(d.x,-d.z)*180/Math.PI+360)%360;return{lat:HOME[0]-p.z/111320,lon:HOME[1]+p.x/mx,acc:northLocked?5:50,hdg:Math.round(hdg)}}
 window.myLatLon=myLatLon;
 async function tick(){if(!S?.live)return;const m=myLatLon();call('/pos',m).catch(()=>{});
  try{const r=await fetch('/api/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){S.live=false;off();return}const seen={};
