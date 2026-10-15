@@ -53,16 +53,17 @@ export function gcPoint(la,lo,b,d){la*=D;lo*=D;b*=D;d*=D;const a2=Math.asin(Math
 // world-scale great circles: proj(lat,lon)->THREE.Vector3 in the caller's world frame
 // Geometric Power: 6 great circles at bearings 0..150 (12 half-lines from the vortex, meeting at its antipode).
 // Returns arrays of positions (one full 360-degree circle each) so the caller can draw thick lines.
-export function vortexWorldCircles(la,lo,proj,n=6){const out=[];for(let k=0;k<n;k++){const pos=[];for(let i=0;i<=360;i+=1){const[a,l]=gcPoint(la,lo,k*180/n,i);const v=proj(a,l);pos.push(v.x,v.y,v.z)}out.push(pos)}return out}
+const GC_ANG=(()=>{const A=[0];for(let d=.00002;d<2;d*=1.15)A.push(d);for(let d=2;d<358;d+=1)A.push(d);const B=A.filter(x=>x<2).reverse().map(x=>360-x);return A.concat(B,[360])})();// dense near the vortex so the circle hugs the ground there
+export function vortexWorldCircles(la,lo,proj,n=6){const out=[];for(let k=0;k<n;k++){const pos=[];for(const i of GC_ANG){const[a,l]=gcPoint(la,lo,k*180/n,i);const v=proj(a,l);pos.push(v.x,v.y,v.z)}out.push(pos)}return out}
 export const WEDGE_COLS=[0xff3b30,0xff9500,0xffcc00,0x9be22d,0x34c759,0x00c7be,0x30b0ff,0x007aff,0x5856d6,0xaf52de,0xff2d92,0xff6482];
 // Local: 12 translucent 30-degree wedge sectors on the ground, fading with radius, with 12 dividing ground ribbons.
-export function makeVortexWedges(T,R=1500){const g=new T.Group();g.userData.layer='vortexL';
+export function makeVortexWedges(T,R=300,RL=1500){const g=new T.Group();g.userData.layer='vortexL';
  for(let k=0;k<12;k++){const b0=k*30;const geo=new T.CircleGeometry(R,24,(90-b0-30)*D,30*D).rotateX(-Math.PI/2);
   const m=passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{c:{value:new T.Color(WEDGE_COLS[k])},R:{value:R},t:U.t},vertexShader:'varying vec2 vP;void main(){vP=position.xz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
    fragmentShader:'uniform vec3 c;uniform float R,t;varying vec2 vP;void main(){float r=length(vP)/R;float a=(1.-smoothstep(.15,1.,r))*.2*smoothstep(.01,.05,r);float ring=smoothstep(.97,1.,fract(r*8.-t*.1))*.15*(1.-r);gl_FragColor=vec4(c,min(1.,(a+ring)*1.6));}'}));
   const w=new T.Mesh(geo,m);w.renderOrder=4;w.frustumCulled=false;w.position.y=.01;g.add(w);
-  const rb=new T.Mesh(new T.PlaneGeometry(2.5,R).rotateX(-Math.PI/2).translate(0,.04,-R/2),passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{R:{value:R}},vertexShader:'varying float vZ;void main(){vZ=-position.z;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float R;varying float vZ;void main(){float a=.55*(1.-smoothstep(.2*R,R,vZ))*smoothstep(20.,80.,vZ);gl_FragColor=vec4(vec3(1.,.95,.8),a);}'})));
-  rb.rotation.y=-b0*D;rb.renderOrder=5;rb.frustumCulled=false;g.add(rb)}
+  const rb=new T.Mesh(new T.PlaneGeometry(2,RL).rotateX(-Math.PI/2).translate(0,.04,-RL/2),passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{R:{value:RL}},vertexShader:'varying float vZ;void main(){vZ=-position.z;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float R;varying float vZ;void main(){float a=.55*(1.-smoothstep(.2*R,R,vZ))*smoothstep(20.,80.,vZ);gl_FragColor=vec4(vec3(1.,.95,.8),a);}'})));
+  rb.rotation.y=-b0*D;rb.renderOrder=5;rb.frustumCulled=false;if(RL>0)g.add(rb)}
  return g}
 export const antipode=(la,lo)=>[-la,((lo+360)%360)-180];
 // ---------- GHOSTBOT: Mixamo-named bone rig (three sanitises "mixamorig:Hips" to "mixamorigHips"), purple Victorian tux
@@ -130,3 +131,12 @@ export function makeVortexWorldTubes(T,la,lo,col,proj,shell=3000,rad=7){const g=
  for(const C of vortexWorldCircles(la,lo,proj)){let run=[];const flush=()=>{if(run.length>3){const cv=new T.CatmullRomCurve3(run);for(const[mm,r]of[[m,rad],[core,rad*.35]]){const t=new T.Mesh(new T.TubeGeometry(cv,run.length*2,r,5,false),mm);t.frustumCulled=false;t.renderOrder=9;g.add(t)}}run=[]};
   for(let i=0;i<C.length;i+=3){const v=new T.Vector3(C[i],C[i+1],C[i+2]);if(v.length()<8000){flush();continue}run.push(v.setLength(shell))}flush()}
  return g}
+
+// tall centre pillar so the vortex reads as 'over there'
+export function makeVortexPillar(T,col,h=420){const g=new T.Group();g.userData.layer='vortexL';const m=passMat(T,new T.ShaderMaterial({depthTest:false,side:T.DoubleSide,uniforms:{c:{value:new T.Color(col)},t:U.t},vertexShader:'varying float vY;void main(){vY=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 c;uniform float t;varying float vY;void main(){float a=(.55+.45*smoothstep(.6,1.,fract(vY*4.-t*.5)))*(1.-vY*.6);gl_FragColor=vec4(mix(c,vec3(1.),.35),a);}'}));
+ for(const r of[16,6]){const b=new T.Mesh(new T.CylinderGeometry(r,r*.6,h,16,1,true),m);b.position.y=h/2;b.renderOrder=8;b.frustumCulled=false;g.add(b)}const ring=new T.Mesh(new T.RingGeometry(10,14,48).rotateX(-Math.PI/2),passMat(T,new T.MeshBasicMaterial({color:col,transparent:true,opacity:.9,depthTest:false})));ring.position.y=.06;g.add(ring);return g}
+
+// 12 half-lines of the 6 great circles, sampled densely near the vortex (true ENU incl. Earth curvature) so they run
+// crisply along the ground to the horizon; the world-mode circles continue them around/through the globe.
+export function vortexGroundLines(la,lo,proj,maxKm=80){const out=[],ds=[0];for(let d=2;d<maxKm*1000;d*=1.08)ds.push(d);ds.push(maxKm*1000);
+ for(let k=0;k<12;k++){const pos=[];for(const d of ds){const[a,l]=gcPoint(la,lo,k*30,d/111195);const v=proj(a,l);pos.push(v.x,v.y,v.z)}out.push(pos)}return out}
