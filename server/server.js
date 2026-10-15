@@ -43,7 +43,10 @@ const gameByCode=c=>one('select * from games where code=? or id=?',String(c||'OP
 const settings=g=>{try{return JSON.parse(g.settings||'{}')}catch(e){return{}}};
 const lastFix=pid=>one('select lat,lon,acc,hdg,t from gfixes where pid=? order by t desc limit 1',pid)||null;
 const teamOf=id=>id?one('select id,name,color from teams where id=?',id):null;
-const pubP=p=>({id:p.id,name:p.name,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id});
+// dummy ghost players: server-side test fixtures (see ghosts block below + /api/gm/ghost). Hex pids so gm.html colours them.
+const GHOSTS={'Ghost-1':{pid:'ab0001',lat:48.11035,lon:-122.80591,place:'Ready Athletics'},'Ghost-2':{pid:'5e0002',lat:48.13165,lon:-122.79921,place:"Cappy's Trails garden"}};
+const isGhost=id=>Object.values(GHOSTS).some(g=>g.pid===id);
+const pubP=p=>({id:p.id,name:p.name,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id,...(isGhost(p.id)?{dummy:true}:{})});
 // ---- federation: Ed25519 identity, registry (Monster runs it), signed heartbeats with stats. Share agreements: NOT built yet.
 const TRUST_LABEL=cfg('TRUST_LABEL')||'Matt Ready Trusted';
 sq.exec(`create table if not exists instances(id text primary key,name text,url text,owner text,pubkey text,area text,lat real,lon real,last_seen int,trusted int default 0,stats text,history text default '[]');
@@ -102,7 +105,25 @@ function gmSnap(u){const now=Date.now(),win=Math.min(864e5,Math.max(5000,+u.sear
  const L=all(all_?'select * from gplayers where seen>?':'select * from gplayers where live=1 and seen>?',now-win);
  return{server_time:now,server_time_iso:new Date(now).toISOString(),window_ms:win,count:L.length,players:L.map(p=>{const f=lastFix(p.id),t=teamOf(p.team_id),g=G[p.game_id]||{};
   return{id:p.id,name:p.name,lat:f?f.lat:null,lon:f?f.lon:null,accuracy:f?f.acc:null,heading:f&&f.hdg!=null?f.hdg:null,last_fix:f?f.t:null,last_seen:p.seen,last_seen_age_s:Math.round((now-p.seen)/1000),
-   stealth:p.mode==='stealth',live:!!p.live,entrance:p.entrance,team:t?{id:t.id,name:t.name,color:t.color}:null,game:{id:p.game_id,name:g.name||null,code:g.code||null}}})}}
+   stealth:p.mode==='stealth',live:!!p.live,dummy:isGhost(p.id),entrance:p.entrance,team:t?{id:t.id,name:t.name,color:t.color}:null,game:{id:p.game_id,name:g.name||null,code:g.code||null}}})}}
+// ---- ghosts: two always-live dummy players in the public game; wander (random walk, ~0.8-3 m/s, <=150 m) around a target; fix + seen every 2 s
+const GHF=path.join(__dirname,'ghosts.json'),GS={},MLAT=111320;try{Object.assign(GS,JSON.parse(fs.readFileSync(GHF,'utf8')))}catch(e){}
+const ghSave=()=>{try{fs.writeFileSync(GHF,JSON.stringify(Object.fromEntries(Object.entries(GS).map(([n,s])=>[n,{tlat:s.tlat,tlon:s.tlon,place:s.place,wander:s.wander,updated:s.updated}]))),{mode:0o600})}catch(e){console.error('ghosts save',e.message)}};
+for(const[n,d]of Object.entries(GHOSTS)){const s=GS[n]=Object.assign({tlat:d.lat,tlon:d.lon,place:d.place,wander:true,updated:Date.now()},GS[n]||{});s.lat=s.tlat;s.lon=s.tlon;s.hdg=Math.random()*360;s.spd=1.5;
+ if(!one('select 1 from gplayers where id=?',d.pid))run('insert into gplayers values(?,?,?,?,?,?,?,?,?,1,?)',d.pid,'public',null,rid(24),n,'regular','walk',null,Date.now(),Date.now());
+ else run("update gplayers set name=?,game_id='public',live=1,mode='regular' where id=?",n,d.pid)}
+function ghStep(n){const d=GHOSTS[n],s=GS[n],now=Date.now();
+ if(s.wander){const k=Math.cos(s.tlat*D2)*MLAT;let dy=(s.lat-s.tlat)*MLAT,dx=(s.lon-s.tlon)*k;s.hdg=(s.hdg+(Math.random()-.5)*60+360)%360;
+  if(Math.hypot(dx,dy)>110){const back=(Math.atan2(-dx,-dy)/D2+360)%360,df=((back-s.hdg+540)%360)-180;s.hdg=(s.hdg+df*.5+360)%360}
+  s.spd=Math.max(.8,Math.min(3,s.spd+(Math.random()-.5)*.6));dy+=Math.cos(s.hdg*D2)*s.spd*2;dx+=Math.sin(s.hdg*D2)*s.spd*2;
+  const rr=Math.hypot(dx,dy);if(rr>150){dx*=150/rr;dy*=150/rr}s.lat=s.tlat+dy/MLAT;s.lon=s.tlon+dx/k}else{s.lat=s.tlat;s.lon=s.tlon}
+ run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',d.pid,s.lat,s.lon,5,now,s.wander?s.hdg:null);run("update gplayers set seen=?,live=1,mode='regular' where id=?",now,d.pid)}
+let ghPrune=0;setInterval(()=>{try{for(const n in GHOSTS)ghStep(n);const now=Date.now();if(now-ghPrune>600000){ghPrune=now;for(const d of Object.values(GHOSTS))run('delete from gfixes where pid=? and t<?',d.pid,now-3600000)}}catch(e){console.error('ghosts',e.message)}},2000);
+const GH_LOCAL=[['ready athletics',48.11035,-122.80591],["cappy",48.13165,-122.79921],['meditation garden',48.1316475,-122.7992293],["memory's vault",48.1384642,-122.7647029],['memorys vault',48.1384642,-122.7647029],['city hall',48.1161771,-122.753612],['sheriff',48.0241638,-122.764488],['jefferson healthcare',48.1060007,-122.7889962],['masonic',48.1139683,-122.7628233]];
+async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.includes(x[0]));if(hit)return{lat:hit[1],lon:hit[2],name:qs+' (app landmark)'};
+ const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
+ const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}
+const ghState=()=>({ghosts:Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n];return{id:n,pid:d.pid,dummy:true,lat:s.lat,lon:s.lon,heading:s.wander?s.hdg:null,wander:s.wander,target:{lat:s.tlat,lon:s.tlon,place:s.place},updated:s.updated}})});
 const types={'.html':'text/html','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
@@ -176,6 +197,13 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   r.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache, no-transform','x-accel-buffering':'no'});r.flushHeaders&&r.flushHeaders();r.write(': '+' '.repeat(2048)+'\n\n');
   const iv=Math.max(1000,Math.min(30000,+u.searchParams.get('every')||3000));const push=()=>{try{r.write('event: snapshot\ndata: '+JSON.stringify(gmSnap(u))+'\n\n')}catch(e){}};push();
   const h=setInterval(push,iv),ka=setInterval(()=>r.write(': ka\n\n'),15000),stop=setTimeout(()=>r.end(),30*60000);q.on('close',()=>{clearInterval(h);clearInterval(ka);clearTimeout(stop)});return}
+ // ---- GM ghost control: GET states; POST {id,lat,lon} | {id,place} | {id,wander:false}
+ case'/api/gm/ghost':{if(limited('gg:'+ip,60,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method==='POST'){const n=Object.keys(GHOSTS).find(k=>k.toLowerCase()===String(j.id||'').toLowerCase());if(!n)return send(r,{error:'id must be Ghost-1 or Ghost-2'},400);const s=GS[n];
+   let la=+j.lat,lo=+j.lon,pl=null;if(j.place){const g=await ghGeo(String(j.place).slice(0,200)).catch(()=>null);if(!g)return send(r,{error:'place not found'},404);la=g.lat;lo=g.lon;pl=g.name}
+   if(j.place||j.lat!=null){if(!isFinite(la)||!isFinite(lo)||Math.abs(la)>90||Math.abs(lo)>180)return send(r,{error:'bad lat/lon'},400);s.tlat=la;s.tlon=lo;s.lat=la;s.lon=lo;s.place=pl||la.toFixed(6)+','+lo.toFixed(6)}
+   if('wander'in j)s.wander=j.wander!==false;else if(j.place||j.lat!=null)s.wander=true;s.updated=now;ghSave();ghStep(n)}
+  return send(r,ghState())}
  // ---- GM/host live map: GM sees all games, host sees own games
  case'/api/gm':{if(!U||!['gm','host'].includes(U.role))return send(r,{error:'bad key'},403);const gid=u.searchParams.get('game');
   let G=U.role==='gm'?all('select * from games'):all('select * from games where owner=?',U.id);if(gid)G=G.filter(g=>g.id===gid);const ids=G.map(g=>g.id);

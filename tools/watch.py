@@ -45,7 +45,7 @@ def table(snap):
     out += [hdr, '-'*len(hdr)]
     for p in sorted(snap['players'], key=lambda p: p['last_seen_age_s']):
         gt = (p['game'].get('code') or '?') + ('/' + p['team']['name'] if p.get('team') else '')
-        fl = ','.join(x for x, on in (('STEALTH', p['stealth']), ('left', not p['live'])) if on)
+        fl = ','.join(x for x, on in (('STEALTH', p['stealth']), ('dummy', p.get('dummy')), ('left', not p['live'])) if on)
         if p['lat'] is None:
             out.append(f"{p['name'][:15]:<16}{gt[:19]:<20}{'(no fix yet)':<24}{'':>6}{'':>6}  {'':<22}{'':<40}{age(p['last_seen_age_s']):>6}  {fl}"); continue
         d, b = dist_bear(RA, (p['lat'], p['lon']))
