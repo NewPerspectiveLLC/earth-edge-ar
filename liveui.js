@@ -1,3 +1,4 @@
+import{CONSENT_REQUIRED}from'./config.js';
 // Live-tracking UI shared by the main build and quest.html: top-level consent modal, one-tap rejoin with remembered
 // consent, and a persistent "Live" pill (pause / stealth / leave / delete). Nothing is sent until the user agrees once.
 export function liveUI({key='eearSession',device='phone',api='/api',start,stop}){
@@ -15,7 +16,7 @@ export function liveUI({key='eearSession',device='phone',api='/api',start,stop})
  document.head.insertAdjacentHTML('beforeend','<style>'+css+'</style>');
  const host=document.getElementById('mpb')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'mpb'}));
  host.insertAdjacentHTML('beforeend',`<button id=joinB>Join live tracking</button><button id=joinX style=display:none title="change name / mode">⚙</button>`);
- document.body.insertAdjacentHTML('beforeend',`<button id=trk>● Live: on</button><div id=trkM><button id=tmP>Pause</button><button id=tmS>Go stealth</button><button id=tmL>Leave and stop tracking</button><button id=tmD>Delete my recorded data</button><button id=tmC>Close</button></div>
+ document.body.insertAdjacentHTML('beforeend',`<button id=trk>● Live: on</button><div id=trkM><div id=tmI style="font-size:13px;color:#ccc;padding:4px 6px">Live: your location is shared with players in this game</div><button id=tmP>Pause</button><button id=tmN>Change name</button><button id=tmS>Go stealth</button><button id=tmL>Leave and stop tracking</button><button id=tmD>Delete my recorded data</button><button id=tmC>Close</button></div>
  <div id=mpc role=dialog aria-modal=true><div class=box><h2 style="margin-top:0">Join live tracking</h2><p><b>This is a GPS game. While you're in, your position is recorded continuously and shown to other players in the game. It is not shown to the public.</b></p><p style=font-size:14px>We store only your display name, mode, entrance, and position fixes (lat, lon, accuracy, heading, time). The game organizer (GM) can see all joined players, including stealth players. Anyone with the link can join. You can pause, leave, or delete your recorded data any time from the red Live pill. Your choice is remembered on this device so next time it's one tap.</p>
  <p>Display name<br><input type=text id=mpn maxlength=24 autocomplete=nickname></p><p>Mode<br><select id=mpm><option value=regular>Regular (visible to players)</option><option value=stealth>Stealth (hidden from players, visible to GM)</option></select></p><p>Entrance<br><select id=mpe><option>walk</option><option>jump</option><option>dance</option><option>run</option></select></p>
  <label class=ag><input type=checkbox id=mpa> I agree</label><div class=row><button id=mpj disabled>Join</button><button id=mpx>Cancel</button></div></div></div>`);
@@ -28,13 +29,15 @@ export function liveUI({key='eearSession',device='phone',api='/api',start,stop})
  async function join(c){const r=await call('/join',{consent:true,name:c.name,mode:c.mode,entrance:c.entrance,device}).catch(()=>({}));
   if(!r.token){alert('Join failed: '+(r.error||'server unreachable'));return false}S={...r,live:true,paused:false,mode:c.mode};save();ui();start&&start();return true}
  $('mpj').onclick=async()=>{if(!$('mpa').checked)return;const c={name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,t:Date.now()};localStorage.eearConsent=JSON.stringify(c);if(await join(c))close()};
- $('joinB').onclick=()=>{const c=C();if(c)join(c);else open()};$('joinX').onclick=open;
+ const autoC=()=>{let c=C();if(!c){c={name:'Player-'+Math.random().toString(36).slice(2,6),mode:'regular',entrance:'walk',t:Date.now(),auto:1};localStorage.eearConsent=JSON.stringify(c)}return c};
+ $('joinB').onclick=()=>{const c=C();if(c)join(c);else if(!CONSENT_REQUIRED)join(autoC());else open()};
+ $('tmN').onclick=async()=>{const c=C()||autoC();const n=(prompt('Display name',c.name)||'').trim().slice(0,24);if(!n||n===c.name)return menu(0);c.name=n;localStorage.eearConsent=JSON.stringify(c);await call('/leave').catch(()=>{});S=null;save();menu(0);await join(c)};$('joinX').onclick=open;
  const menu=v=>$('trkM').style.display=v?'block':'none';$('trk').onclick=()=>menu($('trkM').style.display!=='block');$('tmC').onclick=()=>menu(0);
  $('tmP').onclick=()=>{S.paused=!S.paused;save();ui();menu(0);S.paused?stop&&stop(true):start&&start()};
  $('tmS').onclick=async()=>{const m=S.mode==='stealth'?'regular':'stealth';const r=await call('/mode',{mode:m}).catch(()=>({}));if(r.ok){S.mode=m;save();const c=C();if(c){c.mode=m;localStorage.eearConsent=JSON.stringify(c)}}else alert('Could not change mode');ui();menu(0)};
  $('tmL').onclick=async()=>{await call('/leave').catch(()=>{});S.live=false;save();menu(0);stop&&stop();ui()};
  $('tmD').onclick=async()=>{if(!confirm('Delete all your recorded positions? This also forgets your consent on this device.'))return;await call('/delete').catch(()=>{});S=null;save();localStorage.removeItem('eearConsent');menu(0);stop&&stop();ui()};
- function ui(){const live=S&&S.live,c=C();$('joinB').style.display=live?'none':'';$('joinB').textContent=c?'Join live as '+c.name:'Join live tracking';$('joinX').style.display=!live&&c?'':'none';
+ function ui(){const live=S&&S.live,c=C();$('joinB').style.display=live?'none':'';$('joinB').textContent=c?'Join live as '+c.name:'Join live tracking';$('joinX').style.display=!live&&c&&CONSENT_REQUIRED?'':'none';$('tmI').style.display=CONSENT_REQUIRED?'none':'';
   const t=$('trk');t.style.display=live?'block':'none';t.className=live&&S.paused?'paused':(live&&S.mode==='stealth'?'stealth':'');t.textContent=live?(S.paused?'❚❚ Live: paused':'● Live: on'+(S.mode==='stealth'?' (stealth)':''))+' ▾':'';
   $('tmP').textContent=S?.paused?'Resume':'Pause';$('tmS').textContent=S?.mode==='stealth'?'Go visible (regular)':'Go stealth'}
  // server dropped the session (restart/cleanup): silently rejoin if the user consented and never left

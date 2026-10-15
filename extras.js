@@ -75,7 +75,9 @@ export function makeGhostBot(T,look={}){const L=Object.assign({},GHOST_LOOK,look
  bone('Hips',null,0,1.0,0);bone('Spine','Hips',0,.1,0);bone('Spine1','Spine',0,.13,0);bone('Spine2','Spine1',0,.13,0);bone('Neck','Spine2',0,.15,0);bone('Head','Neck',0,.1,0);
  for(const[s,sx]of[['Left',1],['Right',-1]]){bone(s+'Shoulder','Spine2',.07*sx,.12,0);bone(s+'Arm',s+'Shoulder',.13*sx,0,0);bone(s+'ForeArm',s+'Arm',.28*sx,0,0);bone(s+'Hand',s+'ForeArm',.25*sx,0,0);
   bone(s+'UpLeg','Hips',.1*sx,-.05,0);bone(s+'Leg',s+'UpLeg',0,-.44,0);bone(s+'Foot',s+'Leg',0,-.44,0);bone(s+'ToeBase',s+'Foot',0,-.06,.12)}
- const mat=(c,op=L.glow)=>passMat(T,new T.MeshBasicMaterial({color:c,transparent:true,opacity:op,depthTest:false}),false);
+ // solid + lit: opaque NormalBlending, alpha 1 so the ghost occludes passthrough (pf=1 opts out of the passthrough blend overrides)
+ const mat=(c)=>{const m=new T.MeshLambertMaterial({color:c,emissive:new T.Color(c).multiplyScalar(.28),transparent:false,opacity:1,depthTest:true,depthWrite:true,blending:T.NormalBlending});m.userData.pf=1;m.userData.cpf=1;m.userData.solid=1;return m};
+ {const hl=new T.HemisphereLight(0xffffff,0x605070,1.5),dl=new T.DirectionalLight(0xffffff,1.4);dl.position.set(.6,2.5,1.6);root.add(hl,dl,dl.target)}
  const put=(b,geo,c,x=0,y=0,z=0,op)=>{const m=new T.Mesh(geo,mat(c,op));m.position.set(x*k,y*k,z*k);m.scale.setScalar(k);m.renderOrder=20;B[b].add(m);return m};
  const tux=L.tux;put('Hips',new T.BoxGeometry(.34,.16,.2),tux,0,.02);put('Spine',new T.BoxGeometry(.34,.14,.2),tux,0,.07);put('Spine1',new T.BoxGeometry(.38,.15,.22),tux,0,.07);put('Spine2',new T.BoxGeometry(.42,.16,.23),tux,0,.07);
  put('Spine1',new T.BoxGeometry(.12,.3,.01),L.shirt,0,.1,.116,.85);put('Spine2',new T.ConeGeometry(.05,.06,3).rotateZ(Math.PI/2),L.shirt,.035,.13,.12,.9);put('Spine2',new T.ConeGeometry(.05,.06,3).rotateZ(-Math.PI/2),L.shirt,-.035,.13,.12,.9);// bow tie
@@ -182,3 +184,11 @@ export function makeTerrain(T,M,proj,color=0xffffff){const n=M.n,half=M.half_m,m
   vertexShader:'attribute float hm;varying float vH;varying vec2 vU;void main(){vH=hm;vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader:'uniform vec3 c;varying float vH;varying vec2 vU;void main(){float f=vH/'+top.toFixed(1)+';float ct=abs(fract(vH/250.)-.5)*2.;float w=fwidth(vH/250.)*1.5;float cl=1.-smoothstep(1.-w*2.,1.,ct);vec2 gq=abs(fract(vU*'+cells+')-.5)*2.;vec2 gw=fwidth(vU*'+cells+')*2.;float gl=max(1.-smoothstep(1.-gw.x,1.,gq.x),1.-smoothstep(1.-gw.y,1.,gq.y));float edge=smoothstep(0.,.08,min(min(vU.x,1.-vU.x),min(vU.y,1.-vU.y)));float snow=smoothstep(.5,.75,f);vec3 col=mix(c*.6,vec3(1.),snow);float a=(.05+.25*f+.55*cl*(.3+f)+.25*gl)*edge*smoothstep(150.,700.,vH);gl_FragColor=vec4(col,min(1.,a));}'}));
  m.extensions={derivatives:true};const mesh=new T.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=9;return mesh}
+// ---------- PT SHORELINE (OSM full detail): flat position arrays in true ENU (curvature drop included) at floor height y
+export const SHORE_STYLE={coast:{color:'#6ff6ff',w:4,op:.95,tube:.25},harbor:{color:'#ffffff',w:2.5,op:.8,tube:.12},lagoon:{color:'#8fb8ff',w:3,op:.9,tube:.18}};
+export function shorePolys(J,proj,y=0){const out={coast:[],harbor:[],lagoon:[],labels:[]};
+ for(const k of['coast','harbor','lagoon'])for(const L of J[k]){const P=[];for(const[a,l]of L){const v=proj(a,l);P.push(v.x,v.y+y+.04,v.z)}out[k].push(P)}
+ for(const[n,a,l]of J.labels){const grp=/shoreline/.test(n)?'coast':/Lagoon|lagoon/.test(n)?'lagoon':'harbor';let best=null,bd=1e18;const t=proj(a,l);
+  for(const P of out[grp])for(let i=0;i<P.length;i+=3){const d=(P[i]-t.x)**2+(P[i+2]-t.z)**2;if(d<bd){bd=d;best=[P[i],P[i+1],P[i+2]]}}
+  if(best)out.labels.push({name:n,grp,pos:best,distM:Math.hypot(best[0],best[2])})}
+ return out}

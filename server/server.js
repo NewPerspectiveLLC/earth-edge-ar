@@ -5,6 +5,8 @@ const https=require('https'),fs=require('fs'),path=require('path'),crypto=requir
 const[root,certDir,port]=process.argv.slice(2);
 let C={};try{C=JSON.parse(fs.readFileSync(path.join(__dirname,'config.json')))}catch(e){}
 const cfg=k=>process.env[k]||C[k]||'';
+// TEST switch: CONSENT_REQUIRED=false (env or config.json) lets any client/bot join without the consent flag; GM endpoints stay key-protected
+const CONSENT_REQUIRED=String(cfg('CONSENT_REQUIRED')).toLowerCase()!=='false';
 let GM_KEY=cfg('GM_KEY');if(!GM_KEY)try{GM_KEY=fs.readFileSync(path.join(__dirname,'gm-key.txt'),'utf8').trim()}catch(e){}
 const{DatabaseSync}=require('node:sqlite');const sq=new DatabaseSync(path.join(__dirname,'eear.sqlite'));
 sq.exec(`create table if not exists users(id text primary key,display_name text,email text unique,phone text unique,role text default 'player',created int);
@@ -177,7 +179,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  case'/api/assign':{const p=one('select * from gplayers where id=?',j.player);const g=p&&one('select * from games where id=?',p.game_id);if(!canManage(U,g))return send(r,{error:'not your game'},403);
   run('update gplayers set team_id=? where id=?',j.team||null,p.id);return send(r,{ok:1})}
  // ---- players (consent per game)
- case'/api/join':{if(j.consent!==true)return send(r,{error:'consent required'},400);const g=gameByCode(j.game);if(!g)return send(r,{error:'no such game'},404);
+ case'/api/join':{if(CONSENT_REQUIRED&&j.consent!==true)return send(r,{error:'consent required'},400);const g=gameByCode(j.game);if(!g)return send(r,{error:'no such game'},404);
   if(limited('j:'+ip,30))return send(r,{error:'too many joins'},429);
   const id=rid(6),token=rid(24);run('insert into gplayers values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),j.mode==='stealth'?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
   return send(r,{id,token,game:{id:g.id,name:g.name,code:g.code}})}
