@@ -140,3 +140,8 @@ export function makeVortexPillar(T,col,h=420){const g=new T.Group();g.userData.l
 // crisply along the ground to the horizon; the world-mode circles continue them around/through the globe.
 export function vortexGroundLines(la,lo,proj,maxKm=80){const out=[],ds=[0];for(let d=2;d<maxKm*1000;d*=1.08)ds.push(d);ds.push(maxKm*1000);
  for(let k=0;k<12;k++){const pos=[];for(const d of ds){const[a,l]=gcPoint(la,lo,k*30,d/111195);const v=proj(a,l);pos.push(v.x,v.y,v.z)}out.push(pos)}return out}
+
+// opaque dark sky/ground sphere that hides camera passthrough (writes alpha=1 on purpose; never alpha-fixed)
+export function makeDarkSky(T){const m=new T.ShaderMaterial({side:T.BackSide,depthTest:false,depthWrite:false,vertexShader:'varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ fragmentShader:'varying vec3 vD;void main(){float y=vD.y;vec3 sky=mix(vec3(.04,.10,.23),vec3(.008,.016,.08),smoothstep(0.,.8,y));vec3 gnd=mix(vec3(.03,.05,.09),vec3(0.),smoothstep(0.,-.7,y));gl_FragColor=vec4(y>0.?sky:gnd,1.);}'});
+ m.userData.pf=1;m.userData.cpf=1;const s=new T.Mesh(new T.SphereGeometry(60,32,16),m);s.renderOrder=-100;s.frustumCulled=false;s.visible=false;s.name='darkSky';return s}
