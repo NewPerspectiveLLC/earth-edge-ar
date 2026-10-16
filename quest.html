@@ -183,7 +183,7 @@ import('./extras.js').then(async X=>{const T=THREE,f=document.getElementById('fl
  /* satellite imagery (sat.js, Esri World Imagery): LOD tiles around the viewer in the true-scale floor frame (curvature via enu), zoom from altitude */
  import('./sat.js').then(SM=>{const SA=SM.makeSat(T,{proj:(la,lo,h)=>new T.Vector3(...enu(la,lo,h-.05)),pf:m=>{m.userData.pf=1},globeAbove:1e12});SA.g.userData.qcat='sat';f.add(SA.g);window.QSAT=SA;
   const op=()=>QL.satOpaque===1?1:.6;SA.setOpacity(op());window.qSatOpacity=()=>SA.setOpacity(op());
-  const cr=document.createElement('a-text');cr.id='satCr';cr.setAttribute('value','Imagery © Esri');cr.setAttribute('align','center');cr.setAttribute('width',.5);cr.setAttribute('color','#fff');cr.setAttribute('position','0 -.33 -.8');document.getElementById('head').appendChild(cr);
+  const cr=document.createElement('a-text');cr.id='satCr';cr.setAttribute('value','Imagery © Esri, Vantor/Maxar · PT 2024 ortho © City of Port Townsend');cr.setAttribute('align','center');cr.setAttribute('width',.5);cr.setAttribute('color','#fff');cr.setAttribute('position','0 -.33 -.8');document.getElementById('head').appendChild(cr);
   setInterval(()=>{const on=QL.sat!==0;cr.setAttribute('visible',on);if(!on)return;const c=document.querySelector('a-scene').camera;if(!c)return;const me=new T.Vector3();c.getWorldPosition(me);f.worldToLocal(me);
    const mx=111320*Math.cos(HOME[0]*D);SA.update(HOME[0]-me.z/111320,HOME[1]+me.x/mx,Math.max(0,me.y-1.6))},500);window.QAPPLY&&QAPPLY()}).catch(e=>console.warn('sat',e));
  /* real-time Moon + Sun (sky.js + vendored astronomy-engine): true direction & angular size, 900 m out, centred on the eye; recomputed every 1 s */

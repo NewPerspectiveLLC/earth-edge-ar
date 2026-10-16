@@ -16,7 +16,7 @@ export async function openMapPicker({center=[48.11035,-122.80591],places=[],onUs
  try{await loadLeaflet()}catch(e){$('mpkC').textContent='Could not load the map (offline?)';return}
  const map=L.map($('mpkMap'),{zoomControl:true,tap:true}).setView(center,16);
  const street=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
- const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery © Esri'});
+ const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,maxNativeZoom:21,attribution:'Imagery © Esri · PT 2024 ortho © City of Port Townsend'});
  let isSat=false;$('mpkSat').onclick=()=>{isSat=!isSat;if(isSat){map.removeLayer(street);sat.addTo(map)}else{map.removeLayer(sat);street.addTo(map)}$('mpkSat').textContent=isSat?'Street map':'Satellite'};
  for(const[n,a,l,c]of places)L.circleMarker([a,l],{radius:9,color:'#000',weight:2,fillColor:hex(c),fillOpacity:.95}).addTo(map).bindTooltip(n,{permanent:true,direction:'top',className:'lbl',offset:[0,-8]});
  L.circleMarker(center,{radius:6,color:'#fff',fillColor:'#09f',fillOpacity:1}).addTo(map).bindTooltip('current',{direction:'bottom'});
