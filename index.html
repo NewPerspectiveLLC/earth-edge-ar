@@ -357,7 +357,7 @@ function beamsFrame(t){const on=!!LAY.beams;
  const O=window.MP_OTHERS||{},seen={};
  for(const id in O){const o=O[id].o;if(!o||!o.last||!built||o.mode==='stealth')continue;seen[id]=1;let B=BEAMS[id];if(!B){B=BEAMS[id]=mkBeam(null);B.userData.born=t;world.add(B)}
   const base=toENU(ecef(o.last.lat,o.last.lon,0),built[0],built[1]).multiplyScalar(SC),top=toENU(ecef(o.last.lat,o.last.lon,1000),built[0],built[1]).multiplyScalar(SC);base.y+=-1.6*SC;const U=top.sub(base).normalize();
-  const d=Math.max(.001,base.length()-(window.FLY?0:0)),H=Math.max(.06,d*.12),r=Math.max(.00025,d*.0016);const k=Math.min(1,(t-B.userData.born)/2500),e=1-Math.pow(1-k,3);/* rise on join */
+  const d=Math.max(.001,base.length()),H=Math.max(.06,d*.12),r=Math.max(.00025,d*.004);/* >=~0.45 deg wide at any distance */const k=Math.min(1,(t-B.userData.born)/2500),e=1-Math.pow(1-k,3);/* rise on join */
   const q=new T.Quaternion().setFromUnitVectors(_up,U),P=B.userData.parts;B.visible=on;
   for(const m of[P.b,P.core]){m.position.copy(base);m.quaternion.copy(q)}P.b.scale.set(r,H*e,r);P.core.scale.set(r*.3,H*e,r*.3);
   P.ring.position.copy(base);P.ring.quaternion.setFromUnitVectors(_z,U);P.ring.scale.setScalar(r*(1.2+.6*((t/1200)%1)));
