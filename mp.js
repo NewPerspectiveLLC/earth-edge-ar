@@ -1,14 +1,14 @@
 // Opt-in multiplayer + glowing x-ray stick figures. Nothing leaves the device until the user consents and joins.
 import*as T from'three';import{liveUI}from'./liveui.js';
 export function initMP({scene,cam,getPos,toLocal}){
-const API=(window.EEAR_API||'')+'/api';let timer=null,others={};
+const API=(window.EEAR_API||'')+'/api';let timer=null,others={};window.MP_OTHERS=others;
 const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#radar{position:fixed;left:8px;bottom:40px;z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;
 document.head.insertAdjacentHTML('beforeend','<style>'+css+'</style>');
 document.body.insertAdjacentHTML('beforeend',`<div id=mpb></div><canvas id=radar width=240 height=240></canvas>`);
 const $=id=>document.getElementById(id);
 const LV=liveUI({key:'eearSession',device:'phone',api:API,start:on,stop:off});window.EEAR_LIVE=LV;
 function on(){clearInterval(timer);timer=setInterval(tick,3000);$('radar').style.display='block';tick()}
-function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};$('radar').style.display='none'}
+function off(){clearInterval(timer);timer=null;for(const k in others){scene.remove(others[k].g)}others={};window.MP_OTHERS=others;$('radar').style.display='none'}
 async function tick(){if(!LV.active)return;const S=LV.S;const p=getPos();if(p)LV.call('/pos',{lat:p.lat,lon:p.lon,acc:p.acc,hdg:p.hdg}).catch(()=>{});
 try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){LV.lost();return}
 const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;if(!others[o.id]){others[o.id]={g:stick(o.name+(o.device==='quest'?' (Quest)':''),colorOf(o.id),false),o,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}

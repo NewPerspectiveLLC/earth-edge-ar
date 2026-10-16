@@ -12,8 +12,8 @@ function apply(){QGAP();QAPV();
  for(const c of CATS){const v=on(c);for(const o of tagged(c))o.visible=v;for(const el of domCat(c))el.setAttribute('visible',v&&(on('labels')||!isLabel(el)))}
  if(window.QANTI)for(const k in QANTI)QANTI[k].setAttribute('visible',on(k)&&on('vxAnti')&&on('labels'));
  const gr=document.getElementById('grid');gr&&gr.setAttribute('visible',on('grid'));
- if(!on('labels'))document.querySelectorAll('a-text').forEach(el=>{if(isLabel(el)&&!panelEl(el))el.setAttribute('visible',false)});
- for(const el of qLabels())if(QLOFF.has(qlk(el)))el.setAttribute('visible',false);
+ /* labels hidden by the master / per-label switches are marked so they come back exactly (not left hidden) */
+ for(const el of qLabels()){const off=!on('labels')||QLOFF.has(qlk(el));if(off){if(el.getAttribute('visible')!==false||el.dataset.qlh){el.dataset.qlh=1;el.setAttribute('visible',false)}}else if(el.dataset.qlh){delete el.dataset.qlh;if(!(el.dataset.qcat&&!on(el.dataset.qcat)))el.setAttribute('visible',true)}}
  localStorage.eearQLayers=JSON.stringify(QL);hud();P&&P.refresh()}
 const panelEl=el=>false;
 /* universal labels: per-label off set (first line of the a-text = key), persisted */
@@ -34,7 +34,7 @@ add('Earth','continents','Continents (all)',()=>[G().continents]);for(const[k,l]
 add('Earth','rainier','Mount Rainier',()=>[G().rainier]);add('Earth','baker','Mount Baker',()=>[G().baker]);
 add('Local','shore','PT shoreline',()=>[G().shore]);add('Local','coast','Coastline (old)',()=>tagged('coast'));add('Local','ocean','Ocean',()=>tagged('ocean'));add('Local','grid','Grid',()=>[obj3(document.getElementById('grid'))]);add('Local','roads','Roads & streets',()=>tagged('roads'));
 add('Places','places','Local places',()=>domCat('places').map(obj3));add('Places','poles','Poles',()=>domCat('poles').map(obj3));add('Places','pyramids','Pyramids',()=>domCat('pyramids').map(obj3));add('Places','icecube','IceCube',()=>[G().icecube]);add('Places','edges','Earth edges N/E/S/W',()=>domCat('edges').map(obj3));
-add('Places','saucers','Saucers & pads',()=>tagged('saucers'));add('Places','ghost','GhostBot',()=>tagged('ghost'));
+add('Places','saucers','Saucers & pads',()=>tagged('saucers'));add('Places','ghost','GhostBot',()=>tagged('ghost'));add('Places','beams','Player beams (purple)',()=>Object.values(window.QBEAMS||{}).map(obj3));
 add('Labels','labels','Labels (master)',()=>[...document.querySelectorAll('a-text')].filter(isLabel).filter(e=>e.getAttribute('visible')!==false||true).slice(0,0).concat([...document.querySelectorAll('a-text[data-qcat="places"]')].map(obj3)));
 R.push({section:'Labels',key:'labelsAllOn',label:'All labels ON',kind:'action',run:()=>{QL.labels=1;QLOFF.clear();localStorage.eearQLabelsOff='[]';apply()}});R.push({section:'Labels',key:'labelsAllOff',label:'All labels OFF',kind:'action',run:()=>{QL.labels=0;apply()}});
 const camOnQ=()=>localStorage.eearCam!=='off';

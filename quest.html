@@ -8,7 +8,7 @@
 <a-scene renderer="alpha:true;antialias:true;colorManagement:true" xr-mode-ui="enabled:true;XRMode:ar;enterAREnabled:true;enterVREnabled:false" webxr="requiredFeatures:local-floor;optionalFeatures:local-floor,bounded-floor" vr-mode-ui="enabled:false">
  <a-entity id=rig movement-ctl><a-entity id=head camera look-controls position="0 1.6 0"><a-text id=flyT value="" align=center width=.9 color="#9fd8ff" position="0 -.17 -.7" visible=false></a-text></a-entity>
   <a-entity id=lh oculus-touch-controls="hand:left"></a-entity><a-entity id=rh oculus-touch-controls="hand:right" laser-controls="hand:right" raycaster="far:60;objects:.none"></a-entity></a-entity>
- <a-entity id=world><a-entity id=floor position="0 0 0"><a-entity id=grid grid-plane></a-entity></a-entity><a-entity id=places></a-entity><a-entity id=others></a-entity></a-entity>
+ <a-entity id=world><a-entity id=floor position="0 0 0"><a-entity id=grid grid-plane></a-entity><a-entity id=pself pself></a-entity></a-entity><a-entity id=places></a-entity><a-entity id=others></a-entity></a-entity>
  <a-text id=bm value="" align=center width=1.4 color="#9cf" position="0 1.05 -1.6"></a-text>
  <a-text id=msg value="" align=center width=2.2 color="#fff" position="0 1.3 -1.6" visible=false></a-text>
 </a-scene>
@@ -94,8 +94,29 @@ async function tick(){if(!LV||!LV.active)return;const S=LV.S;const m=myLatLon();
   for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;const p=enu(o.last.lat,o.last.lon,0);let el=others[o.id];
    if(!el){el=document.createElement('a-entity');el.setAttribute('stick-fig',`name:${o.name}${o.device==='quest'?' (Quest)':o.device==='phone'?' (phone)':''}${o.dummy?' · TEST':''};color:hsl(${parseInt(o.id.slice(0,4),16)%360},100%,60%)`);$('others').appendChild(el);others[o.id]=el}
    /* far players clamped to 150 m along their true bearing (distance label stays true); scaled up with distance in the component */
-   const dx=p[0]-me.x,dz2=p[2]-me.z,d=Math.hypot(dx,dz2),k=d>150?150/d:1;el.qTarget=new THREE.Vector3(me.x+dx*k,floorY,me.z+dz2*k);el.qD=d;window.QPLAYERS.push({name:o.name,d:Math.round(d),dummy:!!o.dummy})}
-  for(const k in others)if(!seen[k]){others[k].remove();delete others[k]}}catch(e){console.warn('players tick',e);if(!tick._lg||Date.now()-tick._lg>60000){tick._lg=Date.now();fetch('/api/clientlog',{method:'POST',body:JSON.stringify({ev:'quest-players-tick-error',msg:String(e&&e.message||e).slice(0,200)})}).catch(()=>{})}}}
+   const dx=p[0]-me.x,dz2=p[2]-me.z,d=Math.hypot(dx,dz2),k=d>150?150/d:1;el.qTarget=new THREE.Vector3(me.x+dx*k,floorY,me.z+dz2*k);el.qD=d;qBeam(o,me);window.QPLAYERS.push({name:o.name,d:Math.round(d),dummy:!!o.dummy})}
+  for(const k in others)if(!seen[k]){others[k].remove();delete others[k]}for(const k in QBEAMS)if(!seen[k]){QBEAMS[k].remove();delete QBEAMS[k]}}catch(e){console.warn('players tick',e);if(!tick._lg||Date.now()-tick._lg>60000){tick._lg=Date.now();fetch('/api/clientlog',{method:'POST',body:JSON.stringify({ev:'quest-players-tick-error',msg:String(e&&e.message||e).slice(0,200)})}).catch(()=>{})}}}
+/* purple rising beams: every live player at its TRUE direction (ECEF -> ENU incl. curvature, so far players are below the horizon, through the Earth), pulled in to <=400 m along that direction, rising along the player's local vertical; rises over 2.5 s on join */
+const QBEAMS={};window.QBEAMS=QBEAMS;
+function qBeam(o,me){if(!window.QPJH||o.mode==='stealth')return;const fl=document.getElementById('floor');let el=QBEAMS[o.id];
+ if(!el){el=document.createElement('a-entity');el.setAttribute('pbeam',`name:${o.name}${o.dummy?' · TEST':''}`);fl.appendChild(el);QBEAMS[o.id]=el;el.qBorn=performance.now()}
+ const f=fl.object3D,m=me.clone();f.updateMatrixWorld(true);const mw=world.object3D.localToWorld(m.clone());f.worldToLocal(mw);mw.y=0;
+ const P=QPJH(o.last.lat,o.last.lon,0),Pt=QPJH(o.last.lat,o.last.lon,1000),v=P.clone().sub(mw),d=v.length(),k=Math.min(1,400/Math.max(1,d));
+ el.qB={base:mw.clone().addScaledVector(v,k),U:Pt.sub(P).normalize(),d,show:d*k}}
+AFRAME.registerComponent('pbeam',{schema:{name:{default:''}},init(){const mk=(op)=>{const m=new THREE.MeshBasicMaterial({color:0xb04cff,transparent:true,opacity:op,depthTest:false,depthWrite:false,side:THREE.DoubleSide});m.userData.add=1;noAlpha(m);m.userData.pf=1;return m};
+  const geo=new THREE.CylinderGeometry(1,1,1,14,1,true).translate(0,.5,0);this.b=new THREE.Mesh(geo,mk(.5));this.c=new THREE.Mesh(geo,mk(.9));this.r=new THREE.Mesh(new THREE.RingGeometry(1.4,2.4,40),mk(.6));
+  for(const x of[this.b,this.c,this.r]){x.frustumCulled=false;x.renderOrder=995;this.el.object3D.add(x)}
+  const t=document.createElement('a-text');t.setAttribute('align','center');t.setAttribute('color','#d29bff');t.setAttribute('look-at-cam','');t.setAttribute('side','double');t.setAttribute('value',this.data.name);this.el.appendChild(t);this.t=t;this.lt=0},
+ tick(t){const B=this.el.qB;if(!B)return;const vis=QL.beams!==0;this.el.object3D.visible=vis;if(!vis)return;const e=1-Math.pow(1-Math.min(1,(performance.now()-(this.el.qBorn||0))/2500),3);
+  const H=Math.max(40,B.show*.4),r=Math.max(.15,B.show*.004),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.U);
+  for(const x of[this.b,this.c]){x.position.copy(B.base);x.quaternion.copy(q)}this.b.scale.set(r,H*e,r);this.c.scale.set(r*.3,H*e,r*.3);
+  this.r.position.copy(B.base);this.r.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),B.U);this.r.scale.setScalar(r*(1.2+.6*((t/1200)%1)));
+  if(t-this.lt>500){this.lt=t;const far=B.d>150;this.t.setAttribute('visible',far&&QL.labels!==0);if(far){this.t.setAttribute('value',this.data.name+' · '+(B.d>=1000?(B.d/1000).toFixed(B.d>1e5?0:2)+' km':Math.round(B.d)+' m'));this.t.setAttribute('width',Math.max(4,B.show/12));this.t.object3D.position.copy(B.base).addScaledVector(B.U,H*e)}}}});
+/* my own beam: ring on the floor + beam from above head height; only while live and not stealth/paused */
+AFRAME.registerComponent('pself',{init(){const mk=(op)=>{const m=new THREE.MeshBasicMaterial({color:0xb04cff,transparent:true,opacity:op,depthTest:false,depthWrite:false,side:THREE.DoubleSide});m.userData.add=1;noAlpha(m);m.userData.pf=1;return m};
+  const geo=new THREE.CylinderGeometry(1,1,1,14,1,true).translate(0,.5,0);this.b=new THREE.Mesh(geo,mk(.5));this.r=new THREE.Mesh(new THREE.RingGeometry(1.4,2.4,40),mk(.6));this.r.rotation.x=-Math.PI/2;for(const x of[this.b,this.r]){x.frustumCulled=false;x.renderOrder=995;this.el.object3D.add(x)}},
+ tick(t){const LV=window.EEAR_LIVE,on=QL.beams!==0&&LV&&LV.active&&LV.S&&LV.S.mode!=='stealth';this.el.object3D.visible=!!on;if(!on){this.born=null;return}this.born??=t;const e=1-Math.pow(1-Math.min(1,(t-this.born)/2500),3);
+  const c=this.el.sceneEl.camera,p=new THREE.Vector3();c.getWorldPosition(p);this.el.object3D.parent.worldToLocal(p);this.r.position.set(p.x,.02,p.z);this.r.scale.setScalar(.35*(1+.15*Math.sin(t/400)));this.b.position.set(p.x,2.2,p.z);this.b.scale.set(.18,40*e,.18)}});
 AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'#0ff'}},init(){const g=new THREE.Group(),c=new THREE.Color(this.data.color);
   /* solid, normal-blended (alpha 1 occludes passthrough), drawn on top; 1.8 m tall, limbs 0.12-0.18 m thick */
   const sol=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:1,depthTest:false,depthWrite:false});sol.userData.pf=1;sol.userData.solid=1;
@@ -103,12 +124,12 @@ AFRAME.registerComponent('stick-fig',{schema:{name:{default:''},color:{default:'
   mk([-.13,0,0],[0,.85,0],.065);mk([.13,0,0],[0,.85,0],.065);mk([0,.85,0],[0,1.45,0],.09);mk([0,1.4,0],[-.32,.92,0],.06);mk([0,1.4,0],[.32,.92,0],.06);
   const head=new THREE.Mesh(new THREE.SphereGeometry(.14,16,12),sol);head.position.y=1.64;head.renderOrder=999;g.add(head);
   const bm=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.45,depthTest:false,depthWrite:false});bm.userData.add=1;noAlpha(bm);bm.userData.pf=1;
-  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,60,10,1,true),bm);beam.position.y=30;beam.renderOrder=998;beam.frustumCulled=false;g.add(beam);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,60,10,1,true),bm);beam.position.y=30;beam.renderOrder=998;beam.frustumCulled=false;/* beam replaced by the purple pbeam (true direction) */
   this.fig=g;this.el.setObject3D('mesh',g);
   const t=document.createElement('a-text');t.setAttribute('value',this.data.name);t.setAttribute('align','center');t.setAttribute('color',this.data.color);t.setAttribute('width',3);t.setAttribute('position','0 2.1 0');t.setAttribute('look-at-cam','');t.setAttribute('side','double');this.el.appendChild(t);this.lbl=t;this._lt=0},
   tick(t,dt){const o=this.el.object3D,el=this.el;if(el.qTarget){if(!this._init){o.position.copy(el.qTarget);this._init=1}else o.position.lerp(el.qTarget,Math.min(1,(dt||16)/1500))}
    const c=this.el.sceneEl.camera;if(!c||!o.parent)return;const me=new THREE.Vector3();c.getWorldPosition(me);o.parent.worldToLocal(me);const d=Math.hypot(me.x-o.position.x,me.z-o.position.z),sc=Math.max(1,d/40);this.fig.scale.setScalar(sc);this.fig.rotation.z=Math.sin(t/900)*.04;
-   if(t-this._lt>500){this._lt=t;const td=el.qD!=null?el.qD:d;this.lbl.setAttribute('value',this.data.name+' · '+(td>=1000?(td/1000).toFixed(2)+' km':Math.round(td)+' m'));this.lbl.setAttribute('width',Math.max(3,d/15));this.lbl.object3D.position.y=2.1*sc}}});
+   if(t-this._lt>500){this._lt=t;const td=el.qD!=null?el.qD:d;this.lbl.setAttribute('value',this.data.name+' · '+(td>=1000?(td/1000).toFixed(2)+' km':Math.round(td)+' m'));this.lbl.setAttribute('width',Math.max(3,d/15));this.lbl.object3D.position.y=2.1*sc;this.lbl.setAttribute('visible',td<=150)}}});
 
 // ---- manual location: overrides the default (Ready Athletics); persisted; page recentres on Set
 {const m=JSON.parse(localStorage.eearManLoc||'null');manV.textContent=m?'Applied: '+m.a.toFixed(6)+', '+m.l.toFixed(6)+(m.src&&m.src!=='coords'?' ('+m.src.slice(0,60)+')':''):'Using Ready Athletics (default)';if(m)manI.value=m.a+', '+m.l}
@@ -140,7 +161,7 @@ import('./extras.js').then(async X=>{const T=THREE,f=document.getElementById('fl
    /* labels pulled in to <=400 m along the true direction (same rule as the place labels), lines stay true-size */
    t.setAttribute('position',(L.pos[0]*k)+' '+(L.pos[1]*k+Math.max(1.2,show/20))+' '+(L.pos[2]*k));le.appendChild(t)}
   sg.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.userData.pf=1)});sg.userData.lbl=le;GEOQ.shore=sg;window.QSHORE={pts:S.coast.reduce((n,P)=>n+P.length/3,0),labels:S.labels.map(l=>[l.name,Math.round(l.distM)])}}catch(e){console.warn('shore',e)}
- try{const[LM,MT,CJ]=await Promise.all([fetch('landmass.json').then(r=>r.json()),fetch('mountains.json').then(r=>r.json()),fetch('continents.json').then(r=>r.json()).catch(()=>null)]);const pjm=X.enuProjH(T,HOME[0],HOME[1]);
+ try{const[LM,MT,CJ]=await Promise.all([fetch('landmass.json').then(r=>r.json()),fetch('mountains.json').then(r=>r.json()),fetch('continents.json').then(r=>r.json()).catch(()=>null)]);const pjm=X.enuProjH(T,HOME[0],HOME[1]);window.QPJH=pjm;
   const eye=new T.Group();eye.position.y=1.6;f.add(eye);window.QEYE=eye;
   const mk=(key,nm,col,fn,lc,dist)=>{const k=380/dist,g=new T.Group();g.scale.setScalar(k);eye.add(g);GEOQ[key]=g;const pj=(a,l,h)=>pjm(a,l,h);fn(g,pj);
    const P0=pjm(lc[0],lc[1],(lc[2]||0)-(lc[3]||0)),P=pjm(lc[0],lc[1],lc[2]||0),km=gcq(HOME[0],HOME[1],lc[0],lc[1]),el=Math.asin(P0.y/P0.length())/D,b=((Math.atan2(P.x,-P.z)/D)+360)%360;
