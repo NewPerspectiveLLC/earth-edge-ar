@@ -1,5 +1,5 @@
 // quest.html: one registry for every layer toggle -> 3D in-headset Layers panel (Y button) + 2D HUD + localStorage (QL).
-import{makePanel,xrRays,summon}from'./qpanel.js?v=1792187085485';
+import{makePanel,xrRays,summon}from'./qpanel.js?v=1792187186580';
 const T=AFRAME.THREE;
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.QVXG&&window.QGEO&&window.QGHOST&&window.QGAP&&window.QAPV){clearInterval(iv);r()}},200)});
 await wait();

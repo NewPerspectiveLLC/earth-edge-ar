@@ -6,7 +6,9 @@
 export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden"};
 export const SONG="Happy's Trails Vortex";
 /* tracks: built-in procedural loop, shipped loop files (AudioBufferSourceNode loop=true = sample-exact, no seam), the user's own saved file */
-export const TRACKS=[{id:'vortex',name:SONG,builtin:true},{id:'disco',name:'Disco Jam (instrumental)',urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3']}];
+/* disco: original instrumental, 120 BPM, 32 bars = exactly 64.000 s (3,072,000 samples @48k), mastered -14 LUFS; loopEnd 64.0 skips MP3/AAC padding; trim matches the built-in loop */
+export const TRACKS=[{id:'vortex',name:SONG,builtin:true,tempo:124},{id:'disco',name:'Disco Jam (instrumental)',urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3'],loopEnd:64.0,tempo:120,trim:.7}];
+const renTempo=bpm=>{try{const R=window.EEAR_REN||window.REN;R&&R.setTempo&&R.setTempo(bpm)}catch(e){}window.EEAR_TEMPO=bpm;dispatchEvent(new CustomEvent('eear-tempo',{detail:{bpm}}))};
 const D=Math.PI/180,CMP=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 const $=id=>document.getElementById(id);
 const dist=(a,b,c,d)=>{const R=6371000,x=Math.sin((c-a)*D/2)**2+Math.cos(a*D)*Math.cos(c*D)*Math.sin((d-b)*D/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
@@ -64,8 +66,8 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
  function curName(){return track==='user'&&user?user.name:(TRACKS.find(t=>t.id===track)||TRACKS[0]).name}
  async function startTrack(){$('musE').textContent='';const T=TRACKS.find(t=>t.id===track);$('musNm').textContent=curName();lastR=0;
   if(track==='user'&&user){if(user.pending)await setOn.pend();if(user&&user.buf)return startUser()}
-  if(!T||T.builtin){stopUser();return startBuiltIn()}
-  try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=b.duration;userSrc.connect(bus);userSrc.start();$('musNm').textContent=T.name}
+  if(!T||T.builtin){stopUser();renTempo(124);return startBuiltIn()}
+  try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=Math.min(T.loopEnd||b.duration,b.duration);const tg=ctx.createGain();tg.gain.value=T.trim||1;userSrc.connect(tg);tg.connect(bus);userSrc.start(0,0);renTempo(T.tempo||120);$('musNm').textContent=T.name}
   catch(e){$('musE').textContent=T.name+' is not available yet ('+(e.message||e)+'). Playing the built-in loop.';stopUser();startBuiltIn()}}
  function startUser(){stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=user.buf;userSrc.loop=true;userSrc.connect(bus);userSrc.start()}
  async function loadUser(blob,name){$('musE').textContent='';try{graph();const buf=await ctx.decodeAudioData(await blob.arrayBuffer());user={buf,name};track='user';localStorage.eearMusT=track;trackUI();$('musNm').textContent=name;lastR=0;if(on)startUser();return true}catch(e){$('musE').textContent='Could not decode that audio: '+(e.message||e);return false}}

@@ -1,6 +1,6 @@
 /* Fast forced refresh for every open player (index / quest / gm).
    1) service worker sw.js: skipWaiting + clients.claim, network-first (no-store) for HTML + version.json, ?v=<build> assets cached.
-   2) poll version.json (no-store, ?t=) every 20 s + on focus/visibility; reg.update() every 30 s; mismatch or controllerchange -> reload.
+   2) poll version.json (no-store, ?t=) every 15 s + on focus/visibility; reg.update() every 30 s; mismatch or controllerchange -> reload.
    3) painless reload: pages register save/restore hooks (EEAR_STATE), 3 s "Updating to vX..." toast, once-per-version loop guard,
       single "Tap to resume" button when camera/compass/audio need a fresh tap (iOS), immersive XR session -> defer until it ends (Quest: press A to exit + update). */
 (function(){
@@ -19,7 +19,7 @@ function reloadTo(v){if(busy)return;if(sessionStorage.eearReloadFor===v){console
  busy=true;sessionStorage.eearReloadFor=v;saveState();toast('Updating to v'+v+'…');setTimeout(()=>location.reload(),3000)}
 async function poll(){if(busy||document.hidden&&!pending)return;try{const r=await fetch(new URL('version.json?t='+Date.now(),location.href),{cache:'no-store'});if(!r.ok)return;const j=await r.json();
  if(j.v&&j.v!==CUR&&CUR!=='dev')reloadTo(j.v);else if(j.v===CUR)delete sessionStorage.eearReloadFor}catch(e){}}
-setInterval(poll,20000);setInterval(()=>{if(pending&&!xrActive())reloadTo(pending)},1000);
+setInterval(poll,15000);setInterval(()=>{if(pending&&!xrActive())reloadTo(pending)},1000);
 addEventListener('focus',poll);document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
 // service worker
 if('serviceWorker'in navigator&&isSecureContext){const had=!!navigator.serviceWorker.controller;
