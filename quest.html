@@ -180,6 +180,12 @@ import('./extras.js').then(async X=>{const T=THREE,f=document.getElementById('fl
  try{const[st,sh]=await Promise.all([fetch('streets.json').then(r=>r.json()),fetch('sheridan.json').then(r=>r.json())]);for(const l of st.lines){const r=X.makeRoad(T,HOMEc,0,l.points,l.color);r.userData.qcat='roads';more.add(r)}for(const SG of(sh.segments||[sh.points])){const r=X.makeRoad(T,HOMEc,0,SG,'#ff00cc');r.userData.qcat='roads';more.add(r)}}catch(e){console.warn(e)}
  const mPq=111320*Math.cos(HOME[0]*D);for(const[n,a,l,c]of PLACES){const hero=/Ready Athletics/.test(n);const sc=X.makeSaucer(T,c,hero);sc.userData.qcat='saucers';sc.position.set((l-HOME[1])*mPq+(hero?30:18),0,-(a-HOME[0])*111320+(hero?30:18));more.add(sc)}
  const DS=X.makeDarkSky(T);document.querySelector('a-scene').object3D.add(DS);window.QSKY=DS;
+ /* satellite imagery (sat.js, Esri World Imagery): LOD tiles around the viewer in the true-scale floor frame (curvature via enu), zoom from altitude */
+ import('./sat.js').then(SM=>{const SA=SM.makeSat(T,{proj:(la,lo,h)=>new T.Vector3(...enu(la,lo,h-.05)),pf:m=>{m.userData.pf=1},globeAbove:1e12});SA.g.userData.qcat='sat';f.add(SA.g);window.QSAT=SA;
+  const op=()=>QL.satOpaque===1?1:.6;SA.setOpacity(op());window.qSatOpacity=()=>SA.setOpacity(op());
+  const cr=document.createElement('a-text');cr.id='satCr';cr.setAttribute('value','Imagery © Esri');cr.setAttribute('align','center');cr.setAttribute('width',.5);cr.setAttribute('color','#fff');cr.setAttribute('position','0 -.33 -.8');document.getElementById('head').appendChild(cr);
+  setInterval(()=>{const on=QL.sat!==0;cr.setAttribute('visible',on);if(!on)return;const c=document.querySelector('a-scene').camera;if(!c)return;const me=new T.Vector3();c.getWorldPosition(me);f.worldToLocal(me);
+   const mx=111320*Math.cos(HOME[0]*D);SA.update(HOME[0]-me.z/111320,HOME[1]+me.x/mx,Math.max(0,me.y-1.6))},500);window.QAPPLY&&QAPPLY()}).catch(e=>console.warn('sat',e));
  /* real-time Moon + Sun (sky.js + vendored astronomy-engine): true direction & angular size, 900 m out, centred on the eye; recomputed every 1 s */
  import('./sky.js').then(SM=>{const SK=SM.makeSkyBodies(T,{show:900,pf:(m,s)=>{if(s)m.userData.pf=1}});f.add(SK.g);SK.moon.userData.qcat='moon';SK.sun.userData.qcat='sun';const clk=SM.skyClock();window.skyDate=clk;
   const LE=document.createElement('a-entity');LE.id='skyL';document.getElementById('floor').appendChild(LE);SK.le=LE;SK.lab={};

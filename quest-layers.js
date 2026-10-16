@@ -6,7 +6,7 @@ await wait();
 const sc=document.querySelector('a-scene'),QLs=()=>QL;const on=k=>QL[k]!==0;
 const tagged=cat=>{const a=[];sc.object3D.traverse(o=>{if(o.userData&&o.userData.qcat===cat)a.push(o)});return a};
 const domCat=cat=>[...document.querySelectorAll(`[data-qcat="${cat}"]`)];
-const CATS=['vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges','moon','sun'];
+const CATS=['vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges','moon','sun','sat'];
 const isLabel=el=>el.tagName==='A-TEXT'&&!['msg','bm'].includes(el.id);
 function apply(){QGAP();QAPV();
  for(const c of CATS){const v=on(c);for(const o of tagged(c))o.visible=v;for(const el of domCat(c))el.setAttribute('visible',v&&(on('labels')||!isLabel(el)))}
@@ -30,6 +30,7 @@ const obj3=x=>x&&(x.object3D||x);
 const R=[];const add=(section,key,label,objs,extra={})=>R.push(Object.assign({section,key,label,kind:'toggle',get:()=>on(key),set:v=>set(key,v),objs},extra));
 add('Vortex','vxRA','Ready Athletics',()=>[QVXG.vxRA]);add('Vortex','vxCappy',"Cappy's",()=>[QVXG.vxCappy]);add('Vortex','vxGarden','Meditation Garden',()=>[QVXG.vxGarden]);
 add('Vortex','vxLocal','Local style (wedges, pillar)',()=>tagged('vxLocal'));add('Vortex','vxWorld','World great circles',()=>tagged('vxWorld'));add('Vortex','vxAnti','Antipodes',()=>tagged('vxAnti'));
+add('Earth','sat','Satellite map (© Esri)',()=>window.QSAT?[QSAT.g]:[]);R.push({section:'Earth',key:'satOpaque',label:'Satellite opaque (else 60%)',kind:'toggle',get:()=>QL.satOpaque===1,set:v=>{QL.satOpaque=v?1:0;window.qSatOpacity&&qSatOpacity();apply()},objs:()=>[]});
 add('Earth','continents','Continents (all)',()=>[G().continents]);for(const[k,l]of[['africa','Africa'],['north_america','North America'],['south_america','South America'],['asia','Asia'],['europe','Europe'],['antarctica','Antarctica'],['australia','Australia']])add('Earth',k,l,()=>[G()[k]]);
 add('Earth','rainier','Mount Rainier',()=>[G().rainier]);add('Earth','baker','Mount Baker',()=>[G().baker]);
 add('Local','shore','PT shoreline',()=>[G().shore]);add('Local','coast','Coastline (old)',()=>tagged('coast'));add('Local','ocean','Ocean',()=>tagged('ocean'));add('Local','grid','Grid',()=>[obj3(document.getElementById('grid'))]);add('Local','roads','Roads & streets',()=>tagged('roads'));
@@ -49,7 +50,7 @@ R.push({section:'View',key:'board',label:'Board spaceship',kind:'action',run:()=
 R.push({section:'View',key:'vignette',label:'Comfort vignette (ship)',kind:'toggle',get:()=>!!QSHIP.vignette,set:v=>{QSHIP.vignette=!!v;localStorage.eearVignette=v?'1':'0'},objs:()=>[]});
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
 const SECTIONS=['Vortex','Earth','Local','Places','Sky','Labels','View'];
-for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera')QL[it.key]=1;
+for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera'&&it.key!=='satOpaque')QL[it.key]=1;
 let P=null,nL=-1;const base=R.slice();
 function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;
  const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
