@@ -6,28 +6,16 @@
 // (phone/desktop) and a 3D Talk button + presets (Quest/XR); optional speechSynthesis that respects the music mute;
 // beat-synced per-song dances that are improvised + recorded once, then shared via <API>/api/ren/dance.
 import * as THREE from 'three';
+import * as BEAT from './beat.js?v=1792190990688';
+export { TRACK_META, apiBase } from './beat.js?v=1792190990688';
 
 export const REN_VERSION = 1;
 export const REN_HOME = { lat: 48.13165, lon: -122.79921, name: "Cappy's Trails" }; // Cappy's Trails pillar
 export const REN_EAST_M = 4;            // stand ~4 m east of Cappy's pillar (clear of Cappy's + Meditation Garden beams)
 export const TALK_RADIUS = 15, LEAVE_RADIUS = 20;
-const TUNNEL = 'https://verse-concerning-summit-equipped.trycloudflare.com';
 const FALLBACK = 'Ren is meditating… try again soon.';
 const PURPLE = 0x9b4dff, PURPLE_DEEP = 0x5b1fc0, TEAL = 0x2ff5df, SHELL = 0xf4f1fb;
 const PRESETS = ['Hi Ren', 'What is this place?', 'Tell me about the vortex'];
-// known beat grids for the game's tracks (track key -> bpm, seconds to first downbeat, loop length in bars, dance length in bars)
-export const TRACK_META = {
-  vortex: { bpm: 124, beatOffset: 0, loopBars: 4, bars: 16 },   // built-in procedural loop (4-bar cycle; dance 16 bars)
-  disco:  { bpm: 120, beatOffset: 0, loopBars: 32, bars: 32 },  // disco-jam-loop: 120 BPM, 32 bars = 64.000 s
-
-};
-TRACK_META['happys-trails-vortex'] = TRACK_META.vortex; TRACK_META['disco-jam'] = TRACK_META.disco;   // EEAR_AUDIO track ids
-
-export function apiBase() {
-  if (window.EEAR_API) return window.EEAR_API;
-  return location.hostname.endsWith('github.io') ? TUNNEL : '';
-}
-
 let INST = null; // last instance (for the module-level update()/clearDance())
 export function update(dt, playerPos) { if (INST) INST.update(dt, playerPos); }
 export function clearDance(trackId, gmKey) { return INST ? INST.clearDance(trackId, gmKey) : Promise.resolve(false); }
@@ -278,7 +266,7 @@ export function addRen(scene, where, camera, opts = {}) {
     let reply = FALLBACK;
     try {
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 20000);
-      const r = await fetch(apiBase() + '/api/ren', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal, cache: 'no-store' });
+      const r = await fetch(BEAT.apiBase() + '/api/ren', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal, cache: 'no-store' });
       clearTimeout(to); const d = await r.json().catch(() => ({}));
       if (d && typeof d.reply === 'string' && d.reply.trim()) reply = d.reply.trim();
       if (r.ok && !d.fallback) { history.push({ role: 'user', content: message.slice(0, 500) }, { role: 'assistant', content: reply.slice(0, 500) }); while (history.length > 12) history.shift(); }
@@ -346,54 +334,10 @@ export function addRen(scene, where, camera, opts = {}) {
     else { presetsUntil = 0; ask(b.userData.text); } return true;
   }
 
-  // ---- music tap + beat tracking + dance record/replay
-  const D = { an: null, anCtx: null, buf: null, prevE: 0, fm: 0, fv: .0005, lastOn: -1, onsets: [], t0: 0, bpm: 120, meta: null, key: null, awaitStart: false, energy: 0, silent: true,
-    choreo: null, rec: null, mode: 'off', w: 0, saving: false };
-  function tap(A) {
-    if (!A || !A.ctx || !A.pan) return; if (D.an && D.anCtx === A.ctx) return;
-    try { const ctx = A.ctx, an = ctx.createAnalyser(); an.fftSize = 1024; an.smoothingTimeConstant = 0; A.pan.connect(an); const z = ctx.createGain(); z.gain.value = 0; an.connect(z); z.connect(ctx.destination);
-      D.an = an; D.anCtx = ctx; D.buf = new Uint8Array(an.frequencyBinCount); D.tbuf = new Uint8Array(an.fftSize); } catch (e) { }
-  }
-  const trackIdOf = A => { const t = String(A.track || ''); if (t === 'user') return 'user'; return t.split('?')[0].replace(/^.*\//, '').replace(/\.(m4a|mp3|ogg|wav|aac)$/i, '').replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 64) || 'track'; };
-  function beatTrack(now) {
-    if (!D.an) return; D.an.getByteFrequencyData(D.buf); const hz = D.anCtx.sampleRate / D.an.fftSize, top = Math.max(2, Math.round(160 / hz));
-    let e = 0; for (let i = 1; i <= top; i++) e += D.buf[i]; e /= top * 255;
-    D.an.getByteTimeDomainData(D.tbuf); let rms = 0; for (let i = 0; i < D.tbuf.length; i += 4) { const x = (D.tbuf[i] - 128) / 128; rms += x * x; } rms = Math.sqrt(rms / (D.tbuf.length / 4)); D.energy = lerp(D.energy, rms, .05);
-    const flux = Math.max(0, e - D.prevE); D.prevE = e;
-    D.fm = lerp(D.fm, flux, .02); D.fv = lerp(D.fv, (flux - D.fm) ** 2, .02);
-    const wasSilent = D.silent; D.silent = rms < .01;
-    if (flux > D.fm + 1.6 * Math.sqrt(D.fv) && e > .12 && now - D.lastOn > .22) {
-      D.lastOn = now; D.onsets.push(now); while (D.onsets.length && now - D.onsets[0] > 12) D.onsets.shift();
-      if (D.awaitStart) { D.t0 = now - (D.meta ? D.meta.beatOffset : 0); D.awaitStart = false; }   // first hit after (re)start = bar 0 downbeat
-      else { const L = 60 / D.bpm, ph = (now - D.t0) / L, err = ph - Math.round(ph); if (Math.abs(err) < .3) D.t0 += err * L * .18; } // PLL: pull the grid onto detected beats
-      if (!D.meta && !D.rec?.locked) estimateTempo();
-    }
-    if (D.awaitStart && now > D.startDeadline) D.awaitStart = false;
-  }
-  function estimateTempo() { // unknown (user) tracks: inter-onset histogram folded into 90-180 BPM
-    const O = D.onsets; if (O.length < 16) return; const H = new Float32Array(181);
-    for (let i = 0; i < O.length; i++) for (let j = i + 1; j < O.length && O[j] - O[i] < 2.1; j++) { let b = 60 / (O[j] - O[i]); while (b < 90) b *= 2; while (b > 180) b /= 2; for (let k = -2; k <= 2; k++) { const q = Math.round(b) + k; if (q >= 90 && q <= 180) H[q] += Math.exp(-k * k / 2); } }
-    let best = 120, bv = 0; for (let q = 90; q <= 180; q++) if (H[q] > bv) { bv = H[q]; best = q; } D.bpm = lerp(D.bpm, best, .3);
-  }
-  const LS = id => 'renDance:' + id;
-  function validChoreo(c) { return c && c.v === 1 && Array.isArray(c.moves) && c.moves.length >= 1 && c.moves.length <= 128 && c.bpm > 40 && c.bpm < 240; }
-  async function loadDance(id) {
-    D.choreo = null; D.rec = null; let local = null;
-    try { local = JSON.parse(localStorage[LS(id)] || 'null'); } catch (e) { }
-    if (validChoreo(local)) { D.choreo = local; D.bpm = local.bpm; }
-    if (id === 'user') { if (!D.choreo) startRecording(id); return; }                // user files: device-only
-    try { const r = await fetch(apiBase() + '/api/ren/dance?trackId=' + encodeURIComponent(id), { cache: 'no-store' });
-      if (D.key !== id) return;
-      if (r.ok) { const d = await r.json(); if (validChoreo(d.choreo)) { D.choreo = d.choreo; D.bpm = d.choreo.bpm; localStorage[LS(id)] = JSON.stringify(d.choreo); D.rec = null; return; } }
-      if (r.status === 404 && local && local._unsent) { postDance(id, local); return; }   // we recorded it while the server was down
-    } catch (e) { }
-    if (!D.choreo) startRecording(id);
-  }
-  function startRecording(id) {
-    const m = D.meta; D.rec = { id, bars: m ? m.bars : 32, bpm: m ? m.bpm : D.bpm, moves: [], wander: [], filled: 0, last: null, locked: false };
-  }
-  function improvise(bar) { // pick this bar's move (phrase aware: 2-bar repeats, big move at phrase ends)
-    const R = D.rec, prev = R.moves[(bar + R.bars - 1) % R.bars], e = clamp(D.energy * 6, .35, 1);
+  // ---- dance: shared beat engine + saved choreography (beat.js?v=1792190990688)
+  const D = { w: 0, mode: 'off', key: null, store: null };
+  function improvise(bar, R, st) { // pick this bar's move (phrase aware: 2-bar repeats, big move at phrase ends)
+    const prev = R.moves[(bar + R.bars - 1) % R.bars], e = clamp((st.energy || 0) * 6, .35, 1);
     let id;
     if (bar % 8 === 7) id = ['spin', 'discoPoint', 'lotusRise', 'glide'][Math.floor(Math.random() * 4)];
     else if (bar % 2 === 1 && prev && Math.random() < .6) id = prev[0];
@@ -403,50 +347,17 @@ export function addRen(scene, where, camera, opts = {}) {
     let w = R.wander[(bar + R.bars - 1) % R.bars] || [0, 0];
     if (bar % 2 === 0 || id === 'glide' || id === 'spin') { const a = Math.random() * TAU, r = (id === 'glide' ? 1.3 : .4 + Math.random() * .9); w = [Math.round(Math.cos(a) * r * 10), Math.round(Math.sin(a) * r * 10)]; }
     if (bar % 8 === 0) w = [0, 0];
-    R.moves[bar] = entry; R.wander[bar] = w; R.filled++;
-    if (R.filled >= R.bars && !R.moves.includes(undefined)) finishRecording();
+    return { m: entry, w };
   }
-  function finishRecording() {
-    const R = D.rec; R.locked = true;
-    const c = { v: 1, trackId: R.id, bpm: Math.round(D.bpm * 100) / 100, beatOffset: D.meta ? D.meta.beatOffset : 0, beatsPerBar: 4, bars: R.bars, loopBars: D.meta ? D.meta.loopBars : R.bars,
-      moves: R.moves, wander: R.wander, created: new Date().toISOString(), by: 'ren.js/' + REN_VERSION };
-    D.choreo = c; D.rec = null; localStorage[LS(R.id)] = JSON.stringify({ ...c, _unsent: R.id !== 'user' });
-    if (R.id !== 'user') postDance(R.id, c);
+  function musicTick() {
+    const st = BEAT.tick(); if (!st.on || st.beat < 0) { D.mode = 'off'; D.key = null; return null; }
+    D.key = st.key; D.store = BEAT.choreo(st.key, { bars: st.meta ? st.meta.bars : 32, improvise, localOnly: st.key === 'user' });
+    const barAbs = Math.floor(st.beat / 4), pb = st.beat - barAbs * 4, cur = D.store.get(barAbs, st); if (!cur) return null;
+    const nx = D.store.peek(barAbs + 1) || cur, w0 = cur.w, w1 = nx.w, k = ease(clamp(pb / 4, 0, 1));
+    D.mode = D.store.mode;
+    return { pose: dancePose(cur.m, pb), wx: lerp(w0[0], w1[0], k) / 10, wz: lerp(w0[1], w1[1], k) / 10, pb };
   }
-  async function postDance(id, c) {
-    const { _unsent, ...clean } = c;
-    try { const r = await fetch(apiBase() + '/api/ren/dance', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ trackId: id, choreo: clean }) });
-      const d = await r.json().catch(() => ({}));
-      if (d.exists && validChoreo(d.choreo)) { if (D.key === id) { D.choreo = d.choreo; D.bpm = d.choreo.bpm; } localStorage[LS(id)] = JSON.stringify(d.choreo); }   // first save wins
-      else if (r.ok) localStorage[LS(id)] = JSON.stringify(clean);
-    } catch (e) { }
-  }
-  async function clearDanceI(trackId, gmKey) {
-    const id = trackId || D.key; if (!id) return false; localStorage.removeItem(LS(id)); let ok = true;
-    const key = gmKey || opts.gmKey || localStorage.eearGM;
-    if (key && id !== 'user') { try { const r = await fetch(apiBase() + '/api/ren/dance?trackId=' + encodeURIComponent(id), { method: 'DELETE', headers: { 'x-gm-key': key } }); ok = r.ok; } catch (e) { ok = false; } }
-    if (D.key === id) { D.choreo = null; startRecording(id); }
-    return ok;
-  }
-  function musicTick(now) {
-    const A = window.EEAR_AUDIO; const on = !!(A && A.on && A.ctx && A.ctx.state === 'running');
-    if (!on) { D.key = null; D.mode = 'off'; return null; }
-    tap(A); const id = trackIdOf(A), t = A.ctx.currentTime;
-    if (id !== D.key) { // track (re)started
-      D.key = id; D.meta = TRACK_META[id] || null; D.bpm = A.bpm || (D.meta ? D.meta.bpm : 120);
-      if (typeof A.startedAt === 'number') { D.t0 = A.startedAt + (D.meta ? D.meta.beatOffset : 0); D.awaitStart = false; }
-      else { D.t0 = t + .06; D.awaitStart = true; D.startDeadline = t + 4; }
-      D.onsets.length = 0; loadDance(id);
-    }
-    beatTrack(t);
-    const L = 60 / D.bpm, beat = (t - D.t0) / L; if (beat < 0) return null;
-    const bars = D.choreo ? D.choreo.bars : D.rec ? D.rec.bars : 16, barAbs = Math.floor(beat / 4), bar = ((barAbs % bars) + bars) % bars, pb = beat - barAbs * 4;
-    if (!D.choreo && D.rec && !D.rec.locked && D.rec.moves[bar] === undefined) improvise(bar);
-    const C = D.choreo || D.rec; if (!C) return null;
-    const entry = C.moves[bar], w0 = C.wander[bar] || [0, 0], w1 = C.wander[(bar + 1) % bars] || w0, k = ease(clamp(pb / 4, 0, 1));
-    D.mode = D.choreo ? 'replay' : 'record';
-    return { pose: dancePose(entry, pb), wx: lerp(w0[0], w1[0], k) / 10, wz: lerp(w0[1], w1[1], k) / 10, pb };
-  }
+  const clearDanceI = (trackId, gmKey) => BEAT.clearDance(trackId || D.key, gmKey || opts.gmKey);
 
   // ---------------------------------------------------------------- per-frame
   let T = 0, blinkAt = 2, blinkT = -1, waveT = -1, curDist = 1e9, yaw = 0; const cur = { ...P0 };
@@ -472,7 +383,7 @@ export function addRen(scene, where, camera, opts = {}) {
     else if (inside && curDist > LEAVE_RADIUS) inside = false;
     if (ui) ui.w.style.display = inside && !xrOn() ? 'block' : 'none';
     // music / dance
-    const dance = musicTick(D.anCtx ? D.anCtx.currentTime : 0);
+    const dance = musicTick();
     D.w = lerp(D.w, dance ? 1 : 0, 1 - Math.exp(-dt * 3));
     const target = dance ? dance.pose : P0; for (const k in P0) cur[k] = lerp(P0[k], target[k] ?? P0[k], D.w);
     if (dance) cur.ry = target.ry * D.w; // spins are absolute
@@ -511,8 +422,8 @@ export function addRen(scene, where, camera, opts = {}) {
     for (const m of [P.M.shell, P.M.purple, P.M.screen, P.M.dark]) { m.userData.ei ??= m.emissiveIntensity; m.emissiveIntensity = m.userData.ei * f; }
     P.glows[0].material.opacity = .1 + .4 * night; P.glows[1].material.opacity = .12 + .45 * night; P.pad.material.opacity = .7 + .3 * night; beamBase = .12 + .1 * night; }
   let beamBase = .12;
-  const inst = { group: root, triangles, setNight, get analyser() { return D.an; }, update: updateI, say, ask, ray, clearDance: clearDanceI, listen,
-    get dance() { return { mode: D.mode, trackId: D.key, bpm: D.bpm, choreo: D.choreo, recording: D.rec && { bars: D.rec.bars, filled: D.rec.filled } }; },
+  const inst = { group: root, triangles, setNight, get analyser() { return BEAT.analyser(); }, update: updateI, say, ask, ray, clearDance: clearDanceI, listen,
+    get dance() { const S = D.store, st = BEAT.tick(); return { mode: D.mode, trackId: D.key, bpm: st.bpm || 0, choreo: S && S.data, recording: S && S.rec && { bars: S.rec.bars, filled: S.rec.moves.filter(x => x !== undefined).length } }; },
     dispose() { scene.remove(root); if (ui) ui.w.remove(); window.removeEventListener('pointerdown', prime); root.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } }); if (INST === inst) INST = null; } };
   setNight(0); INST = inst; window.REN = inst; return inst;
 }

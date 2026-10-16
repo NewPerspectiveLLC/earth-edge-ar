@@ -1,5 +1,5 @@
 // Glowing meditation circle at Matt's Meditation Garden (48.1316475, -122.7992293), centred on the Garden pillar.
-// 12 standing stones with glowing rune veins, a ring of 12 pavers with lit seams, 4 softly lit cushions, a lotus dais
+// 12 standing stones with glowing rune veins, a ring of 12 pavers with lit seams, 12 softly lit purple/teal cushions (one inside each stone), a lotus dais
 // with edge-lit petals, and floating orbs. Cheap fake bloom: radial halo sprites + fresnel shells (no post-processing),
 // 2 point lights. setNight(t 0..1): glow ~2.5x at night, subtle by day. Normal blending everywhere (safe over iOS video).
 import * as THREE from 'three';
@@ -54,11 +54,16 @@ export function buildCircle(opts = {}) {
   for (let i = 0; i < 12; i++) { const a = i * TAU / 12, len = paveOut - paveIn, s = new THREE.Mesh(new THREE.PlaneGeometry(.03, len), seamM); s.rotation.x = -PI / 2; s.rotation.z = -a; const rm = (paveIn + paveOut) / 2; s.position.set(Math.sin(a) * rm, .017, -Math.cos(a) * rm); root.add(s); }
   const floorGlow = new THREE.Mesh(new THREE.RingGeometry(paveIn, paveOut + .5, 64), new THREE.MeshBasicMaterial({ map: canvasTex(8, 64, (g) => { const r = g.createLinearGradient(0, 0, 0, 64); r.addColorStop(0, 'rgba(255,196,107,0)'); r.addColorStop(.5, 'rgba(164,92,255,.5)'); r.addColorStop(1, 'rgba(47,245,223,0)'); g.fillStyle = r; g.fillRect(0, 0, 8, 64); }), transparent: true, opacity: .25, depthWrite: false }));
   floorGlow.rotation.x = -PI / 2; floorGlow.position.y = .02; root.add(floorGlow); halos.push(floorGlow); floorGlow.userData.op = .25;
-  // ---- cushions (zafu) at N/E/S/W on the pavers, softly lit
-  const cushM = M({ map: cushMap, color: 0xffffff, emissive: GOLD, emissiveMap: cushMap, emissiveIntensity: .35, roughness: .95 });
-  for (let i = 0; i < 4; i++) { const a = i * TAU / 4 + PI / 12, r = 1.75, c = new THREE.Mesh(new THREE.SphereGeometry(.26, 20, 10), cushM); c.scale.set(1, .38, 1); c.position.set(Math.sin(a) * r, .11, -Math.cos(a) * r); root.add(c);
-    const piping = new THREE.Mesh(new THREE.TorusGeometry(.255, .012, 6, 32), seamM); piping.rotation.x = PI / 2; piping.position.copy(c.position).setY(.115); root.add(piping);
-    const h = halo(GOLD, .9, .12); h.position.copy(c.position).setY(.2); root.add(h); halos.push(h); }
+  // ---- 12 cushions (zafu), one just inside each stone, alternating purple / teal, softly lit (performers stand in the gaps)
+  const cushTex = (a, b) => canvasTex(128, 128, (g, w, h) => { const r = g.createRadialGradient(64, 64, 4, 64, 64, 64); r.addColorStop(0, '#fff6ff'); r.addColorStop(.45, a); r.addColorStop(1, b); g.fillStyle = r; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 2; for (let k = 0; k < 12; k++) { g.beginPath(); g.moveTo(64, 64); g.lineTo(64 + Math.cos(k * PI / 6) * 64, 64 + Math.sin(k * PI / 6) * 64); g.stroke(); } });
+  const cushP = cushTex('#c58cff', '#5a1fb0'), cushT = cushTex('#7ffff0', '#0f8f86');
+  const cushMs = [M({ map: cushP, color: 0xffffff, emissive: PURPLE, emissiveMap: cushP, emissiveIntensity: .4, roughness: .95 }), M({ map: cushT, color: 0xffffff, emissive: TEAL, emissiveMap: cushT, emissiveIntensity: .4, roughness: .95 })];
+  const pipeMs = [new THREE.MeshBasicMaterial({ color: 0xe2c2ff }), new THREE.MeshBasicMaterial({ color: 0xb8fff6 })];
+  const cushG = new THREE.SphereGeometry(.25, 18, 9), pipeG = new THREE.TorusGeometry(.245, .011, 5, 28), cushR = opts.cushionRadius ?? (stoneR - .58);
+  for (let i = 0; i < 12; i++) { const a = i * TAU / 12, k = i % 2, c = new THREE.Mesh(cushG, cushMs[k]); c.scale.set(1, .38, 1); c.position.set(Math.sin(a) * cushR, .1, -Math.cos(a) * cushR); root.add(c);
+    const piping = new THREE.Mesh(pipeG, pipeMs[k]); piping.rotation.x = PI / 2; piping.position.copy(c.position).setY(.105); root.add(piping);
+    const h = halo(k ? TEAL : PURPLE, .85, .13); h.position.copy(c.position).setY(.2); root.add(h); halos.push(h); }
   // ---- lotus dais (around the pillar): base + 12 + 12 edge-lit petals
   const baseM = M({ color: 0xe9e3f5, emissive: 0x4a2a80, emissiveIntensity: .45, roughness: .4, metalness: .1 });
   const base = new THREE.Mesh(new THREE.CylinderGeometry(.78, .86, .18, 48), baseM); base.position.y = .09; root.add(base);

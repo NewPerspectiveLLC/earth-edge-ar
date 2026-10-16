@@ -77,7 +77,7 @@ export function initDayNight(T,o){/* o: {scene, skyGroup(), skyRadius, base:()=>
  const N={clock:C,f:0,phase:'day',sunAlt:90,U,built:null};
  const hemi=new T.HemisphereLight(0xbfd8ff,0x3a3020,.9),sun=new T.DirectionalLight(0xffffff,1),moon=new T.DirectionalLight(0x9ab0ff,0);hemi.name='dnHemi';o.scene.add(hemi,sun,moon,sun.target,moon.target);N.lights={hemi,sun,moon};
  const stars=starField(T,o.skyRadius*.95);N.stars=stars;let starParent=null;
- let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792189732314').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
+ let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792190990688').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
  N.build=async(parent,proj)=>{await tp;if(N.built)N.built.parent&&N.built.parent.remove(N.built);const G=new T.Group();G.name='nightGlow';N.built=G;N.mats=[];
   for(const S of SITES){const sg=new T.Group();sg.userData.layer=o.layerOf?o.layerOf(S.key):undefined;G.add(sg);const c=proj(S.lat,S.lon,0);
    const bm=beamMat(T,S.col,U);for(const[r,h]of[[3.5,1500],[1.2,1500]]){const b=new T.Mesh(new T.CylinderGeometry(r,r,h,20,1,true),bm);b.position.copy(c).y+=h/2;b.renderOrder=9;b.frustumCulled=false;sg.add(b)}
