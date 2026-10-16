@@ -1,0 +1,99 @@
+// Directional music at Matt's Meditation Garden (48.1316475,-122.7992293): Web Audio PannerNode (HRTF) for direction only (rolloff 0, source placed
+// 10 m away along the true great-circle bearing, so it works anywhere on Earth); loudness = DGAIN(distance): 1.0 within 50 m, sqrt(50/d) beyond,
+// floor 0.15 so it is audible anywhere in the world (200 m 0.50, 500 m 0.32, 1 km 0.22, 1.7 km 0.17, >=2.2 km 0.15). Listener = app ENU position + true heading + pitch, updated every frame.
+// Song: built-in ORIGINAL procedural loop "Happy's Trails Vortex" (12-step arpeggio motif = 12 wedges, kick, bass, hats; generated live, no samples),
+// or the user's own file (saved in IndexedDB) / URL. Audio starts only from a tap (iOS unlock). navigator.audioSession='playback' where supported.
+export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden"};
+export const SONG="Happy's Trails Vortex";
+/* tracks: built-in procedural loop, shipped loop files (AudioBufferSourceNode loop=true = sample-exact, no seam), the user's own saved file */
+export const TRACKS=[{id:'vortex',name:SONG,builtin:true},{id:'disco',name:'Disco Jam (instrumental)',urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3']}];
+const D=Math.PI/180,CMP=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+const $=id=>document.getElementById(id);
+const dist=(a,b,c,d)=>{const R=6371000,x=Math.sin((c-a)*D/2)**2+Math.cos(a*D)*Math.cos(c*D)*Math.sin((d-b)*D/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+const brg=(a,b,c,d)=>{const y=Math.sin((d-b)*D)*Math.cos(c*D),x=Math.cos(a*D)*Math.sin(c*D)-Math.sin(a*D)*Math.cos(c*D)*Math.cos((d-b)*D);return(Math.atan2(y,x)/D+360)%360};
+export const DGAIN=d=>Math.max(.15,Math.min(1,Math.sqrt(50/Math.max(d,50))));
+const fmt=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(m<1e4?1:0)+' km';
+// ---- IndexedDB (one record: the chosen song file)
+const idb=()=>new Promise((ok,err)=>{const r=indexedDB.open('eearAudio',1);r.onupgradeneeded=()=>r.result.createObjectStore('s');r.onsuccess=()=>ok(r.result);r.onerror=()=>err(r.error)});
+const idbPut=async(k,v)=>{const db=await idb();return new Promise((ok,err)=>{const t=db.transaction('s','readwrite');t.objectStore('s').put(v,k);t.oncomplete=ok;t.onerror=()=>err(t.error)})};
+const idbGet=async k=>{const db=await idb();return new Promise((ok,err)=>{const q=db.transaction('s').objectStore('s').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>err(q.error)})};
+const idbDel=async k=>{const db=await idb();return new Promise(ok=>{const t=db.transaction('s','readwrite');t.objectStore('s').delete(k);t.oncomplete=ok})};
+
+export function initAudio({getListener,toast=(t)=>console.log(t)}){
+ const st=document.createElement('style');st.textContent=`#musW{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 308px);z-index:22;display:flex;align-items:center;gap:5px;flex-direction:row-reverse}
+#musB{font-size:15px;padding:12px;border-radius:10px}#musR{font:11px sans-serif;color:#fff;background:#000a;border-radius:8px;padding:3px 6px;max-width:150px;text-align:right;line-height:1.25}
+#musS{font-size:15px;padding:12px 10px;border-radius:10px}#musP{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 360px);z-index:40;width:min(330px,calc(100vw - 16px));background:#0b0b0ff2;color:#fff;font:13px sans-serif;border:1px solid #fff3;border-radius:12px;padding:10px;display:none}
+#musP input[type=range]{width:100%}#musP button{font-size:13px;padding:6px 9px;margin:3px 2px;border-radius:8px;border:0}#musP input[type=url]{width:100%;box-sizing:border-box;font-size:13px;padding:5px;margin:3px 0}#musP small{color:#bbb}`;
+ document.head.appendChild(st);
+ document.body.insertAdjacentHTML('beforeend',`<div id=musW><button id=musB>🎵 Music: off</button><button id=musS aria-label="music settings">⋯</button><div id=musR>${SONG}</div></div>
+<div id=musP><b>🎵 ${SONG}</b><br><small>Plays from ${SRC.name} (${SRC.lat}, ${SRC.lon}), directional: turn toward it and it gets centred. Louder as you get closer (full within 50 m), never below 15% so you hear it anywhere.</small>
+<label style="display:block;margin-top:6px">Volume <span id=musVv></span><input id=musV type=range min=0 max=100 step=1></label>
+<label style="display:block;margin:5px 0">Track <select id=musT style="font-size:14px;max-width:100%"></select></label><div id=musN style="margin:4px 0;font-size:12px">Playing: <b id=musNm>${SONG} (built-in)</b></div>
+<label><button id=musF type=button>Choose song file…</button><input id=musFi type=file accept="audio/*" style="display:none"></label><button id=musBi>Use built-in</button>
+<input id=musU type=url placeholder="or paste an audio URL (must allow CORS)"><button id=musUg>Load URL</button>
+<div><small>iPhone: the ringer/silent switch may mute web audio. If you hear nothing, flip the switch to ring and turn the volume up. Audio starts only after a tap.</small></div>
+<div id=musE style="color:#ff9a9a;font-size:12px"></div><button id=musX style="background:#ffc800;font-weight:bold">Close</button></div>`);
+ let dg=null,curD=null,ctx=null,pan=null,bus=null,vol=null,on=false,user=null,userSrc=null,seqT=null,step=0,nextT=0,lastR=0;
+ const V=()=>(+(localStorage.eearMusV??80))/100;$('musV').value=Math.round(V()*100);$('musVv').textContent=$('musV').value+'%';
+ function graph(){if(ctx)return;const AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();
+  try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  pan=ctx.createPanner();Object.assign(pan,{panningModel:'HRTF',distanceModel:'inverse',refDistance:10,rolloffFactor:0,maxDistance:1e6,coneInnerAngle:360,coneOuterAngle:360});dg=ctx.createGain();dg.gain.value=.15;
+  const comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;vol=ctx.createGain();vol.gain.value=V();
+  bus=ctx.createGain();bus.gain.value=1.4;bus.connect(comp);comp.connect(pan);pan.connect(dg);dg.connect(vol);vol.connect(ctx.destination);
+  const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)/* iOS unlock */}
+ // ---- built-in original loop: 124 bpm, 16ths; 12-step motif over a 4-chord cycle (I-V-vi-IV in D major), kick on beats, offbeat bass, hats
+ const BPM=124,S16=60/BPM/4,ROOT=62,CH=[[0,4,7],[7,11,14],[9,12,16],[5,9,12]],MOT=[0,1,2,1,2,3,2,3,4,3,4,5];
+ const mtof=m=>440*2**((m-69)/12);
+ function note(t,f,len,type,g,cut){const o=ctx.createOscillator(),a=ctx.createGain(),fl=ctx.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(f,t);fl.type='lowpass';fl.frequency.setValueAtTime(cut,t);fl.Q.value=6;
+  a.gain.setValueAtTime(0,t);a.gain.linearRampToValueAtTime(g,t+.005);a.gain.exponentialRampToValueAtTime(.0008,t+len);o.connect(fl);fl.connect(a);a.connect(bus);o.start(t);o.stop(t+len+.02)}
+ function kick(t){const o=ctx.createOscillator(),a=ctx.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);a.gain.setValueAtTime(1,t);a.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(a);a.connect(bus);o.start(t);o.stop(t+.4)}
+ let nb=null;function hat(t,g){if(!nb){nb=ctx.createBuffer(1,ctx.sampleRate*.1,ctx.sampleRate);const d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),a=ctx.createGain();s.buffer=nb;f.type='highpass';f.frequency.value=7000;a.gain.setValueAtTime(g,t);a.gain.exponentialRampToValueAtTime(.001,t+.05);s.connect(f);f.connect(a);a.connect(bus);s.start(t);s.stop(t+.06)}
+ function play16(t,i){const bar=Math.floor(i/16)%4,c=CH[bar],k=i%16;
+  const m=MOT[i%12],deg=c[m%3]+12*Math.floor(m/3);/* 12-step motif rolls against the 16-step bar: the wedge pattern shifts every bar */
+  const sweep=900+1800*(.5+.5*Math.sin(i/64*Math.PI*2));note(t,mtof(ROOT+deg),S16*1.6,'sawtooth',.16,sweep);note(t,mtof(ROOT+deg+12),S16*.9,'square',.05,sweep*1.5);
+  if(k%4===0)kick(t);if(k%4===2){note(t,mtof(ROOT-24+c[0]),S16*1.8,'sawtooth',.32,420)}hat(t,k%2?.10:.05);
+  if(k===0&&bar===0)note(t,mtof(ROOT+24+c[2]),S16*12,'triangle',.07,3000)/* bell every 4 bars */}
+ function seq(){const now=ctx.currentTime;if(nextT<now)nextT=now+.05;while(nextT<now+.25){play16(nextT,step++);nextT+=S16}}
+ function startBuiltIn(){stopUser();if(!seqT){nextT=ctx.currentTime+.06;seqT=setInterval(seq,50);seq()}}
+ function stopBuiltIn(){clearInterval(seqT);seqT=null}
+ function stopUser(){if(userSrc){try{userSrc.stop()}catch(e){}userSrc.disconnect();userSrc=null}}
+ const bufs={};let track=localStorage.eearMusT||'vortex';
+ async function fileBuf(T){if(bufs[T.id])return bufs[T.id];let last;for(const u of T.urls){try{const r=await fetch(window.EEAR_V?u+'?v='+EEAR_V:u);if(!r.ok)throw new Error('HTTP '+r.status);const b=await ctx.decodeAudioData(await r.arrayBuffer());/* trim decoder priming/padding: loop the exact decoded buffer */return bufs[T.id]=b}catch(e){last=e}}throw last}
+ function trackUI(){const sel=$('musT');const L=TRACKS.map(t=>[t.id,t.name+(t.builtin?' (built-in)':'')]).concat(user?[['user',(user.name||'My song')+' (my file)']]:[]);sel.innerHTML=L.map(([i,n])=>`<option value="${i}">${n.replace(/</g,'&lt;')}</option>`).join('');if(!L.some(x=>x[0]===track))track='vortex';sel.value=track}
+ function curName(){return track==='user'&&user?user.name:(TRACKS.find(t=>t.id===track)||TRACKS[0]).name}
+ async function startTrack(){$('musE').textContent='';const T=TRACKS.find(t=>t.id===track);$('musNm').textContent=curName();lastR=0;
+  if(track==='user'&&user){if(user.pending)await setOn.pend();if(user&&user.buf)return startUser()}
+  if(!T||T.builtin){stopUser();return startBuiltIn()}
+  try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=b.duration;userSrc.connect(bus);userSrc.start();$('musNm').textContent=T.name}
+  catch(e){$('musE').textContent=T.name+' is not available yet ('+(e.message||e)+'). Playing the built-in loop.';stopUser();startBuiltIn()}}
+ function startUser(){stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=user.buf;userSrc.loop=true;userSrc.connect(bus);userSrc.start()}
+ async function loadUser(blob,name){$('musE').textContent='';try{graph();const buf=await ctx.decodeAudioData(await blob.arrayBuffer());user={buf,name};track='user';localStorage.eearMusT=track;trackUI();$('musNm').textContent=name;lastR=0;if(on)startUser();return true}catch(e){$('musE').textContent='Could not decode that audio: '+(e.message||e);return false}}
+ async function setOn(v){on=v;$('musB').textContent='🎵 Music: '+(on?'on':'off');localStorage.eearMus=on?'1':'0';
+  if(on){graph();await ctx.resume().catch(()=>{});if(ctx.state!=='running')$('musE').textContent='Audio is blocked until you tap. Tap Music again.';startTrack();
+   if(!setOn.n){setOn.n=1;toast("🎵 "+curName()+" from "+SRC.name+". No sound? The ringer/silent switch may mute web audio.",5000)}}
+  else{stopBuiltIn();stopUser();ctx&&ctx.suspend().catch(()=>{})}}
+ $('musB').onclick=()=>setOn(!on);$('musS').onclick=()=>{$('musP').style.display=$('musP').style.display==='block'?'none':'block'};$('musX').onclick=()=>$('musP').style.display='none';
+ $('musV').oninput=()=>{localStorage.eearMusV=$('musV').value;$('musVv').textContent=$('musV').value+'%';if(vol)vol.gain.value=V()};
+ $('musF').onclick=()=>$('musFi').click();
+ $('musFi').onchange=async()=>{const f=$('musFi').files[0];if(!f)return;graph();if(await loadUser(f,f.name)){await idbPut('song',{blob:f,name:f.name}).catch(e=>$('musE').textContent='Saved for this session only ('+e.message+')');toast('🎵 Song saved on this device: '+f.name);if(!on)setOn(true)}};
+ $('musBi').onclick=async()=>{user=null;await idbDel('song').catch(()=>{});localStorage.removeItem('eearMusUrl');track='vortex';localStorage.eearMusT=track;trackUI();$('musNm').textContent=SONG+' (built-in)';lastR=0;if(on){stopUser();startBuiltIn()}};
+ $('musT').onchange=()=>{track=$('musT').value;localStorage.eearMusT=track;if(on)startTrack();else $('musNm').textContent=curName()};
+ $('musU').value=localStorage.eearMusUrl||'';
+ $('musUg').onclick=async()=>{const u=$('musU').value.trim();if(!u)return;$('musE').textContent='Loading…';try{graph();const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(await loadUser(b,decodeURIComponent(u.split('/').pop().split('?')[0])||'URL song')){localStorage.eearMusUrl=u;await idbPut('song',{blob:b,name:$('musNm').textContent}).catch(()=>{});$('musE').textContent='';if(!on)setOn(true)}}catch(e){$('musE').textContent='Could not load URL (the site must allow CORS): '+e.message}};
+ idbGet('song').then(r=>{if(r&&r.blob){user={pending:r,name:r.name}}trackUI();$('musNm').textContent=curName()}).catch(()=>trackUI());trackUI();
+ // decode the saved song lazily on first tap (needs an AudioContext)
+ setOn.pend=async()=>{if(user&&user.pending){const r=user.pending,keep=track;user=null;await loadUser(r.blob,r.name);track=keep;localStorage.eearMusT=track;trackUI()}};
+ $('musB').onclick=async()=>{if(!on){graph();await ctx.resume().catch(()=>{});if(track==='user')await setOn.pend()}setOn(!on)};
+ const fw=[0,0,0],up=[0,0,0];
+ function frame(){const L=getListener&&getListener();if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
+  const dE=10*Math.cos(el)*Math.sin(b*D),dN=10*Math.cos(el)*Math.cos(b*D),dU=10*Math.sin(el);
+  const now=performance.now();if(now-lastR>500){lastR=now;$('musR').textContent=curName()+' · '+fmt(d)+' · '+CMP[Math.round(b/22.5)%16]+' · vol '+Math.round(DGAIN(d)*100)+'%'}
+  if(!ctx||!on)return;const h=L.hdg*D,p=(L.pitch||0)*D,t=ctx.currentTime;dg.gain.setTargetAtTime(DGAIN(d),t,.3);
+  fw[0]=Math.sin(h)*Math.cos(p);fw[1]=Math.sin(p);fw[2]=-Math.cos(h)*Math.cos(p);up[0]=-Math.sin(h)*Math.sin(p);up[1]=Math.cos(p);up[2]=Math.cos(h)*Math.sin(p);
+  const l=ctx.listener;if(l.forwardX){l.positionX.setTargetAtTime(0,t,.05);l.positionY.setTargetAtTime(0,t,.05);l.positionZ.setTargetAtTime(0,t,.05);
+   l.forwardX.setTargetAtTime(fw[0],t,.05);l.forwardY.setTargetAtTime(fw[1],t,.05);l.forwardZ.setTargetAtTime(fw[2],t,.05);l.upX.setTargetAtTime(up[0],t,.05);l.upY.setTargetAtTime(up[1],t,.05);l.upZ.setTargetAtTime(up[2],t,.05)}
+  else{l.setPosition(0,0,0);l.setOrientation(fw[0],fw[1],fw[2],up[0],up[1],up[2])}
+  if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
+ window.EEAR_AUDIO={get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame};
+ return{frame,SRC}}

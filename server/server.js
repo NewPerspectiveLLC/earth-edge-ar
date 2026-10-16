@@ -24,6 +24,13 @@ const one=(s,...a)=>sq.prepare(s).get(...a),all=(s,...a)=>sq.prepare(s).all(...a
 const LIVE_MS=60000;
 const send=(r,o,c=200,h={})=>{r.writeHead(c,{'content-type':'application/json','cache-control':'no-store',...h});r.end(JSON.stringify(o))};
 // --- rate limit: sliding window per key
+/* ---- Ren (3dguru) chat: live Grok via xAI (OpenAI-compatible chat completions). Key ONLY server-side: env XAI_API_KEY or file ~/.eear-secrets/xai_api_key (chmod 600). Never logged/returned. */
+const os=require('os');
+const xaiKey=()=>{if(process.env.XAI_API_KEY)return process.env.XAI_API_KEY.trim();try{return fs.readFileSync(path.join(os.homedir(),'.eear-secrets','xai_api_key'),'utf8').trim()}catch(e){return''}};
+const REN_MODEL=()=>process.env.REN_MODEL||'grok-4.20-0309-non-reasoning';
+const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's Earth Edge AR game. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
+const REN_DF=path.join(__dirname,'ren-dances.json');let REND={};try{REND=JSON.parse(fs.readFileSync(REN_DF,'utf8'))}catch(e){}
+const renSave=()=>{try{fs.writeFileSync(REN_DF,JSON.stringify(REND),{mode:0o600})}catch(e){console.error('ren dance save',e.message)}};
 const RL={};function limited(k,max,ms=900000){const n=Date.now();RL[k]=(RL[k]||[]).filter(t=>n-t<ms);if(RL[k].length>=max)return true;RL[k].push(n);return false}
 // --- pluggable senders (dev mode logs only; nothing is sent)
 async function sendEmail(to,subject,text){const m=cfg('MAIL_MODE')||'dev';
@@ -170,19 +177,24 @@ async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.include
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
  const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}
 const ghState=()=>({ghosts:Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n];return{id:n,pid:d.pid,dummy:true,lat:s.lat,lon:s.lon,heading:s.wander?s.hdg:null,wander:s.wander,target:{lat:s.tlat,lon:s.tlon,place:s.place},updated:s.updated}})});
-const types={'.html':'text/html','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
  if(!u.pathname.startsWith('/api/')){let dp;try{dp=decodeURIComponent(u.pathname)}catch(e){return r.writeHead(400),r.end()}
   // static allowlist: decoded + normalized + case-insensitive (macOS FS is case-insensitive). Never serve server/, cert/, logs/, dotfiles, db/key/log files.
   const rel=path.posix.normalize('/'+dp.replace(/\\/g,'/')).toLowerCase();
-  if(rel.includes('\0')||/(^|\/)(server|cert|logs|node_modules)(\/|$)/.test(rel)||/(^|\/)\./.test(rel)||(!rel.endsWith('/')&&!/\.(html|js|json|png|jpg|jpeg|webp|css|glb|gltf|svg|ico|txt|mp3|wav)$/.test(rel))||/\.(pem|key|sqlite|log|err|bak.*)$/.test(rel)||/gm-key|config\.json|ed25519/.test(rel))return r.writeHead(404),r.end('not found');
+  if(rel.includes('\0')||/(^|\/)(server|cert|logs|node_modules)(\/|$)/.test(rel)||/(^|\/)\./.test(rel)||(!rel.endsWith('/')&&!/\.(html|js|json|png|jpg|jpeg|webp|css|glb|gltf|svg|ico|txt|mp3|wav|m4a)$/.test(rel))||/\.(pem|key|sqlite|log|err|bak.*)$/.test(rel)||/gm-key|config\.json|ed25519/.test(rel))return r.writeHead(404),r.end('not found');
   let f=path.normalize(path.join(root,dp));if(!f.startsWith(path.normalize(root)+path.sep))return r.writeHead(404),r.end();
   if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,'index.html');
-  return fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end('not found')}r.writeHead(200,{'content-type':types[path.extname(f)]||'application/octet-stream'});r.end(d)})}
+  /* caching: HTML no-cache (always revalidate), version.json + sw.js + updater.js no-store, ?v=<build> assets immutable, others ETag revalidation */
+  return fs.stat(f,(e,stt)=>{if(e||!stt.isFile()){r.writeHead(404);return r.end('not found')}const ext=path.extname(f).toLowerCase(),base=path.basename(f).toLowerCase(),tag='W/"'+stt.size.toString(36)+'-'+Math.floor(stt.mtimeMs).toString(36)+'"';
+   const cc=ext==='.html'?'no-cache':(base==='version.json'||base==='sw.js'||base==='updater.js')?'no-store':u.searchParams.has('v')?'public, max-age=31536000, immutable':'no-cache';
+   const h={'content-type':types[ext]||'application/octet-stream','cache-control':cc,'etag':tag};if(base==='sw.js')h['service-worker-allowed']='/';
+   if(cc!=='no-store'&&q.headers['if-none-match']===tag){r.writeHead(304,h);return r.end()}
+   fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,h);r.end(d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy')){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
-  if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST','access-control-max-age':'600'});return r.end()}}
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+  if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
  if(u.pathname.startsWith('/api/registry')){if(await registry(u,q,r,j,b,U,ip)!==false)return}
@@ -241,6 +253,25 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   return send(r,{me:{team:teamOf(P.team_id),device:P.device,mode:P.mode},seeStealth:see,policy:pol,teamOnly:!!s.teamOnly,players:L.map(pubP)})}
  case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);let m=j.mode==='stealth'?'stealth':'regular';const dev=P.device||devOf(j.device,q.headers['user-agent']);if(m==='stealth'&&!stealthOk(dev)){run("update gplayers set mode='regular' where id=?",P.id);return send(r,{ok:0,mode:'regular',stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop})}run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
  case'/api/policy':return send(r,{policy:getPol()})
+ case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
+  if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
+  const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);
+  const key=xaiKey();if(!key)return send(r,{reply:"Ren is meditating right now (the AI key isn't set up on the server yet). Try again soon!",fallback:'key missing'},503);
+  const hist=(Array.isArray(j.history)?j.history:[]).slice(-6).filter(h=>h&&(h.role==='user'||h.role==='assistant')&&typeof h.content==='string').map(h=>({role:h.role,content:h.content.slice(0,500)}));
+  try{const x=await fetch('https://api.x.ai/v1/chat/completions',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},signal:AbortSignal.timeout(15000),
+    body:JSON.stringify({model:REN_MODEL(),max_tokens:200,temperature:.7,messages:[{role:'system',content:REN_SYS},...hist,{role:'user',content:msg}]})});
+   const d=await x.json().catch(()=>({}));if(!x.ok){console.error('ren upstream',x.status,(d&&d.error&&(d.error.message||d.error))||'');return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:'upstream '+x.status},502)}
+   const reply=String(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content||'').trim().slice(0,1200);return send(r,{reply:reply||'…',model:REN_MODEL()})}
+  catch(e){return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:e.name==='TimeoutError'?'timeout':'error'},504)}}
+ case'/api/ren/dance':{const tid=String(u.searchParams.get('trackId')||j.trackId||'');if(!/^[A-Za-z0-9_.-]{1,64}$/.test(tid))return send(r,{error:'trackId must be 1-64 chars [A-Za-z0-9_.-]'},400);
+  if(q.method==='GET'){if(limited('rdg:'+ip,120,60000))return send(r,{error:'rate limited'},429);return REND[tid]?send(r,{trackId:tid,choreo:REND[tid].choreo,saved:REND[tid].t}):send(r,{error:'no dance saved for this track'},404)}
+  if(q.method==='DELETE'){if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);const had=!!REND[tid];delete REND[tid];renSave();audit(ip,'ren-dance-reset',{tid});return send(r,{ok:1,deleted:had})}
+  if(q.method==='POST'){if(limited('rdp:'+ip,10,60000))return send(r,{error:'rate limited'},429);const c=j.choreo;if(!c||typeof c!=='object'||Array.isArray(c))return send(r,{error:'choreo must be a JSON object'},400);
+   const sz=Buffer.byteLength(JSON.stringify(c));if(sz>20480)return send(r,{error:'choreo too large (max 20 KB)'},413);
+   if(REND[tid])return send(r,{ok:0,exists:true,trackId:tid,choreo:REND[tid].choreo,saved:REND[tid].t});/* first save wins */
+   REND[tid]={choreo:c,t:Date.now(),ip:crypto.createHash('sha256').update(ip).digest('hex').slice(0,8)};renSave();return send(r,{ok:1,trackId:tid,saved:REND[tid].t})}
+  return send(r,{error:'GET, POST or DELETE'},405)}
+ case'/api/gm/ren-dances':{if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,{dances:Object.entries(REND).map(([k,v])=>({trackId:k,saved:v.t,bytes:Buffer.byteLength(JSON.stringify(v.choreo))}))})}
  case'/api/leave':{if(P)run('update gplayers set live=0 where id=?',P.id);return send(r,{ok:1})}
  case'/api/delete':{if(P){run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
  // ---- read-only GM watcher (GM key header only; watcher never joins, so it never appears as a player)

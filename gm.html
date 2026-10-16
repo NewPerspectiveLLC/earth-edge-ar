@@ -1,5 +1,5 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR GM - live satellite</title>
-<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js></script>
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792186882745><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792186882745></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR GM - live satellite</title>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js?v=1792186882745></script>
 <style>
 html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;background:#000;color:#eee;overflow:hidden}
 #map{position:fixed;inset:0;background:#111}
@@ -43,7 +43,7 @@ html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;back
 <span id=stat><span class=dot id=dot></span><span id=st>connecting…</span></span>
 <button class="btn wide" id=lmlab>Landmark labels</button><button class=btn id=sideb>Players</button><button class=btn id=ctlb>Rules &amp; bots</button></div>
 <div id=ctl><h4 style=margin-top:0>Stealth rules <small id=polst></small></h4><table><tr><th></th><th>iPhone</th><th>Quest</th><th>Desktop</th></tr><tr><td>Sees stealth players</td><td><input type=checkbox data-g=canSee data-d=iphone></td><td><input type=checkbox data-g=canSee data-d=quest></td><td><input type=checkbox data-g=canSee data-d=desktop></td></tr><tr><td>Can go stealth</td><td><input type=checkbox data-g=canGoStealth data-d=iphone></td><td><input type=checkbox data-g=canGoStealth data-d=quest></td><td><input type=checkbox data-g=canGoStealth data-d=desktop></td></tr></table><small>Applies live (clients re-read within ~3 s). GM always sees everyone. Device = client claim cross-checked with the browser User-Agent: spoofable, a game rule not a security boundary. Android counts as Desktop.</small>
-<h4>Permanent bots <small>(tag BOT)</small></h4><div id=botl></div><button class=btn id=ctlx style=margin-top:8px>Close</button></div>
+<h4>Permanent bots <small>(tag BOT)</small></h4><div id=botl></div><h4>Ren's dances <small>(first save per track wins)</small></h4><div id=renl class=sub>none saved yet</div><button class=btn id=ctlx style=margin-top:8px>Close</button></div>
 <div id=side><h3><span>Live players (<span id=n>0</span>)</span><label style="font-weight:400;font-size:12px"><input type=checkbox id=tr> trails</label></h3><div class=list id=list></div></div>
 <div id=lock><div><b>Earth Edge AR - Game master</b><br><span style="color:#aaa">Paste the GM key to see live players.</span>
 <input id=k type=password autocomplete=off placeholder="GM key"><button class=btn id=go style="width:100%">Unlock</button><div id=err></div></div></div>
@@ -66,8 +66,8 @@ const LM=[["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff'],['Po
 const pin=(t,cls,g,dy)=>L.marker([t[1],t[2]],{icon:L.divIcon({className:'',html:`<div class="lm ${cls}"><div class=i style="background:${t[3]}"></div><div class=t style="${dy?'top:'+dy+'px':''}">${esc(t[0])}</div></div>`,iconSize:[0,0]}),keyboard:false}).addTo(g).bindTooltip(esc(t[0]));
 VX.forEach((t,i)=>pin(t,'vx',vxG,i===2?-22:0));LM.forEach(t=>pin(t,'',lmG));
 $('lmlab').onclick=()=>{document.body.classList.toggle('hidelm');$('lmlab').classList.toggle('on',!document.body.classList.contains('hidelm'))};$('lmlab').classList.add('on');
-fetch('streets.json').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
-fetch('sheridan.json').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
+fetch('streets.json?v=1792186882745').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
+fetch('sheridan.json?v=1792186882745').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
 // ---- players
 const RA=[48.11035,-122.80591];
 function hcol(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+(h%360)+',95%,55%)'}
@@ -124,7 +124,7 @@ $('go').onclick=()=>{KEY=$('k').value.trim();if(!KEY)return;localStorage.eearGM=
 // ---- Rules & bots panel (GM key; same server as the live map)
 const gmF=(p,b)=>fetch(BASE+'/api/gm/'+p,{method:b?'POST':'GET',headers:{'x-gm-key':KEY,...(b?{'content-type':'application/json'}:{})},body:b?JSON.stringify(b):undefined,cache:'no-store'}).then(r=>r.json());
 function polShow(P){for(const i of document.querySelectorAll('#ctl input[data-g]'))i.checked=!!(P[i.dataset.g]||{})[i.dataset.d]}
-async function ctlLoad(){try{const a=await gmF('policy');if(a.policy)polShow(a.policy);$('polst').textContent='';const b=await gmF('bots');if(b.styles)STY=b.styles;botShow(b.bots||[],b.edge)}catch(e){$('polst').textContent='(load failed)'}}
+async function ctlLoad(){try{const a=await gmF('policy');if(a.policy)polShow(a.policy);$('polst').textContent='';const b=await gmF('bots');if(b.styles)STY=b.styles;botShow(b.bots||[],b.edge);renLoad()}catch(e){$('polst').textContent='(load failed)'}}
 let EDGE_A=null,STY=['default','lightblue','plaid'];
 const swatch=s=>s==='plaid'?'<svg width=14 height=14 style="vertical-align:-2px;margin-right:4px"><rect width=14 height=14 rx=3 fill="url(#eearPlaid)" stroke="#9be89b"/></svg>':s==='lightblue'?'<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#7ec8ff;margin-right:4px;vertical-align:-2px"></span>':'';
 function botShow(B,E){if(E)EDGE_A=E;const ed=B.filter(b=>b.group==='edge'),all=k=>ed.length&&ed.every(b=>b[k]);
@@ -137,6 +137,9 @@ $('ctl').addEventListener('change',async e=>{const i=e.target;try{if(i.dataset.g
 $('ctl').addEventListener('input',e=>{if(e.target.id==='edLat'){const m=e.target.value.match(/^\s*(-?\d+\.?\d*)\s*[, ]\s*(-?\d+\.?\d*)\s*$/);if(m){e.target.value=m[1];$('edLon').value=m[2]}}});
 $('ctl').addEventListener('click',async e=>{if(e.target.id!=='edGo')return;const la=+$('edLat').value,lo=+$('edLon').value,rr=+$('edR').value||7;if(!isFinite(la)||!isFinite(lo)){$('polst').textContent='enter lat and lon';return}
  $('polst').textContent='moving ring…';try{const r=await gmF('bots',{edge:{lat:la,lon:lo,r:rr,name:'GM-set anchor '+la.toFixed(6)+', '+lo.toFixed(6)}});if(r.error){$('polst').textContent=r.error;return}botShow(r.bots||[],r.edge);$('polst').textContent='ring moved '+new Date().toLocaleTimeString();poll()}catch(err){$('polst').textContent='move failed'}});
+async function renLoad(){try{const d=await gmF('ren-dances');const L=d.dances||[];$('renl').innerHTML=L.length?L.map(x=>`<div class=p style="cursor:default"><div><div class=nm>${esc(x.trackId)}</div><div class=sub>saved ${new Date(x.saved).toLocaleString()} · ${x.bytes} B</div></div><button class=btn data-rend="${esc(x.trackId)}" style="margin-left:auto">Reset Ren's dance</button></div>`).join(''):'none saved yet'}catch(e){$('renl').textContent='(load failed)'}}
+$('ctl').addEventListener('click',async e=>{const t=e.target.dataset&&e.target.dataset.rend;if(!t)return;if(!confirm("Reset Ren's dance for "+t+"? The next player to dance it saves a new one."))return;
+ try{await fetch(BASE+'/api/ren/dance?trackId='+encodeURIComponent(t),{method:'DELETE',headers:{'x-gm-key':KEY}});renLoad()}catch(err){$('polst').textContent='reset failed'}});
 $('ctlb').onclick=()=>{const c=$('ctl');c.style.display=c.style.display==='block'?'none':'block';if(c.style.display==='block')ctlLoad()};$('ctlx').onclick=()=>$('ctl').style.display='none';
 if(KEY)poll();else $('lock').style.display='flex';setInterval(poll,POLL_MS);document.addEventListener('visibilitychange',poll);
 </script></body></html>
