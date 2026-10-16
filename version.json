@@ -1,1 +1,1 @@
-{"v": "1792110838994", "note": "Real-time Moon + Sun (astronomy-engine): true direction & angular size, 1 s updates, labels, Sky tab (2D + 3D panels), verified vs JPL Horizons"}
+{"v": "1792179259611", "note": "iPhone compass fix: true north (WMM-2025 declination), no lock-in on a bad first fix (re-snap), single manual offset (nudge +-1/+-5, Reset north), accuracy warning, live heading/declination readout, camera-matched FOV"}
