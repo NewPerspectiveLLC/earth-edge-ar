@@ -1,1 +1,1 @@
-{"v": "1792179259611", "note": "iPhone compass fix: true north (WMM-2025 declination), no lock-in on a bad first fix (re-snap), single manual offset (nudge +-1/+-5, Reset north), accuracy warning, live heading/declination readout, camera-matched FOV"}
+{"v": "1792183060089", "note": "iPhone camera fix: desk-mode fallback no longer hides the camera feed (it fired 2.5 s after page load, before Start); getUserMedia+play() inside the Start tap, Retry camera + clear errors, resume after background, sun glow alpha fix"}

@@ -204,7 +204,7 @@ function declUpd(){const P=window.MYPOS||(built?{lat:built[0],lon:built[1]}:null
 setInterval(declUpd,5000);
 // circular (sin/cos) mean over 1.5 s; gated slow blend; a sustained disagreement >15 deg with a good compass re-snaps (no permanent lock-in on a bad first fix)
 let hInit=false,lastA=null,lastT=0,rejT=0,disT=0,HLOCK=false;const hBuf=[];const wrap=d=>((d+540)%360)-180;
-function onOri(e,absEv){if(e.alpha==null&&e.beta==null)return;if(absEv)NORTH.abs=true;else if(NORTH.abs&&e.webkitCompassHeading==null)return;/* Android: never mix relative+absolute frames */
+function onOri(e,absEv){if(e.alpha==null&&e.beta==null)return;if(desk&&window.exitDesk)exitDesk();if(absEv)NORTH.abs=true;else if(NORTH.abs&&e.webkitCompassHeading==null)return;/* Android: never mix relative+absolute frames */
  ori=e;const now=performance.now();
  const rate=lastA!=null?Math.abs(wrap(e.alpha-lastA))/Math.max(.001,(now-lastT)/1000):0;const dt=lastT?(now-lastT)/1000:0;lastA=e.alpha;lastT=now;
  let mag,acc;if(e.webkitCompassHeading!=null){mag=e.webkitCompassHeading;acc=e.webkitCompassAccuracy;NORTH.src='iOS webkitCompassHeading'}else if(absEv&&e.alpha!=null){mag=(360-e.alpha)%360;acc=null;NORTH.src='absolute alpha (Android)'}else{NORTH.src='gyro only (no compass)';return}
@@ -235,9 +235,10 @@ function setCam(){if(q.has('lv')){const v=q.get('lv').split(',').map(Number);cam
 eu.set(b,a,-g,'YXZ');tq.setFromEuler(eu);tq.multiply(q1);tq.multiply(new T.Quaternion().setFromAxisAngle(zee,-so));const ang=cam.quaternion.angleTo(tq)/D;if(ang>20)cam.quaternion.copy(tq);else if(ang>.3)cam.quaternion.slerp(tq,.2)}const tq=new T.Quaternion();
 async function askMotion(){try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission){NORTH.perm=await DeviceOrientationEvent.requestPermission()}else NORTH.perm='not required'}catch(e){NORTH.perm='error: '+e.message}}window.askMotion=askMotion;
 async function start(){document.getElementById('start').remove();
-await askMotion();/* must run inside the Start tap (iOS user-gesture rule) */
+const camP=camOn()?startCam():null;/* kick getUserMedia + play() inside the Start tap */
+await askMotion();await camP;/* must run inside the Start tap (iOS user-gesture rule) */
 addEventListener('deviceorientation',e=>onOri(e,false));addEventListener('deviceorientationabsolute',e=>onOri(e,true));
-if(localStorage.eearCam==='off')camApply();else try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message;setTimeout(enterDesk,0)}
+STARTED=true;camApply();/* camera (getUserMedia + play) */setTimeout(()=>{if(!ori)enterDesk()},COARSE?4000:2500);/* phones keep the camera feed in desk mode */
 if(q.has('lat')){build(+q.get('lat'),+q.get('lon'));updLocal(+q.get('lat'),+q.get('lon'),5);MYPOS={lat:+q.get('lat'),lon:+q.get('lon'),acc:5}}
 else navigator.geolocation.watchPosition(p0=>{if(PLOCK||window.MANLOC)return;if(p0.coords.accuracy>30&&MYPOS)return;if(!window._gf)window._gf={lat:p0.coords.latitude,lon:p0.coords.longitude};const gf=window._gf;gf.lat+=(p0.coords.latitude-gf.lat)*.3;gf.lon+=(p0.coords.longitude-gf.lon)*.3;const p={coords:{latitude:gf.lat,longitude:gf.lon,accuracy:p0.coords.accuracy}};build(p.coords.latitude,p.coords.longitude);updLocal(p.coords.latitude,p.coords.longitude,p.coords.accuracy);MYPOS={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}},e=>{ui.textContent='No GPS fix ('+e.message+'), using Ready Athletics';setLoc(48.11035,-122.80591)},{enableHighAccuracy:true})}
 document.getElementById('start').onclick=start;
@@ -283,7 +284,8 @@ function setLoc(a,l){built=null;L0=null;sm=null;build(a,l);updLocal(a,l,5);MYPOS
 window.setLoc=setLoc;
 TARGETS.forEach((t,i)=>locSel.insertAdjacentHTML('beforeend',`<option value=${i}>${t[0]}</option>`));
 locSel.onchange=()=>{if(locSel.value==='gps')navigator.geolocation.getCurrentPosition(p=>setLoc(p.coords.latitude,p.coords.longitude),()=>alert('No GPS fix'));else{const t=TARGETS[+locSel.value];setLoc(t[1],t[2])}};
-function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#000)';vid.style.display='none';
+window.exitDesk=()=>{desk=false;document.getElementById('desk').style.display='none';if(camOn()){document.body.style.background='#000';startCam()}};
+function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';if(!(camOn()&&vid.srcObject)){document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#000)';vid.style.display='none'}
  if(!MYPOS){ui.textContent='No GPS yet, using Ready Athletics';setLoc(48.11035,-122.80591);locSel.value='0'}}
 document.querySelectorAll('#desk button').forEach(b=>b.onclick=()=>{yaw=+b.dataset.h});
 let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('button,select,#mpc,#trkM,#hpP,#hpD,#card,#zoom'))drag=[e.clientX,e.clientY,yaw,pitch,0]});
@@ -292,7 +294,8 @@ addEventListener('pointerup',()=>{drag=null});
 addEventListener('keydown',e=>{if(!desk)return;if(e.key==='ArrowLeft')yaw=(yaw-3+360)%360;if(e.key==='ArrowRight')yaw=(yaw+3)%360;if(e.key==='ArrowUp')pitch=Math.min(89,pitch+3);if(e.key==='ArrowDown')pitch=Math.max(-89,pitch-3)});
 function applyMan(){if(!manYaw)return;cam.quaternion.premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),-manYaw*D))}
 function deskCam(){if(!desk||ori||q.has('look'))return;cam.rotation.set(pitch*D,-yaw*D,0,'YXZ');hdg.textContent=Math.round(yaw)+'°'}
-setTimeout(()=>{if(!ori)enterDesk()},2500);
+/* desk (drag-to-look) fallback: desktop only after Start or 2.5 s; on phones never before Start (it used to fire 2.5 s after LOAD and hid the camera feed forever) */
+setTimeout(()=>{if(!ori&&!COARSE)enterDesk()},2500);
 
 // position lock: freeze GPS, keep gyro live; manual yaw offset + nudge; camera-flow yaw drift cancel (beta)
 var PLOCK=false,manYaw=0,blendT=0;window.nudge=new T.Vector3();const nudge=window.nudge;window.PLOCK=()=>PLOCK;
@@ -361,10 +364,25 @@ setInterval(camPassFix,1000);setTimeout(camPassFix,300);window.camPassFix=camPas
 // ---- camera passthrough toggle (persisted). Phone/desktop: stop/restart getUserMedia + dark gradient. Quest AR: opaque dark sky sphere.
 const DSKY=X.makeDarkSky(T);scene.add(DSKY);
 function camOn(){return localStorage.eearCam!=='off'}
+const COARSE=matchMedia('(pointer:coarse)').matches;var STARTED=false;window.CAMERR=null;
+function camMsg(t,retry){let el=document.getElementById('camErr');if(!el){el=document.createElement('div');el.id='camErr';el.style.cssText="position:fixed;left:50%;transform:translateX(-50%);top:40%;z-index:40;background:#300d;border:2px solid #f66;border-radius:12px;padding:12px 16px;max-width:86vw;font-size:16px;text-align:center";document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target.id==='camRetry'){el.style.display='none';startCam()}if(e.target.id==='camX')el.style.display='none'})}
+ if(!t){el.style.display='none';return}el.innerHTML=t+(retry?"<br><button id=camRetry style='font-size:18px;margin-top:8px'>Retry camera</button> ":"")+"<button id=camX style='font-size:18px;margin-top:8px'>Close</button>";el.style.display='block'}
+// one camera path: getUserMedia(environment) -> srcObject -> play() (playsinline+muted+autoplay); errors surfaced with Retry
+async function startCam(){if(ren.xr.isPresenting||!camOn())return;vid.setAttribute('playsinline','');vid.setAttribute('webkit-playsinline','');vid.muted=true;vid.autoplay=true;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){CAMERR='no getUserMedia';camMsg(location.protocol!=='https:'?'Camera needs HTTPS (open the https:// link).':'This browser has no camera API.',false);return}
+ try{let st=vid.srcObject&&vid.srcObject.getVideoTracks().some(t=>t.readyState==='live')?vid.srcObject:null;
+  if(!st){try{st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}catch(e){if(e.name==='OverconstrainedError')st=await navigator.mediaDevices.getUserMedia({video:true,audio:false});else throw e}
+   vid.srcObject=st;for(const t of st.getVideoTracks())t.addEventListener('ended',()=>{if(camOn()&&!ren.xr.isPresenting)camMsg('The camera stopped (another tab or app may have taken it). Close it, then:',true)})}
+  vid.style.display='';document.body.style.background='#000';await vid.play().catch(e=>{throw Object.assign(new Error('play() blocked: '+e.message),{name:'PlayError'})});CAMERR=null;camMsg(null)}
+ catch(e){CAMERR=e.name+': '+e.message;const m={NotAllowedError:'Camera permission was denied. iPhone: Settings › Safari › Camera › Allow (or tap aA › Website Settings), then',NotReadableError:'The camera is in use by another tab or app (iOS lets only one use it). Close it, then',AbortError:'The camera could not start (it may be in use by another tab or app). Close it, then',NotFoundError:'No camera found.',SecurityError:'Camera blocked: this page must be opened over https.',PlayError:'The camera started but the video could not play. Tap'}[e.name]||('Camera unavailable ('+e.name+': '+e.message+'). Try');
+  camMsg(m+(e.name==='NotFoundError'||e.name==='SecurityError'?'':' tap Retry camera.'),!(e.name==='NotFoundError'||e.name==='SecurityError'));ui.textContent='Camera unavailable: '+e.message;fetch('/api/clientlog',{method:'POST',body:JSON.stringify({ev:'cam-error',name:e.name,msg:e.message,ua:navigator.userAgent})}).catch(()=>{})}}
+window.startCam=startCam;
 async function camApply(){const on=camOn();camB.textContent='Camera: '+(on?'on':'off');DSKY.visible=!on&&ren.xr.isPresenting;
  if(ren.xr.isPresenting)return;
- if(!on){if(vid.srcObject){vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null}vid.style.display='none';document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#03060c 56%,#000)'}
- else if(!desk){vid.style.display='';document.body.style.background='#000';if(!vid.srcObject)try{vid.srcObject=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){ui.textContent='Camera unavailable: '+e.message}}}
+ if(!on){if(vid.srcObject){vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null}vid.style.display='none';camMsg(null);document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#03060c 56%,#000)'}
+ else if(STARTED||vid.srcObject){await startCam()}}
+/* iOS suspends the stream in the background: resume on return */
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&STARTED&&camOn()&&!ren.xr.isPresenting){const t=vid.srcObject&&vid.srcObject.getVideoTracks()[0];if(!t||t.readyState!=='live'){vid.srcObject=null;startCam()}else vid.play().catch(()=>{})}});
 function camToggle(){localStorage.eearCam=camOn()?'off':'on';camApply();if(ren.xr.isPresenting)xrMsg('Camera passthrough: '+(camOn()?'on':'off'))}
 camB.onclick=camToggle;camB.textContent='Camera: '+(camOn()?'on':'off');window.camToggle=camToggle;window.camOnM=camOn;window.applyLayers=applyLayers;window.LAYERS=LAYERS;window.DSKY=DSKY;
 window.EEAR={ren,scene,cam,world,LAY,local,get nudge(){return nudge}};window.alphaProbe=(fix=true)=>{if(fix)xrPassFix();ren.render(scene,cam);const gl=ren.getContext(),w=gl.drawingBufferWidth,h=gl.drawingBufferHeight,px=new Uint8Array(4);let mx=0,n=0;for(let i=1;i<10;i++)for(let j=1;j<10;j++){gl.readPixels(w*i/10|0,h*j/10|0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);mx=Math.max(mx,px[3]);if(px[3]>0)n++}return{maxAlpha:mx,nonzero:n}};
