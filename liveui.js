@@ -27,20 +27,24 @@ export function liveUI({key='eearSession',device='phone',api='/api',start,stop})
  const close=()=>{mpc.style.display='none';document.body.classList.remove('mpOpen')};
  $('mpa').onchange=$('mpn').oninput=()=>$('mpj').disabled=!$('mpa').checked||!$('mpn').value.trim();$('mpx').onclick=close;
  async function join(c){const r=await call('/join',{consent:true,name:c.name,mode:c.mode,entrance:c.entrance,device}).catch(()=>({}));
-  if(!r.token){alert('Join failed: '+(r.error||'server unreachable'));return false}S={...r,live:true,paused:false,mode:c.mode};save();ui();start&&start();return true}
+  if(!r.token){alert('Join failed: '+(r.error||'server unreachable'));return false}S={...r,live:true,paused:false,mode:r.mode||c.mode};save();ui();start&&start();if(r.stealthDenied)warn(r.warning);if(r.policy)polUI(r.policy);return true}
+ const warn=t=>{t=t||"Stealth isn't available on this device. Use the iPhone app to go stealth.";(window.eearToast?eearToast('⚠ '+t,6000):alert(t))};
+ const CLS=device==='iphone'?'iphone':device==='quest'?'quest':'desktop';
+ function polUI(P){window.EEAR_POLICY=P;const ok=!!(P.canGoStealth||{})[CLS],o=$('mpm').querySelector('option[value=stealth]');o.textContent=ok?'Stealth (hidden from players, visible to GM)':'Stealth (not available on this device; iPhone only)';o.disabled=!ok;if(!ok&&$('mpm').value==='stealth')$('mpm').value='regular';$('tmS').dataset.na=ok?'':'1';ui()}
+ fetch(api+'/policy').then(r=>r.json()).then(j=>j.policy&&polUI(j.policy)).catch(()=>{});
  $('mpj').onclick=async()=>{if(!$('mpa').checked)return;const c={name:$('mpn').value.trim(),mode:$('mpm').value,entrance:$('mpe').value,t:Date.now()};localStorage.eearConsent=JSON.stringify(c);if(await join(c))close()};
  const autoC=()=>{let c=C();if(!c){c={name:'Player-'+Math.random().toString(36).slice(2,6),mode:'regular',entrance:'walk',t:Date.now(),auto:1};localStorage.eearConsent=JSON.stringify(c)}return c};
  $('joinB').onclick=()=>{const c=C();if(c)join(c);else if(!CONSENT_REQUIRED)join(autoC());else open()};
  $('tmN').onclick=async()=>{const c=C()||autoC();const n=(prompt('Display name',c.name)||'').trim().slice(0,24);if(!n||n===c.name)return menu(0);c.name=n;localStorage.eearConsent=JSON.stringify(c);await call('/leave').catch(()=>{});S=null;save();menu(0);await join(c)};$('joinX').onclick=open;
  const menu=v=>$('trkM').style.display=v?'block':'none';$('trk').onclick=()=>menu($('trkM').style.display!=='block');$('tmC').onclick=()=>menu(0);
  $('tmP').onclick=()=>{S.paused=!S.paused;save();ui();menu(0);S.paused?stop&&stop(true):start&&start()};
- $('tmS').onclick=async()=>{const m=S.mode==='stealth'?'regular':'stealth';const r=await call('/mode',{mode:m}).catch(()=>({}));if(r.ok){S.mode=m;save();const c=C();if(c){c.mode=m;localStorage.eearConsent=JSON.stringify(c)}}else alert('Could not change mode');ui();menu(0)};
+ $('tmS').onclick=async()=>{const m=S.mode==='stealth'?'regular':'stealth';const r=await call('/mode',{mode:m,device}).catch(()=>({}));if(r.stealthDenied){S.mode='regular';save();warn(r.warning);ui();menu(0);return}if(r.ok){S.mode=m;save();const c=C();if(c){c.mode=m;localStorage.eearConsent=JSON.stringify(c)}}else alert('Could not change mode');ui();menu(0)};
  $('tmL').onclick=async()=>{await call('/leave').catch(()=>{});S.live=false;save();menu(0);stop&&stop();ui()};
  $('tmD').onclick=async()=>{if(!confirm('Delete all your recorded positions? This also forgets your consent on this device.'))return;await call('/delete').catch(()=>{});S=null;save();localStorage.removeItem('eearConsent');menu(0);stop&&stop();ui()};
  function ui(){const live=S&&S.live,c=C();$('joinB').style.display=live?'none':'';$('joinB').textContent=c?'Join live as '+c.name:'Join live tracking';$('joinX').style.display=!live&&c&&CONSENT_REQUIRED?'':'none';$('tmI').style.display=CONSENT_REQUIRED?'none':'';
   const t=$('trk');t.style.display=live?'block':'none';t.className=live&&S.paused?'paused':(live&&S.mode==='stealth'?'stealth':'');t.textContent=live?(S.paused?'❚❚ Live: paused':'● Live: on'+(S.mode==='stealth'?' (stealth)':''))+' ▾':'';
-  $('tmP').textContent=S?.paused?'Resume':'Pause';$('tmS').textContent=S?.mode==='stealth'?'Go visible (regular)':'Go stealth'}
+  $('tmP').textContent=S?.paused?'Resume':'Pause';$('tmS').textContent=S?.mode==='stealth'?'Go visible (regular)':($('tmS').dataset.na?'Go stealth (iPhone only)':'Go stealth')}
  // server dropped the session (restart/cleanup): silently rejoin if the user consented and never left
  let rj=0;async function lost(){S&&(S.live=false);const c=C();if(c&&Date.now()-rj>30000){rj=Date.now();if(await join(c))return true}stop&&stop();ui();return false}
  ui();if(S?.live&&!S.paused)setTimeout(()=>start&&start(),0);
- return{get S(){return S},call,lost,ui,open,get active(){return!!(S&&S.live&&!S.paused)}}}
+ return{get S(){return S},call,lost,ui,open,polUI,get active(){return!!(S&&S.live&&!S.paused)}}}

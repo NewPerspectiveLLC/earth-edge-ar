@@ -48,7 +48,27 @@ const teamOf=id=>id?one('select id,name,color from teams where id=?',id):null;
 // dummy ghost players: server-side test fixtures (see ghosts block below + /api/gm/ghost). Hex pids so gm.html colours them.
 const GHOSTS={'Ghost-1':{pid:'ab0001',lat:48.11035,lon:-122.80591,place:'Ready Athletics'},'Ghost-2':{pid:'5e0002',lat:48.13165,lon:-122.79921,place:"Cappy's Trails garden"}};
 const isGhost=id=>Object.values(GHOSTS).some(g=>g.pid===id);
-const pubP=p=>({id:p.id,name:p.name,device:p.device||null,mode:p.mode,entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id,...(isGhost(p.id)?{dummy:true}:{})});
+// ---- stealth policy (GM-editable via /api/gm/policy, public read /api/policy). Device class: client claim cross-checked with the User-Agent
+// (client-side + spoofable; this is a game rule, not a security boundary). Android phones and anything unrecognised count as 'desktop'.
+sq.exec('create table if not exists kv(k text primary key,v text)');
+const POL_DEF={canSee:{iphone:true,quest:true,desktop:false},canGoStealth:{iphone:true,quest:false,desktop:false}};
+const getPol=()=>{try{const v=one("select v from kv where k='stealthPolicy'");const o=v?JSON.parse(v.v):{};return{canSee:{...POL_DEF.canSee,...(o.canSee||{})},canGoStealth:{...POL_DEF.canGoStealth,...(o.canGoStealth||{})}}}catch(e){return JSON.parse(JSON.stringify(POL_DEF))}};
+const setPol=o=>{const P=getPol();for(const g of['canSee','canGoStealth'])for(const d of['iphone','quest','desktop'])if(o&&o[g]&&typeof o[g][d]==='boolean')P[g][d]=o[g][d];run("insert into kv values('stealthPolicy',?) on conflict(k) do update set v=excluded.v",JSON.stringify(P));return P};
+function devOf(claim,ua){ua=String(ua||'');claim=String(claim||'');
+ if(claim==='bot')return'bot';
+ if(/iPhone|iPod/.test(ua)&&['iphone','phone',''].includes(claim))return'iphone';
+ if(/OculusBrowser|Quest/i.test(ua)&&(claim==='quest'||claim===''||claim==='phone'))return'quest';
+ if(/Android/.test(ua)&&/Mobile/.test(ua))return'android';
+ return'desktop'}
+const polClass=d=>d==='iphone'?'iphone':d==='quest'?'quest':'desktop';
+const STEALTH_WARN={desktop:"Stealth isn't available on desktop. Use the iPhone app to go stealth.",quest:"Stealth isn't available on Quest yet. Use the iPhone app to go stealth.",android:"Stealth isn't available on this device. Use the iPhone app to go stealth."};
+const stealthOk=d=>!!getPol().canGoStealth[polClass(d)];
+// ---- permanent bots (tag BOT; distinct from TEST ghosts). State in server/bots.json; GM can pause (freeze) or hide (not live) each.
+const BOTS={"Cappy's Keeper":{pid:'b0c0a1',lat:48.13165,lon:-122.79921,kind:'fixed'},"Ready Athletics Keeper":{pid:'b0a7a2',lat:48.11035,lon:-122.80591,kind:'fixed'},"Matt's Shadow":{pid:'b05ad3',lat:48.117325,lon:-122.791138,kind:'shadow'}};
+const isBot=id=>Object.values(BOTS).some(b=>b.pid===id);
+const BTF=path.join(__dirname,'bots.json'),BS={};try{Object.assign(BS,JSON.parse(fs.readFileSync(BTF,'utf8')))}catch(e){}
+const btSave=()=>{try{fs.writeFileSync(BTF,JSON.stringify(Object.fromEntries(Object.entries(BS).map(([n,s])=>[n,{alat:s.alat,alon:s.alon,paused:!!s.paused,hidden:!!s.hidden,odx:s.odx,ody:s.ody,anchorT:s.anchorT||null,frozen:!!s.frozen}]))),{mode:0o600})}catch(e){console.error('bots save',e.message)}};
+const pubP=p=>({id:p.id,name:p.name,device:p.device||null,mode:p.mode,stealth:p.mode==='stealth',entrance:p.entrance,team:teamOf(p.team_id),last:lastFix(p.id),game_id:p.game_id,...(isGhost(p.id)?{dummy:true,tag:'TEST'}:{}),...(isBot(p.id)?{bot:true,tag:'BOT'}:{})});
 // ---- federation: Ed25519 identity, registry (Monster runs it), signed heartbeats with stats. Share agreements: NOT built yet.
 const TRUST_LABEL=cfg('TRUST_LABEL')||'Matt Ready Trusted';
 sq.exec(`create table if not exists instances(id text primary key,name text,url text,owner text,pubkey text,area text,lat real,lon real,last_seen int,trusted int default 0,stats text,history text default '[]');
@@ -107,7 +127,7 @@ function gmSnap(u){const now=Date.now(),win=Math.min(864e5,Math.max(5000,+u.sear
  const L=all(all_?'select * from gplayers where seen>?':'select * from gplayers where live=1 and seen>?',now-win);
  return{server_time:now,server_time_iso:new Date(now).toISOString(),window_ms:win,count:L.length,players:L.map(p=>{const f=lastFix(p.id),t=teamOf(p.team_id),g=G[p.game_id]||{};
   return{id:p.id,name:p.name,lat:f?f.lat:null,lon:f?f.lon:null,accuracy:f?f.acc:null,heading:f&&f.hdg!=null?f.hdg:null,last_fix:f?f.t:null,last_seen:p.seen,last_seen_age_s:Math.round((now-p.seen)/1000),
-   stealth:p.mode==='stealth',live:!!p.live,dummy:isGhost(p.id),entrance:p.entrance,team:t?{id:t.id,name:t.name,color:t.color}:null,game:{id:p.game_id,name:g.name||null,code:g.code||null}}})}}
+   stealth:p.mode==='stealth',live:!!p.live,dummy:isGhost(p.id),bot:isBot(p.id),tag:isBot(p.id)?'BOT':isGhost(p.id)?'TEST':null,device:p.device||null,entrance:p.entrance,team:t?{id:t.id,name:t.name,color:t.color}:null,game:{id:p.game_id,name:g.name||null,code:g.code||null}}})}}
 // ---- ghosts: two always-live dummy players in the public game; wander (random walk, ~0.8-3 m/s, <=150 m) around a target; fix + seen every 2 s
 const GHF=path.join(__dirname,'ghosts.json'),GS={},MLAT=111320;try{Object.assign(GS,JSON.parse(fs.readFileSync(GHF,'utf8')))}catch(e){}
 const ghSave=()=>{try{fs.writeFileSync(GHF,JSON.stringify(Object.fromEntries(Object.entries(GS).map(([n,s])=>[n,{tlat:s.tlat,tlon:s.tlon,place:s.place,wander:s.wander,updated:s.updated}]))),{mode:0o600})}catch(e){console.error('ghosts save',e.message)}};
@@ -121,6 +141,23 @@ function ghStep(n){const d=GHOSTS[n],s=GS[n],now=Date.now();
   const rr=Math.hypot(dx,dy);if(rr>150){dx*=150/rr;dy*=150/rr}s.lat=s.tlat+dy/MLAT;s.lon=s.tlon+dx/k}else{s.lat=s.tlat;s.lon=s.tlon}
  run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',d.pid,s.lat,s.lon,5,now,s.wander?s.hdg:null);run("update gplayers set seen=?,live=1,mode='regular' where id=?",now,d.pid)}
 let ghPrune=0;setInterval(()=>{try{for(const n in GHOSTS)ghStep(n);const now=Date.now();if(now-ghPrune>600000){ghPrune=now;for(const d of Object.values(GHOSTS))run('delete from gfixes where pid=? and t<?',d.pid,now-3600000)}}catch(e){console.error('ghosts',e.message)}},2000);
+for(const[n,d]of Object.entries(BOTS)){const s=BS[n]=Object.assign({alat:d.lat,alon:d.lon,paused:false,hidden:false},BS[n]||{});if(s.odx==null){const r=20+Math.random()*40,a=Math.random()*2*Math.PI;s.odx=d.kind==='shadow'?r*Math.sin(a):0;s.ody=d.kind==='shadow'?r*Math.cos(a):0}
+ s.lat=s.alat+s.ody/MLAT;s.lon=s.alon+s.odx/(MLAT*Math.cos(s.alat*D2));s.hdg=Math.random()*360;s.spd=1;
+ if(!one('select 1 from gplayers where id=?',d.pid))run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,?,?)',d.pid,'public',null,rid(24),n,'regular','walk',null,Date.now(),s.hidden?0:1,Date.now());
+ run("update gplayers set name=?,game_id='public',mode='regular',device='bot',live=? where id=?",n,s.hidden?0:1,d.pid)}
+btSave();
+/* Matt's Shadow anchor = latest real (non-dummy, non-bot) fix of a player named 'Matt Ready'; frozen while that player is in stealth so the Shadow never leaks a stealth position */
+function shadowAnchor(s){const L=all("select * from gplayers where lower(name)='matt ready'").filter(p=>!isGhost(p.id)&&!isBot(p.id));let best=null,bp=null;for(const p of L){const f=lastFix(p.id);if(f&&(!best||f.t>best.t)){best=f;bp=p}}
+ if(!best){return}if(bp.mode==='stealth'){s.frozen=true;return}s.frozen=false;if(best.t!==s.anchorT){s.anchorT=best.t;s.alat=best.lat;s.alon=best.lon;if(Math.random()<.05){const r=20+Math.random()*40,a=Math.random()*2*Math.PI;s.odx=r*Math.sin(a);s.ody=r*Math.cos(a)}}}
+function btStep(n){const d=BOTS[n],s=BS[n],now=Date.now();if(s.hidden){run('update gplayers set live=0 where id=?',d.pid);return}
+ if(d.kind==='shadow'&&!s.paused)shadowAnchor(s);
+ const k=Math.cos(s.alat*D2)*MLAT,cy=s.alat+s.ody/MLAT,cx=s.alon+s.odx/k;
+ if(s.paused){}else if(d.kind==='fixed'){s.lat=d.lat;s.lon=d.lon;s.hdg=(s.hdg+1.5)%360/* slow idle turn */}
+ else{let dy=(s.lat-cy)*MLAT,dx=(s.lon-cx)*k;s.hdg=(s.hdg+(Math.random()-.5)*50+360)%360;if(Math.hypot(dx,dy)>30){const back=(Math.atan2(-dx,-dy)/D2+360)%360,df=((back-s.hdg+540)%360)-180;s.hdg=(s.hdg+df*.6+360)%360}
+  s.spd=Math.max(.5,Math.min(1.8,s.spd+(Math.random()-.5)*.4));dy+=Math.cos(s.hdg*D2)*s.spd*2;dx+=Math.sin(s.hdg*D2)*s.spd*2;const rr=Math.hypot(dx,dy);if(rr>40){dx*=40/rr;dy*=40/rr}s.lat=cy+dy/MLAT;s.lon=cx+dx/k}
+ run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',d.pid,s.lat,s.lon,4,now,s.hdg);run("update gplayers set seen=?,live=1,mode='regular',device='bot' where id=?",now,d.pid)}
+let btPrune=0,btSv=0;setInterval(()=>{try{for(const n in BOTS)btStep(n);const now=Date.now();if(now-btSv>30000){btSv=now;btSave()}if(now-btPrune>600000){btPrune=now;for(const d of Object.values(BOTS))run('delete from gfixes where pid=? and t<?',d.pid,now-3600000)}}catch(e){console.error('bots',e.message)}},2000);
+const btState=()=>({bots:Object.entries(BOTS).map(([n,d])=>{const s=BS[n];return{id:n,pid:d.pid,kind:d.kind,bot:true,lat:s.lat,lon:s.lon,heading:s.hdg,paused:!!s.paused,hidden:!!s.hidden,frozen:!!s.frozen,anchor_t:s.anchorT||null}})});
 const GH_LOCAL=[['ready athletics',48.11035,-122.80591],["cappy",48.13165,-122.79921],['meditation garden',48.1316475,-122.7992293],["memory's vault",48.1384642,-122.7647029],['memorys vault',48.1384642,-122.7647029],['city hall',48.1161771,-122.753612],['sheriff',48.0241638,-122.764488],['jefferson healthcare',48.1060007,-122.7889962],['masonic',48.1139683,-122.7628233]];
 async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.includes(x[0]));if(hit)return{lat:hit[1],lon:hit[2],name:qs+' (app landmark)'};
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
@@ -137,8 +174,8 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,'index.html');
   return fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end('not found')}r.writeHead(200,{'content-type':types[path.extname(f)]||'application/octet-stream'});r.end(d)})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&u.pathname==='/api/gm'){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
-  if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key','access-control-allow-methods':'GET','access-control-max-age':'600'});return r.end()}}
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy')){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+  if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
  if(u.pathname.startsWith('/api/registry')){if(await registry(u,q,r,j,b,U,ip)!==false)return}
@@ -184,16 +221,19 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  // ---- players (consent per game)
  case'/api/join':{if(CONSENT_REQUIRED&&j.consent!==true)return send(r,{error:'consent required'},400);const g=gameByCode(j.game);if(!g)return send(r,{error:'no such game'},404);
   if(limited('j:'+ip,30))return send(r,{error:'too many joins'},429);
-  const id=rid(6),token=rid(24);run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),j.mode==='stealth'?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
-  {const dv=['phone','quest','desktop','bot'].includes(j.device)?j.device:null;if(dv)run('update gplayers set device=? where id=?',dv,id)}
-  return send(r,{id,token,game:{id:g.id,name:g.name,code:g.code}})}
+  const dev=devOf(j.device,q.headers['user-agent']),wantS=j.mode==='stealth',okS=wantS&&stealthOk(dev);
+  const id=rid(6),token=rid(24);run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),okS?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
+  run('update gplayers set device=? where id=?',dev,id);
+  return send(r,{id,token,device:dev,mode:okS?'stealth':'regular',...(wantS&&!okS?{stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop}:{}),policy:getPol(),game:{id:g.id,name:g.name,code:g.code}})}
  case'/api/pos':{if(!P||!P.live)return send(r,{error:'not joined'},401);const lat=+j.lat,lon=+j.lon,acc=+j.acc||0;if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90)return send(r,{error:'bad'},400);
-  if(limited('p:'+P.id,40,60000))return send(r,{error:'slow down'},429);const hdg=isFinite(+j.hdg)&&j.hdg!==null&&j.hdg!==''?((+j.hdg%360)+360)%360:null;run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',P.id,lat,lon,acc,now,hdg);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,team:teamOf(P.team_id)})}
+  if(limited('p:'+P.id,150,60000))return send(r,{error:'slow down'},429);/* >=1/s ping + 3 s tick */const hdg=isFinite(+j.hdg)&&j.hdg!==null&&j.hdg!==''?((+j.hdg%360)+360)%360:null;run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',P.id,lat,lon,acc,now,hdg);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,t:now,team:teamOf(P.team_id)})}
  case'/api/players':{if(!P||!P.live)return send(r,{error:'not joined'},401);const g=one('select * from games where id=?',P.game_id),s=settings(g);
-  let L=all('select * from gplayers where game_id=? and live=1 and id<>? and mode<>? and seen>?',P.game_id,P.id,'stealth',now-LIVE_MS);
+  const pol=getPol(),see=!!pol.canSee[polClass(P.device)];
+  let L=all('select * from gplayers where game_id=? and live=1 and id<>? and seen>?',P.game_id,P.id,now-LIVE_MS).filter(o=>o.mode!=='stealth'||see);
   if(s.teamOnly)L=L.filter(o=>P.team_id&&o.team_id===P.team_id);// team-only: only teammates; no team => see nobody
-  return send(r,{me:{team:teamOf(P.team_id)},teamOnly:!!s.teamOnly,players:L.map(pubP)})}
- case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);const m=j.mode==='stealth'?'stealth':'regular';run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
+  return send(r,{me:{team:teamOf(P.team_id),device:P.device,mode:P.mode},seeStealth:see,policy:pol,teamOnly:!!s.teamOnly,players:L.map(pubP)})}
+ case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);let m=j.mode==='stealth'?'stealth':'regular';const dev=P.device||devOf(j.device,q.headers['user-agent']);if(m==='stealth'&&!stealthOk(dev)){run("update gplayers set mode='regular' where id=?",P.id);return send(r,{ok:0,mode:'regular',stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop})}run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
+ case'/api/policy':return send(r,{policy:getPol()})
  case'/api/leave':{if(P)run('update gplayers set live=0 where id=?',P.id);return send(r,{ok:1})}
  case'/api/delete':{if(P){run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
  // ---- read-only GM watcher (GM key header only; watcher never joins, so it never appears as a player)
@@ -210,6 +250,13 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    if(j.place||j.lat!=null){if(!isFinite(la)||!isFinite(lo)||Math.abs(la)>90||Math.abs(lo)>180)return send(r,{error:'bad lat/lon'},400);s.tlat=la;s.tlon=lo;s.lat=la;s.lon=lo;s.place=pl||la.toFixed(6)+','+lo.toFixed(6)}
    if('wander'in j)s.wander=j.wander!==false;else if(j.place||j.lat!=null)s.wander=true;s.updated=now;ghSave();ghStep(n)}
   return send(r,ghState())}
+ case'/api/gm/policy':{if(limited('gp:'+ip,60,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method==='POST'){const P2=setPol(j.policy||j);audit(ip,'stealth-policy',P2);/* demote stealth players whose device may no longer go stealth */for(const p of all("select id,device from gplayers where mode='stealth' and live=1"))if(!P2.canGoStealth[polClass(p.device)])run("update gplayers set mode='regular' where id=?",p.id);return send(r,{policy:P2})}
+  return send(r,{policy:getPol(),defaults:POL_DEF})}
+ case'/api/gm/bots':{if(limited('gb:'+ip,60,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method==='POST'){const n=Object.keys(BOTS).find(k=>k.toLowerCase()===String(j.id||'').toLowerCase());if(!n)return send(r,{error:'unknown bot'},400);const s=BS[n];
+   if('paused'in j)s.paused=!!j.paused;if('hidden'in j){s.hidden=!!j.hidden;run('update gplayers set live=? where id=?',s.hidden?0:1,BOTS[n].pid)}btSave();if(!s.hidden)btStep(n)}
+  return send(r,btState())}
  // ---- GM/host live map: GM sees all games, host sees own games
  case'/api/gm':{if(!U||!['gm','host'].includes(U.role))return send(r,{error:'bad key'},403);const gid=u.searchParams.get('game');
   let G=U.role==='gm'?all('select * from games'):all('select * from games where owner=?',U.id);if(gid)G=G.filter(g=>g.id===gid);const ids=G.map(g=>g.id);
