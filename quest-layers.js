@@ -6,7 +6,7 @@ await wait();
 const sc=document.querySelector('a-scene'),QLs=()=>QL;const on=k=>QL[k]!==0;
 const tagged=cat=>{const a=[];sc.object3D.traverse(o=>{if(o.userData&&o.userData.qcat===cat)a.push(o)});return a};
 const domCat=cat=>[...document.querySelectorAll(`[data-qcat="${cat}"]`)];
-const CATS=['vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges'];
+const CATS=['vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges','moon','sun'];
 const isLabel=el=>el.tagName==='A-TEXT'&&!['msg','bm'].includes(el.id);
 function apply(){QGAP();QAPV();
  for(const c of CATS){const v=on(c);for(const o of tagged(c))o.visible=v;for(const el of domCat(c))el.setAttribute('visible',v&&(on('labels')||!isLabel(el)))}
@@ -35,6 +35,7 @@ add('Earth','rainier','Mount Rainier',()=>[G().rainier]);add('Earth','baker','Mo
 add('Local','shore','PT shoreline',()=>[G().shore]);add('Local','coast','Coastline (old)',()=>tagged('coast'));add('Local','ocean','Ocean',()=>tagged('ocean'));add('Local','grid','Grid',()=>[obj3(document.getElementById('grid'))]);add('Local','roads','Roads & streets',()=>tagged('roads'));
 add('Places','places','Local places',()=>domCat('places').map(obj3));add('Places','poles','Poles',()=>domCat('poles').map(obj3));add('Places','pyramids','Pyramids',()=>domCat('pyramids').map(obj3));add('Places','icecube','IceCube',()=>[G().icecube]);add('Places','edges','Earth edges N/E/S/W',()=>domCat('edges').map(obj3));
 add('Places','saucers','Saucers & pads',()=>tagged('saucers'));add('Places','ghost','GhostBot',()=>tagged('ghost'));add('Places','beams','Player beams (purple)',()=>Object.values(window.QBEAMS||{}).map(obj3));
+add('Sky','moon','Moon (real-time)',()=>window.QSKYB?[QSKYB.moon]:[]);add('Sky','sun','Sun (real-time)',()=>window.QSKYB?[QSKYB.sun]:[]);
 add('Labels','labels','Labels (master)',()=>[...document.querySelectorAll('a-text')].filter(isLabel).filter(e=>e.getAttribute('visible')!==false||true).slice(0,0).concat([...document.querySelectorAll('a-text[data-qcat="places"]')].map(obj3)));
 R.push({section:'Labels',key:'labelsAllOn',label:'All labels ON',kind:'action',run:()=>{QL.labels=1;QLOFF.clear();localStorage.eearQLabelsOff='[]';apply()}});R.push({section:'Labels',key:'labelsAllOff',label:'All labels OFF',kind:'action',run:()=>{QL.labels=0;apply()}});
 const camOnQ=()=>localStorage.eearCam!=='off';
@@ -47,7 +48,7 @@ const LVo=()=>window.EEAR_LIVE;R.push({section:'View',key:'live',label:'Live tra
 R.push({section:'View',key:'board',label:'Board spaceship',kind:'action',run:()=>qBoard()},{section:'View',key:'exitShip',label:'Exit ship (to ground)',kind:'action',run:()=>qExit()});
 R.push({section:'View',key:'vignette',label:'Comfort vignette (ship)',kind:'toggle',get:()=>!!QSHIP.vignette,set:v=>{QSHIP.vignette=!!v;localStorage.eearVignette=v?'1':'0'},objs:()=>[]});
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
-const SECTIONS=['Vortex','Earth','Local','Places','Labels','View'];
+const SECTIONS=['Vortex','Earth','Local','Places','Sky','Labels','View'];
 for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera')QL[it.key]=1;
 let P=null,nL=-1;const base=R.slice();
 function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;
