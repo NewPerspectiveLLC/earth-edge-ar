@@ -44,6 +44,8 @@ R.push({section:'View',key:'ground',label:'Return to ground',kind:'action',run:(
 R.push({section:'View',key:'floorUp',label:'Floor +10 cm',kind:'action',run:()=>qFloor(.1)},{section:'View',key:'floorDn',label:'Floor -10 cm',kind:'action',run:()=>qFloor(-.1)});
 /* Live tracking state in the headset (TEST config auto-joins); off = pause (keeps the session), on = join / resume */
 const LVo=()=>window.EEAR_LIVE;R.push({section:'View',key:'live',label:'Live tracking',kind:'toggle',get:()=>!!(LVo()&&LVo().active),set:v=>{const L=LVo();if(!L)return;const S=L.S;if(v){if(S&&S.live&&S.paused)document.getElementById('tmP').click();else{const b=document.getElementById('joinB');b&&b.click()}}else if(S&&S.live&&!S.paused)document.getElementById('tmP').click();setTimeout(()=>P.refresh(),1500);setTimeout(()=>P.refresh(),4000)},objs:()=>[]});
+R.push({section:'View',key:'board',label:'Board spaceship',kind:'action',run:()=>qBoard()},{section:'View',key:'exitShip',label:'Exit ship (to ground)',kind:'action',run:()=>qExit()});
+R.push({section:'View',key:'vignette',label:'Comfort vignette (ship)',kind:'toggle',get:()=>!!QSHIP.vignette,set:v=>{QSHIP.vignette=!!v;localStorage.eearVignette=v?'1':'0'},objs:()=>[]});
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
 const SECTIONS=['Vortex','Earth','Local','Places','Labels','View'];
 for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera')QL[it.key]=1;
@@ -51,13 +53,16 @@ let P=null,nL=-1;const base=R.slice();
 function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;
  const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
  items.splice(at,0,...T0.map(t=>({section:'Labels',key:'lab:'+t,label:t,kind:'toggle',get:()=>!QLOFF.has(t),set:v=>qLabelSet(t,v),objs:()=>qLabels().filter(el=>qlk(el)===t).map(obj3)})));
- const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone();if(P)sc.object3D.remove(P.root);
- P=makePanel(T,{items,sections:SECTIONS,title:'Earth Edge AR Layers'});sc.object3D.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+ const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone(),par=P&&P.root.parent||sc.object3D;if(P&&P.root.parent)P.root.parent.remove(P.root);
+ P=makePanel(T,{items,sections:SECTIONS,title:'Earth Edge AR Layers'});par.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
  if(vis){P.root.position.copy(pos);P.root.quaternion.copy(q);P.root.visible=true}window.QPANEL=P;window.QREG=items}
 build();
 const rig=document.getElementById('rig').object3D;
 const X=xrRays(T,{renderer:sc.renderer,scene:sc.object3D,panel:()=>P,xrToWorld:()=>{rig.updateMatrixWorld(true);return rig.matrixWorld}});
 AFRAME.registerComponent('qlayers-tick',{tick(){if(sc.renderer.xr.isPresenting)X.tick()}});sc.setAttribute('qlayers-tick','');
 window.QPANEL_TOGGLE=()=>{if(P.root.visible){P.root.visible=false}else{build();P.refresh();summon(T,P,sc.camera)}};
-window.QXR=X;window.QPANEL_BUILD=build;window.QAPPLY=apply;
+window.QXR=X;window.QPANEL_BUILD=build;
+/* in the ship the same panel is the dashboard: docked on the console, tilted toward the pilot, always on */
+window.QPANEL_DOCK=cp=>{build();if(P.root.parent)P.root.parent.remove(P.root);cp.add(P.root);P.root.position.set(0,1.2,-.66);P.root.rotation.set(-.55,0,0);P.root.scale.setScalar(.9);P.root.visible=true;P.refresh()};
+window.QPANEL_UNDOCK=()=>{if(P.root.parent)P.root.parent.remove(P.root);sc.object3D.add(P.root);P.root.scale.setScalar(1);P.root.visible=false};window.QAPPLY=apply;
 apply();

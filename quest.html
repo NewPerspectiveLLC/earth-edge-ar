@@ -6,7 +6,7 @@
 </div>
 
 <a-scene renderer="alpha:true;antialias:true;colorManagement:true" xr-mode-ui="enabled:true;XRMode:ar;enterAREnabled:true;enterVREnabled:false" webxr="requiredFeatures:local-floor;optionalFeatures:local-floor,bounded-floor" vr-mode-ui="enabled:false">
- <a-entity id=rig movement-ctl><a-entity id=head camera look-controls position="0 1.6 0"><a-text id=flyT value="" align=center width=.9 color="#9fd8ff" position="0 -.17 -.7" visible=false></a-text></a-entity>
+ <a-entity id=rig movement-ctl><a-entity id=head camera look-controls position="0 1.6 0"><a-text id=flyT value="" align=center width=.9 color="#9fd8ff" position="0 .2 -.75" visible=false></a-text></a-entity>
   <a-entity id=lh oculus-touch-controls="hand:left"></a-entity><a-entity id=rh oculus-touch-controls="hand:right" laser-controls="hand:right" raycaster="far:60;objects:.none"></a-entity></a-entity>
  <a-entity id=world><a-entity id=floor position="0 0 0"><a-entity id=grid grid-plane></a-entity><a-entity id=pself pself></a-entity></a-entity><a-entity id=places></a-entity><a-entity id=others></a-entity></a-entity>
  <a-text id=bm value="" align=center width=1.4 color="#9cf" position="0 1.05 -1.6"></a-text>
@@ -40,8 +40,8 @@ let northLocked=false,floorY=0;window.qFloor=d=>{floorY=Math.round((floorY+d)*10
 function say(t){msg.setAttribute('value',t);msg.setAttribute('visible',true);clearTimeout(say.t);say.t=setTimeout(()=>msg.setAttribute('visible',false),4000)}
 function camYaw(){const c=document.querySelector('a-scene').camera;const e=new THREE.Euler().setFromQuaternion(c.getWorldQuaternion(new THREE.Quaternion()),'YXZ');return e.y}
 function setNorth(){if(northLocked)return say('North already locked (B to unlock)');world.object3D.rotation.y=camYaw();northLocked=true;say('North set. You are facing north.');window.NORTH_YAW=world.object3D.rotation.y}
-['abuttondown'].forEach(ev=>document.getElementById('rh').addEventListener(ev,setNorth));/* trigger used to ALSO set north: every UI click re-aligned the world */
-document.getElementById('rh').addEventListener('bbuttondown',()=>{northLocked=false;say('North unlocked: face north, press A')});
+['abuttondown'].forEach(ev=>document.getElementById('rh').addEventListener(ev,()=>{if(window.QSHIP&&!QSHIP.on&&northLocked)return qBoard();if(window.QSHIP&&QSHIP.on)return;setNorth()}));/* trigger used to ALSO set north: every UI click re-aligned the world */
+document.getElementById('rh').addEventListener('bbuttondown',()=>{if(window.QSHIP&&QSHIP.on)return qExit();northLocked=false;say('North unlocked: face north, press A')});
 document.addEventListener('keydown',e=>{if(e.key==='n')setNorth()});
 // Thumbsticks read straight from XRInputSource gamepads (xr-standard: axes[2]/[3] = stick; some runtimes report it on [0]/[1], so the larger pair wins), deadzone 0.15.
 // BUTTON MAP (quest.html): left stick = move/strafe (head-relative; with BOOST or airborne, forward follows head pitch);
@@ -50,12 +50,42 @@ document.addEventListener('keydown',e=>{if(e.key==='n')setNorth()});
 const DZ=.15,dz=v=>Math.abs(v)<DZ?0:(v-Math.sign(v)*DZ)/(1-DZ);
 function stick(src){const g=src.gamepad;if(!g||!g.axes)return[0,0];const a=g.axes;if(a.length>=4&&Math.abs(a[2]||0)+Math.abs(a[3]||0)>=Math.abs(a[0]||0)+Math.abs(a[1]||0))return[a[2]||0,a[3]||0];return[a[0]||0,a[1]||0]}
 function rotAbout(o,pivot,ang){const p=o.position.clone().sub(pivot).applyAxisAngle(new THREE.Vector3(0,1,0),ang);o.position.copy(pivot).add(p);o.rotation.y+=ang}
+/* ---- spaceship: board (panel button, or A once north is locked), see-through cockpit fixed to the rig, inertial flight.
+   Left stick: thrust (fwd/back) + strafe; right stick: yaw (x) + pitch (y); right trigger: boost (x5..x1000 with altitude), left trigger: brake; B or panel: exit -> back to ground where you boarded. */
+const QSHIP=window.QSHIP={on:false,v:new THREE.Vector3(),pitch:0,board:null,vignette:localStorage.eearVignette!=='0',near:''};
+function cockpit(){const T=THREE,g=new T.Group();g.name='cockpit';const pf=m=>{m.userData.add=1;noAlpha(m);m.userData.pf=1;return m};
+ const strut=pf(new T.LineBasicMaterial({color:0x9fd8ff,transparent:true,opacity:.85,depthTest:false}));const R=1.25,C=new T.Vector3(0,1.6,0);
+ const arc=(f)=>{const pts=[];for(let i=0;i<=32;i++)pts.push(f(i/32));const l=new T.Line(new T.BufferGeometry().setFromPoints(pts),strut);l.renderOrder=990;l.frustumCulled=false;g.add(l)};
+ for(const a of[-60,-25,25,60])arc(u=>{const th=(u-.5)*Math.PI*.9,az=a*Math.PI/180;return new T.Vector3(Math.sin(az)*Math.cos(th)*R,Math.sin(th)*R*.8,-Math.cos(az)*Math.cos(th)*R).add(C)});/* canopy ribs */
+ for(const el of[-12,35])arc(u=>{const az=(u-.5)*Math.PI*1.4,th=el*Math.PI/180;return new T.Vector3(Math.sin(az)*Math.cos(th)*R,Math.sin(th)*R,-Math.cos(az)*Math.cos(th)*R).add(C)});/* window frame */
+ const glass=new T.Mesh(new T.SphereGeometry(R,32,16,0,Math.PI*2,0,Math.PI*.62),pf(new T.MeshBasicMaterial({color:0x2a6cff,transparent:true,opacity:.05,depthTest:false,depthWrite:false,side:T.BackSide})));glass.position.copy(C);glass.renderOrder=989;g.add(glass);
+ const con=new T.Mesh(new T.BoxGeometry(1.1,.06,.42),pf(new T.MeshBasicMaterial({color:0x1b2a44,transparent:true,opacity:.35,depthTest:false,depthWrite:false})));con.position.set(0,1.02,-.55);con.rotation.x=.35;con.renderOrder=989;g.add(con);
+ const edge=new T.LineSegments(new T.EdgesGeometry(con.geometry),strut);edge.position.copy(con.position);edge.rotation.copy(con.rotation);g.add(edge);
+ const vg=new T.Mesh(new T.RingGeometry(.16,.6,48),pf(new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0,depthTest:false,depthWrite:false})));vg.position.z=-.3;vg.renderOrder=10003;g.userData.vig=vg;/* comfort vignette, parented to the head */
+ return g}
+window.qBoard=()=>{const S=QSHIP;if(S.on)return;const r=document.getElementById('rig').object3D;S.board={p:r.position.clone(),q:r.quaternion.clone()};S.on=true;S.v.set(0,0,0);S.pitch=0;
+ if(!S.cp){S.cp=cockpit();r.add(S.cp);document.querySelector('a-scene').camera.add(S.cp.userData.vig)}S.cp.visible=true;
+ if(window.QPANEL_DOCK)QPANEL_DOCK(S.cp);say('Boarded. Left stick thrust, right stick steer, R trigger boost, L trigger brake, B exit')};
+window.qExit=()=>{const S=QSHIP;if(!S.on)return;const r=document.getElementById('rig').object3D;S.on=false;S.v.set(0,0,0);r.position.copy(S.board.p);r.quaternion.copy(S.board.q);QFLY.alt=0;QFLY.take=null;S.cp.visible=false;S.cp.userData.vig.material.opacity=0;if(window.QPANEL_UNDOCK)QPANEL_UNDOCK();say('Back on the ground')};
+const hav=(a1,o1,a2,o2)=>{const D2=Math.PI/180,x=Math.sin((a2-a1)*D2/2)**2+Math.cos(a1*D2)*Math.cos(a2*D2)*Math.sin((o2-o1)*D2/2)**2;return 2*6371008.8*Math.asin(Math.sqrt(x))};
+function shipTick(t,dt,ss,L,Rr){const T=THREE,S=QSHIP,F=QFLY,r=document.getElementById('rig').object3D,c=document.querySelector('a-scene').camera;let rt=0,lt=0;
+ for(const src of ss.inputSources){const b=src.gamepad&&src.gamepad.buttons[0];const v=b?(b.value||(b.pressed?1:0)):0;/* a trigger aimed at the dashboard is a click, not thrust */const hov=window.QXR&&[...QXR.srcs.entries()].some(([s2,st])=>s2===src&&st.hover);if(hov)continue;if(src.handedness==='right')rt=v;else if(src.handedness==='left')lt=v}
+ const pv=new T.Vector3();c.getWorldPosition(pv);
+ const yx=dz(Rr[0]),py=dz(Rr[1]);if(yx)rotAbout(r,pv,-yx*dt*Math.PI/2.5);
+ if(py){const ax=new T.Vector3(1,0,0).applyQuaternion(r.quaternion),ang=-py*dt*Math.PI/3;const q=new T.Quaternion().setFromAxisAngle(ax,ang);const p=r.position.clone().sub(pv).applyQuaternion(q);r.position.copy(pv).add(p);r.quaternion.premultiply(q);S.pitch+=ang}
+ const alt=F.alt=Math.max(0,r.position.y),boost=rt>.1?Math.min(1000,5+alt/200)*rt+1:1,vmax=Math.max(15,alt*.6)*boost;
+ const fw=new T.Vector3(0,0,-1).applyQuaternion(r.quaternion),rgt=new T.Vector3(1,0,0).applyQuaternion(r.quaternion);const tgt=fw.multiplyScalar(-dz(L[1])).addScaledVector(rgt,dz(L[0])).multiplyScalar(vmax);
+ S.v.lerp(tgt,Math.min(1,dt*1.5));if(lt>.1)S.v.multiplyScalar(Math.max(0,1-lt*dt*4));r.position.addScaledVector(S.v,dt);if(r.position.y<0){r.position.y=0;if(S.v.y<0)S.v.y=0}F.alt=r.position.y;F.speed=S.v.length();F.boost=boost>1;F.mult=boost;
+ const want=Math.max(10000,F.alt*4+5000);if(Math.abs(c.far-want)/want>.2){c.far=want;c.updateProjectionMatrix()}
+ const vg=S.cp.userData.vig;vg.material.opacity=S.vignette?Math.min(.85,(S.v.length()/Math.max(1,vmax/boost))*.15+(yx||py?.45:0)):0;
+ if(t-(shipTick.ht||0)>250){shipTick.ht=t;const me=myLatLon();let best=null;for(const[n,a,l]of PLACES){const d=Math.hypot(hav(me.lat,me.lon,a,l),F.alt);if(!best||d<best[1])best=[n,d]}for(const o of(window.QPLAYERS||[])){if(best&&o.d<best[1])best=[o.name,o.d]}S.near=best?best[0]+' '+fmtD(best[1]):'';
+  const h=document.getElementById('flyT');h.setAttribute('visible',true);h.setAttribute('color',F.boost?'#ff5a3c':'#9fd8ff');h.setAttribute('value',`SHIP ${F.boost?'BOOST x'+Math.round(boost)+' ':''}· ${fmtD(F.speed)}/s · ALT ${fmtD(F.alt)}\nnearest: ${S.near}`)}}
 const QFLY=window.QFLY={alt:0,boost:false,mult:1,speed:0,smooth:localStorage.eearSmoothTurn==='1',take:null};
 window.qGround=()=>{const r=document.getElementById('rig').object3D;if(QFLY.take){r.position.x=QFLY.take.x;r.position.z=QFLY.take.z}r.position.y=0;QFLY.alt=0;QFLY.take=null;say('Back on the ground')};
 const fmtD=m=>m>=1e6?(m/1e3).toLocaleString(undefined,{maximumFractionDigits:0})+' km':m>=1000?(m/1000).toFixed(m>=1e5?0:1)+' km':m.toFixed(m<10?1:0)+' m';
 AFRAME.registerComponent('movement-ctl',{init(){this.snap=0;this.snapT=0;this.ht=0},
  tick(t,dt){dt=Math.min(dt||16,50)/1000;const sc=this.el.sceneEl,ss=sc.xrSession;if(!ss)return;let L=[0,0],Rr=[0,0],LG=null;for(const src of ss.inputSources){if(src.handedness==='left'){L=stick(src);LG=src.gamepad}else if(src.handedness==='right')Rr=stick(src)}
-  window.QAX={L,R:Rr};const r=this.el.object3D,c=sc.camera,F=QFLY;const bt=i=>!!(LG&&LG.buttons&&LG.buttons[i]&&LG.buttons[i].pressed);
+  window.QAX={L,R:Rr};const r=this.el.object3D,c=sc.camera,F=QFLY;if(QSHIP.on){shipTick(t,dt,ss,L,Rr);return}const bt=i=>!!(LG&&LG.buttons&&LG.buttons[i]&&LG.buttons[i].pressed);
   F.boost=bt(1)||bt(3);const alt=F.alt=Math.max(0,r.position.y);F.mult=F.boost?Math.min(1000,50+alt/100):1;const base=Math.max(2,alt*.5);
   const lx=dz(L[0]),ly=dz(L[1]);F.speed=0;
   if(lx||ly){const y=camYaw(),air=F.boost||alt>.5;let fw;if(air){fw=new THREE.Vector3();c.getWorldDirection(fw)/* camera look direction incl. pitch */}else fw=new THREE.Vector3(-Math.sin(y),0,-Math.cos(y));
