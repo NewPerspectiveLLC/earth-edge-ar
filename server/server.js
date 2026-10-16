@@ -257,9 +257,10 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
   const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);
   const key=xaiKey();if(!key)return send(r,{reply:"Ren is meditating right now (the AI key isn't set up on the server yet). Try again soon!",fallback:'key missing'},503);
+  const renCtx=j=>{const c=j.context&&typeof j.context==='object'?j.context:{},cl=v=>String(v||'').replace(/[^\w .,'’:-]/g,'').slice(0,40);const nm=cl(j.playerName),td=cl(c.timeOfDay);return(nm?`\nThe visitor talking to you calls themselves "${nm}".`:'')+(td?`\nLocal time of day: ${td}.`:'')};
   const hist=(Array.isArray(j.history)?j.history:[]).slice(-6).filter(h=>h&&(h.role==='user'||h.role==='assistant')&&typeof h.content==='string').map(h=>({role:h.role,content:h.content.slice(0,500)}));
   try{const x=await fetch('https://api.x.ai/v1/chat/completions',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},signal:AbortSignal.timeout(15000),
-    body:JSON.stringify({model:REN_MODEL(),max_tokens:200,temperature:.7,messages:[{role:'system',content:REN_SYS},...hist,{role:'user',content:msg}]})});
+    body:JSON.stringify({model:REN_MODEL(),max_tokens:200,temperature:.7,messages:[{role:'system',content:REN_SYS+renCtx(j)},...hist,{role:'user',content:msg}]})});
    const d=await x.json().catch(()=>({}));if(!x.ok){console.error('ren upstream',x.status,(d&&d.error&&(d.error.message||d.error))||'');return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:'upstream '+x.status},502)}
    const reply=String(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content||'').trim().slice(0,1200);return send(r,{reply:reply||'…',model:REN_MODEL()})}
   catch(e){return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:e.name==='TimeoutError'?'timeout':'error'},504)}}

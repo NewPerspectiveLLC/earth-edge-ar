@@ -7,7 +7,12 @@ export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden
 export const SONG="Happy's Trails Vortex";
 /* tracks: built-in procedural loop, shipped loop files (AudioBufferSourceNode loop=true = sample-exact, no seam), the user's own saved file */
 /* disco: original instrumental, 120 BPM, 32 bars = exactly 64.000 s (3,072,000 samples @48k), mastered -14 LUFS; loopEnd 64.0 skips MP3/AAC padding; trim matches the built-in loop */
-export const TRACKS=[{id:'vortex',name:SONG,builtin:true,tempo:124},{id:'disco',name:'Disco Jam (instrumental)',urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3'],loopEnd:64.0,tempo:120,trim:.7}];
+const MATT={id:'mattready',name:'Matt Ready'};
+export const TRACKS=[{id:'happys-trails-vortex',title:SONG,name:SONG,singers:[MATT],builtin:true,tempo:124},{id:'disco-jam',title:'Disco Jam (instrumental)',name:'Disco Jam (instrumental)',singers:[],urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3'],loopEnd:64.0,tempo:120,trim:.7}];
+const slug=n=>String(n).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'singer';
+export const parseSingers=t=>String(t||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).slice(0,8).map(n=>({id:/^matt\s*ready$/i.test(n)?'mattready':slug(n),name:n.slice(0,60)}));
+/* event for performers.js: window 'eear:track' {trackId,title,singers,playing,tempo} on play / stop / switch */
+function trackEvent(d){window.EEAR_TRACK=d;try{dispatchEvent(new CustomEvent('eear:track',{detail:d}))}catch(e){}}
 const renTempo=bpm=>{try{const R=window.EEAR_REN||window.REN;R&&R.setTempo&&R.setTempo(bpm)}catch(e){}window.EEAR_TEMPO=bpm;dispatchEvent(new CustomEvent('eear-tempo',{detail:{bpm}}))};
 const D=Math.PI/180,CMP=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 const $=id=>document.getElementById(id);
@@ -31,7 +36,7 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
 <div id=musP><b>🎵 ${SONG}</b><br><small>Plays from ${SRC.name} (${SRC.lat}, ${SRC.lon}), directional: turn toward it and it gets centred. Louder as you get closer (full within 50 m), never below 15% so you hear it anywhere.</small>
 <label style="display:block;margin-top:6px">Volume <span id=musVv></span><input id=musV type=range min=0 max=100 step=1></label>
 <label style="display:block;margin:5px 0">Track <select id=musT style="font-size:14px;max-width:100%"></select></label><div id=musN style="margin:4px 0;font-size:12px">Playing: <b id=musNm>${SONG} (built-in)</b></div>
-<label><button id=musF type=button>Choose song file…</button><input id=musFi type=file accept="audio/*" style="display:none"></label><button id=musBi>Use built-in</button>
+<label style="display:block">Who sings? <input id=musWho placeholder="Matt Ready" style="width:60%;font-size:13px"> <small>(comma-separated, for your own file)</small></label><label><button id=musF type=button>Choose song file…</button><input id=musFi type=file accept="audio/*" style="display:none"></label><button id=musBi>Use built-in</button>
 <input id=musU type=url placeholder="or paste an audio URL (must allow CORS)"><button id=musUg>Load URL</button>
 <div><small>iPhone: the ringer/silent switch may mute web audio. If you hear nothing, flip the switch to ring and turn the volume up. Audio starts only after a tap.</small></div>
 <div id=musE style="color:#ff9a9a;font-size:12px"></div><button id=musX style="background:#ffc800;font-weight:bold">Close</button></div>`);
@@ -57,35 +62,39 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
   if(k%4===0)kick(t);if(k%4===2){note(t,mtof(ROOT-24+c[0]),S16*1.8,'sawtooth',.32,420)}hat(t,k%2?.10:.05);
   if(k===0&&bar===0)note(t,mtof(ROOT+24+c[2]),S16*12,'triangle',.07,3000)/* bell every 4 bars */}
  function seq(){const now=ctx.currentTime;if(nextT<now)nextT=now+.05;while(nextT<now+.25){play16(nextT,step++);nextT+=S16}}
- function startBuiltIn(){stopUser();if(!seqT){nextT=ctx.currentTime+.06;seqT=setInterval(seq,50);seq()}}
+ function startBuiltIn(){stopUser();if(!seqT){nextT=ctx.currentTime+.06;stAt=nextT-step*S16;seqT=setInterval(seq,50);seq()}}
  function stopBuiltIn(){clearInterval(seqT);seqT=null}
  function stopUser(){if(userSrc){try{userSrc.stop()}catch(e){}userSrc.disconnect();userSrc=null}}
- const bufs={};let track=localStorage.eearMusT||'vortex';
+ let stAt=null;const bufs={};let track=({vortex:'happys-trails-vortex',disco:'disco-jam'})[localStorage.eearMusT]||localStorage.eearMusT||'happys-trails-vortex';
  async function fileBuf(T){if(bufs[T.id])return bufs[T.id];let last;for(const u of T.urls){try{const r=await fetch(window.EEAR_V?u+'?v='+EEAR_V:u);if(!r.ok)throw new Error('HTTP '+r.status);const b=await ctx.decodeAudioData(await r.arrayBuffer());/* trim decoder priming/padding: loop the exact decoded buffer */return bufs[T.id]=b}catch(e){last=e}}throw last}
- function trackUI(){const sel=$('musT');const L=TRACKS.map(t=>[t.id,t.name+(t.builtin?' (built-in)':'')]).concat(user?[['user',(user.name||'My song')+' (my file)']]:[]);sel.innerHTML=L.map(([i,n])=>`<option value="${i}">${n.replace(/</g,'&lt;')}</option>`).join('');if(!L.some(x=>x[0]===track))track='vortex';sel.value=track}
+ function trackUI(){const sel=$('musT');const L=TRACKS.map(t=>[t.id,t.name+(t.builtin?' (built-in)':'')]).concat(user?[['user',(user.name||'My song')+' (my file)']]:[]);sel.innerHTML=L.map(([i,n])=>`<option value="${i}">${n.replace(/</g,'&lt;')}</option>`).join('');if(!L.some(x=>x[0]===track))track='happys-trails-vortex';sel.value=track}
+ function curMeta(){const T=TRACKS.find(t=>t.id===track);if(track==='user'&&user)return{trackId:'user-'+slug(user.name||'song'),title:user.name,singers:(user.singers||[MATT]).map(x=>x.id==='matt-ready'?{...x,id:'mattready'}:x),tempo:null};const t=T||TRACKS[0];return{trackId:t.id,title:t.title,singers:t.singers,tempo:t.tempo}}
+ function emit(playing){trackEvent({...curMeta(),playing:!!playing})}
  function curName(){return track==='user'&&user?user.name:(TRACKS.find(t=>t.id===track)||TRACKS[0]).name}
- async function startTrack(){$('musE').textContent='';const T=TRACKS.find(t=>t.id===track);$('musNm').textContent=curName();lastR=0;
+ async function startTrack(){$('musE').textContent='';setTimeout(()=>emit(true),0);const T=TRACKS.find(t=>t.id===track);$('musNm').textContent=curName();lastR=0;
   if(track==='user'&&user){if(user.pending)await setOn.pend();if(user&&user.buf)return startUser()}
   if(!T||T.builtin){stopUser();renTempo(124);return startBuiltIn()}
-  try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=Math.min(T.loopEnd||b.duration,b.duration);const tg=ctx.createGain();tg.gain.value=T.trim||1;userSrc.connect(tg);tg.connect(bus);userSrc.start(0,0);renTempo(T.tempo||120);$('musNm').textContent=T.name}
+  try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=Math.min(T.loopEnd||b.duration,b.duration);const tg=ctx.createGain();tg.gain.value=T.trim||1;userSrc.connect(tg);tg.connect(bus);const t0=ctx.currentTime+.05;userSrc.start(t0,0);stAt=t0;renTempo(T.tempo||120);$('musNm').textContent=T.name}
   catch(e){$('musE').textContent=T.name+' is not available yet ('+(e.message||e)+'). Playing the built-in loop.';stopUser();startBuiltIn()}}
- function startUser(){stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=user.buf;userSrc.loop=true;userSrc.connect(bus);userSrc.start()}
- async function loadUser(blob,name){$('musE').textContent='';try{graph();const buf=await ctx.decodeAudioData(await blob.arrayBuffer());user={buf,name};track='user';localStorage.eearMusT=track;trackUI();$('musNm').textContent=name;lastR=0;if(on)startUser();return true}catch(e){$('musE').textContent='Could not decode that audio: '+(e.message||e);return false}}
+ function startUser(){stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=user.buf;userSrc.loop=true;userSrc.connect(bus);const t0=ctx.currentTime+.05;userSrc.start(t0);stAt=t0}
+ async function loadUser(blob,name,singers){$('musE').textContent='';try{graph();const buf=await ctx.decodeAudioData(await blob.arrayBuffer());user={buf,name,singers:singers||parseSingers($('musWho').value||'Matt Ready')};$('musWho').value=user.singers.map(x=>x.name).join(', ');track='user';localStorage.eearMusT=track;trackUI();$('musNm').textContent=name;lastR=0;if(on)startUser();return true}catch(e){$('musE').textContent='Could not decode that audio: '+(e.message||e);return false}}
  async function setOn(v){on=v;$('musB').textContent='🎵 Music: '+(on?'on':'off');localStorage.eearMus=on?'1':'0';
-  if(on){graph();await ctx.resume().catch(()=>{});if(ctx.state!=='running')$('musE').textContent='Audio is blocked until you tap. Tap Music again.';startTrack();
+  if(on){graph();await ctx.resume().catch(()=>{});setTimeout(()=>emit(true),0);if(ctx.state!=='running')$('musE').textContent='Audio is blocked until you tap. Tap Music again.';startTrack();
    if(!setOn.n){setOn.n=1;toast("🎵 "+curName()+" from "+SRC.name+". No sound? The ringer/silent switch may mute web audio.",5000)}}
-  else{stopBuiltIn();stopUser();ctx&&ctx.suspend().catch(()=>{})}}
+  else{stopBuiltIn();stopUser();ctx&&ctx.suspend().catch(()=>{});emit(false)}}
  $('musB').onclick=()=>setOn(!on);$('musS').onclick=()=>{$('musP').style.display=$('musP').style.display==='block'?'none':'block'};$('musX').onclick=()=>$('musP').style.display='none';
  $('musV').oninput=()=>{localStorage.eearMusV=$('musV').value;$('musVv').textContent=$('musV').value+'%';if(vol)vol.gain.value=V()};
  $('musF').onclick=()=>$('musFi').click();
- $('musFi').onchange=async()=>{const f=$('musFi').files[0];if(!f)return;graph();if(await loadUser(f,f.name)){await idbPut('song',{blob:f,name:f.name}).catch(e=>$('musE').textContent='Saved for this session only ('+e.message+')');toast('🎵 Song saved on this device: '+f.name);if(!on)setOn(true)}};
- $('musBi').onclick=async()=>{user=null;await idbDel('song').catch(()=>{});localStorage.removeItem('eearMusUrl');track='vortex';localStorage.eearMusT=track;trackUI();$('musNm').textContent=SONG+' (built-in)';lastR=0;if(on){stopUser();startBuiltIn()}};
- $('musT').onchange=()=>{track=$('musT').value;localStorage.eearMusT=track;if(on)startTrack();else $('musNm').textContent=curName()};
+ $('musFi').onchange=async()=>{const f=$('musFi').files[0];if(!f)return;graph();if(await loadUser(f,f.name)){await idbPut('song',{blob:f,name:f.name,singers:user.singers}).catch(e=>$('musE').textContent='Saved for this session only ('+e.message+')');toast('🎵 Song saved on this device: '+f.name);if(!on)setOn(true)}};
+ $('musBi').onclick=async()=>{user=null;await idbDel('song').catch(()=>{});localStorage.removeItem('eearMusUrl');track='happys-trails-vortex';localStorage.eearMusT=track;trackUI();$('musNm').textContent=SONG+' (built-in)';lastR=0;if(on){stopUser();startBuiltIn()}emit(on)};
+ $('musT').onchange=()=>{track=$('musT').value;localStorage.eearMusT=track;if(on)startTrack();else $('musNm').textContent=curName();emit(on)};
+ $('musWho').value=(user&&user.singers||[MATT]).map(x=>x.name).join(', ');
+ $('musWho').onchange=async()=>{const sg=parseSingers($('musWho').value);if(user){user.singers=sg.length?sg:[];const r=await idbGet('song').catch(()=>null);if(r){r.singers=user.singers;await idbPut('song',r).catch(()=>{})}if(track==='user')emit(on)}};
  $('musU').value=localStorage.eearMusUrl||'';
- $('musUg').onclick=async()=>{const u=$('musU').value.trim();if(!u)return;$('musE').textContent='Loading…';try{graph();const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(await loadUser(b,decodeURIComponent(u.split('/').pop().split('?')[0])||'URL song')){localStorage.eearMusUrl=u;await idbPut('song',{blob:b,name:$('musNm').textContent}).catch(()=>{});$('musE').textContent='';if(!on)setOn(true)}}catch(e){$('musE').textContent='Could not load URL (the site must allow CORS): '+e.message}};
- idbGet('song').then(r=>{if(r&&r.blob){user={pending:r,name:r.name}}trackUI();$('musNm').textContent=curName()}).catch(()=>trackUI());trackUI();
+ $('musUg').onclick=async()=>{const u=$('musU').value.trim();if(!u)return;$('musE').textContent='Loading…';try{graph();const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(await loadUser(b,decodeURIComponent(u.split('/').pop().split('?')[0])||'URL song')){localStorage.eearMusUrl=u;await idbPut('song',{blob:b,name:$('musNm').textContent,singers:user.singers}).catch(()=>{});$('musE').textContent='';if(!on)setOn(true)}}catch(e){$('musE').textContent='Could not load URL (the site must allow CORS): '+e.message}};
+ idbGet('song').then(r=>{if(r&&r.blob){user={pending:r,name:r.name,singers:r.singers||[MATT]};$('musWho').value=user.singers.map(x=>x.name).join(', ')}trackUI();$('musNm').textContent=curName()}).catch(()=>trackUI());trackUI();
  // decode the saved song lazily on first tap (needs an AudioContext)
- setOn.pend=async()=>{if(user&&user.pending){const r=user.pending,keep=track;user=null;await loadUser(r.blob,r.name);track=keep;localStorage.eearMusT=track;trackUI()}};
+ setOn.pend=async()=>{if(user&&user.pending){const r=user.pending,keep=track;user=null;await loadUser(r.blob,r.name,r.singers||[MATT]);track=keep;localStorage.eearMusT=track;trackUI()}};
  $('musB').onclick=async()=>{if(!on){graph();await ctx.resume().catch(()=>{});if(track==='user')await setOn.pend()}setOn(!on)};
  const fw=[0,0,0],up=[0,0,0];
  function frame(){const L=getListener&&getListener();if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
@@ -97,5 +106,5 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
    l.forwardX.setTargetAtTime(fw[0],t,.05);l.forwardY.setTargetAtTime(fw[1],t,.05);l.forwardZ.setTargetAtTime(fw[2],t,.05);l.upX.setTargetAtTime(up[0],t,.05);l.upY.setTargetAtTime(up[1],t,.05);l.upZ.setTargetAtTime(up[2],t,.05)}
   else{l.setPosition(0,0,0);l.setOrientation(fw[0],fw[1],fw[2],up[0],up[1],up[2])}
   if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
- window.EEAR_AUDIO={get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame};
+ window.EEAR_AUDIO={TRACKS,get startedAt(){return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame};
  return{frame,SRC}}

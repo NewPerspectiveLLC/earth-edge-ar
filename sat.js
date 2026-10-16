@@ -14,7 +14,8 @@ export function zFor(alt,lat,lon){const C=40075016*Math.cos(lat*D),mx=lon!=null&
 export function makeSat(T,{proj,projGlobe,unit=1,maxTiles=190,renderOrder=-10,pf=()=>{},globeAbove=2e5,localBelow=1.5e6}){
  const g=new T.Group();g.name='sat';const loc=new T.Group(),glob=new T.Group();g.add(loc);
  const L=new T.TextureLoader();L.setCrossOrigin('anonymous');const cache=new Map();let key='',opacity=.6,loads=0,fails=0;
- const mat=tex=>{const m=new T.MeshBasicMaterial({map:tex,transparent:true,opacity,depthWrite:false,depthTest:true,side:T.FrontSide});pf(m);return m};
+ const TINT=new T.Color(1,1,1);/* day-night: shared colour multiplier (daynight.js?v=1792189732314 dims imagery at night) */
+ const mat=tex=>{const m=new T.MeshBasicMaterial({map:tex,transparent:true,opacity,depthWrite:false,depthTest:true,side:T.FrontSide});m.color=TINT;pf(m);return m};
  const surf=(la0,la1,lo0,lo1,nx,ny,merc,pj=proj)=>{/* grid of lat/lon -> proj; rows spaced linearly in mercator y so the texture is not distorted */
   const P=[],U=[],I=[],y0=lat2y(la0,0),y1=lat2y(la1,0);let c=null;
   for(let j=0;j<=ny;j++){const v=j/ny,la=merc?y2lat(y0+(y1-y0)*v,0):la0+(la1-la0)*v;for(let i=0;i<=nx;i++){const u=i/nx,lo=lo0+(lo1-lo0)*u,p=pj(la,lo,0);if(!c)c=p.clone();P.push(p.x-c.x,p.y-c.y,p.z-c.z);U.push(u,1-v)}}
@@ -31,7 +32,7 @@ export function makeSat(T,{proj,projGlobe,unit=1,maxTiles=190,renderOrder=-10,pf
  /* Esri 'Map data not yet available' placeholder = flat #cccccc tile: hide it so the coarser level shows through */
  const bc=document.createElement('canvas');bc.width=bc.height=8;const bx=bc.getContext('2d',{willReadFrequently:true});
  function blank(im){try{bx.drawImage(im,0,0,8,8);const d=bx.getImageData(0,0,8,8).data;let n=0;for(let i=0;i<d.length;i+=4)if(Math.abs(d[i]-204)<6&&Math.abs(d[i+1]-204)<6&&Math.abs(d[i+2]-204)<6)n++;return n>=56}catch(e){return false}}
- const S={g,loc,glob,cache,cur:new Set(),get stats(){return{tiles:cache.size,shown:loc.children.length,loads,fails,z:S.z,key}}};
+ const S={g,loc,glob,cache,tint:TINT,cur:new Set(),get stats(){return{tiles:cache.size,shown:loc.children.length,loads,fails,z:S.z,key}}};
  S.setOpacity=o=>{opacity=o;g.traverse(m=>{if(m.material){m.material.opacity=o;m.material.transparent=o<1;m.material.depthWrite=o>=1;m.material.needsUpdate=true}})};
  S.reset=()=>{for(const o of cache.values()){o.m.parent&&o.m.parent.remove(o.m);o.m.geometry.dispose();o.tex.dispose();o.m.material.dispose()}cache.clear();key='';S.cur.clear();
   for(const m of[...glob.children]){glob.remove(m);m.geometry.dispose();m.material.map&&m.material.map.dispose();m.material.dispose()}S.globe=null};
