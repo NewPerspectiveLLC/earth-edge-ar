@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Earth Edge AR GM - live satellite</title>
-<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js></script>
 <style>
 html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;background:#000;color:#eee;overflow:hidden}
 #map{position:fixed;inset:0;background:#111}
@@ -71,15 +71,15 @@ fetch('sheridan.json').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points
 // ---- players
 const RA=[48.11035,-122.80591];
 function hcol(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+(h%360)+',95%,55%)'}
-const colOf=p=>p.mode==='stealth'?'#9a9a9a':(p.team&&p.team.color)||hcol(p.id);
+const colOf=p=>p.mode==='stealth'?'#9a9a9a':(p.bot&&EEAR_BOTSTYLE.COL[p.style])||(p.team&&p.team.color)||hcol(p.id);EEAR_BOTSTYLE.svgDefs();
 const arrowSvg=(c,hasH)=>hasH?`<svg viewBox="0 0 34 34"><path d="M17 2 L25 24 L17 19 L9 24 Z" fill="${c}" stroke="#000" stroke-width="1.5" stroke-linejoin=round/><circle cx=17 cy=17 r=4 fill="#fff" stroke="#000"/></svg>`
  :`<svg viewBox="0 0 34 34"><circle cx=17 cy=17 r=8 fill="${c}" stroke="#fff" stroke-width=2.5/></svg>`;
 const P={};let followHold=0,follow=null,firstFit=false,lastOk=0,trailsAt=0;
 function dist(a,b){const R=6371000,d=Math.PI/180,x=Math.sin((b[0]-a[0])*d/2)**2+Math.cos(a[0]*d)*Math.cos(b[0]*d)*Math.sin((b[1]-a[1])*d/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
 const fmtD=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km',age=t=>{const s=Math.max(0,(Date.now()-t)/1000|0);return s<60?s+'s':(s/60|0)+'m'};
 function lbl(p){return esc(p.name)+(p.bot?'<span class="tag bot">BOT</span>':'')+(p.dummy?'<span class="tag test">TEST</span>':'')+(p.mode==='stealth'?'<span class="tag st">STEALTH</span>':'')}
-function iconHtml(p,c){return `<div class="pm${p.mode==='stealth'?' stealth':''}" style="--c:${c}"><div class=ar>${arrowSvg(c,p.last&&p.last.hdg!=null)}</div><div class=lb>${lbl(p)}</div></div>`}
-function sig(p,c){return [p.name,p.mode,p.dummy,p.bot,c,p.last&&p.last.hdg!=null].join('|')}
+function iconHtml(p,c){return `<div class="pm${p.mode==='stealth'?' stealth':''}" style="--c:${c}"><div class=ar>${arrowSvg(p.bot&&p.style==='plaid'&&p.mode!=='stealth'?'url(#eearPlaid)':c,p.last&&p.last.hdg!=null)}</div><div class=lb>${lbl(p)}</div></div>`}
+function sig(p,c){return [p.name,p.mode,p.dummy,p.bot,p.style,c,p.last&&p.last.hdg!=null].join('|')}
 // smooth movement: tween each marker from its drawn position to the newest fix
 function tween(o,to,dt){o.from=o.m.getLatLng();o.to=L.latLng(to);o.t0=performance.now();o.dur=Math.max(700,Math.min(2500,dt||1300));// spread the move over the gap between fixes -> continuous glide
  if(o.from.distanceTo(o.to)>3000){o.from=o.to}}// teleports (ghost moves) jump instead of sliding across town
@@ -124,10 +124,16 @@ $('go').onclick=()=>{KEY=$('k').value.trim();if(!KEY)return;localStorage.eearGM=
 // ---- Rules & bots panel (GM key; same server as the live map)
 const gmF=(p,b)=>fetch(BASE+'/api/gm/'+p,{method:b?'POST':'GET',headers:{'x-gm-key':KEY,...(b?{'content-type':'application/json'}:{})},body:b?JSON.stringify(b):undefined,cache:'no-store'}).then(r=>r.json());
 function polShow(P){for(const i of document.querySelectorAll('#ctl input[data-g]'))i.checked=!!(P[i.dataset.g]||{})[i.dataset.d]}
-async function ctlLoad(){try{const a=await gmF('policy');if(a.policy)polShow(a.policy);$('polst').textContent='';const b=await gmF('bots');botShow(b.bots||[])}catch(e){$('polst').textContent='(load failed)'}}
-function botShow(B){$('botl').innerHTML=B.map(b=>`<div class=p style="cursor:default"><div><div class=nm>${esc(b.id)}<span class="tag bot">BOT</span>${b.frozen?'<span class="tag st">anchor frozen (Matt stealth)</span>':''}</div><div class=sub>${b.kind==='shadow'?'follows Matt Ready (20–60 m offset, wanders ≤40 m)':'fixed at vortex centre'} · ${b.lat!=null?b.lat.toFixed(5)+', '+b.lon.toFixed(5):''}</div></div><label style="margin-left:auto;font-size:12px"><input type=checkbox data-b="${esc(b.id)}" data-k=paused ${b.paused?'checked':''}> pause</label><label style="font-size:12px"><input type=checkbox data-b="${esc(b.id)}" data-k=hidden ${b.hidden?'checked':''}> hide</label></div>`).join('')}
+async function ctlLoad(){try{const a=await gmF('policy');if(a.policy)polShow(a.policy);$('polst').textContent='';const b=await gmF('bots');if(b.styles)STY=b.styles;botShow(b.bots||[],b.edge)}catch(e){$('polst').textContent='(load failed)'}}
+let EDGE_A=null,STY=['default','lightblue','plaid'];
+const swatch=s=>s==='plaid'?'<svg width=14 height=14 style="vertical-align:-2px;margin-right:4px"><rect width=14 height=14 rx=3 fill="url(#eearPlaid)" stroke="#9be89b"/></svg>':s==='lightblue'?'<span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#7ec8ff;margin-right:4px;vertical-align:-2px"></span>':'';
+function botShow(B,E){if(E)EDGE_A=E;const ed=B.filter(b=>b.group==='edge'),all=k=>ed.length&&ed.every(b=>b[k]);
+ $('botl').innerHTML=B.filter(b=>b.group!=='edge').map(botRow).join('')+(ed.length?`<div class=p style="cursor:default;background:#ffffff0c"><div><div class=nm>City-edge bots <span class="tag bot">BOT ×${ed.length}</span></div><div class=sub>ring r=${EDGE_A?EDGE_A.r:'?'} m at ${EDGE_A?esc(EDGE_A.name)+' · '+EDGE_A.lat.toFixed(6)+', '+EDGE_A.lon.toFixed(6):''}; Edge-N° sits N° clockwise from north (Ready Athletics wedge rays)</div></div><label style="margin-left:auto;font-size:12px"><input type=checkbox data-grp=edge data-k=paused ${all('paused')?'checked':''}> pause all</label><label style="font-size:12px"><input type=checkbox data-grp=edge data-k=hidden ${all('hidden')?'checked':''}> hide all</label></div>`+ed.map(botRow).join(''):'')}
+function botRow(b){return `<div class=p style="cursor:default"><div><div class=nm>${swatch(b.style)}${esc(b.id)}<span class="tag bot">BOT</span>${b.frozen?'<span class="tag st">anchor frozen (Matt stealth)</span>':''}</div><div class=sub>${b.kind==='shadow'?'follows Matt Ready (20–60 m offset, wanders ≤40 m)':b.group==='edge'?'wedge ray '+b.ray+'° · city-edge ring':'fixed at vortex centre'} · ${b.lat!=null?b.lat.toFixed(6)+', '+b.lon.toFixed(6):''} · style <select data-s="${esc(b.id)}" style="font-size:11px">${STY.map(s=>`<option ${s===(b.style||'default')?'selected':''}>${s}</option>`).join('')}</select></div></div><label style="margin-left:auto;font-size:12px"><input type=checkbox data-b="${esc(b.id)}" data-k=paused ${b.paused?'checked':''}> pause</label><label style="font-size:12px"><input type=checkbox data-b="${esc(b.id)}" data-k=hidden ${b.hidden?'checked':''}> hide</label></div>`}
 $('ctl').addEventListener('change',async e=>{const i=e.target;try{if(i.dataset.g){const P={canSee:{},canGoStealth:{}};for(const x of document.querySelectorAll('#ctl input[data-g]'))P[x.dataset.g][x.dataset.d]=x.checked;$('polst').textContent='saving…';const r=await gmF('policy',{policy:P});polShow(r.policy);$('polst').textContent='saved '+new Date().toLocaleTimeString()}
- if(i.dataset.b){const r=await gmF('bots',{id:i.dataset.b,[i.dataset.k]:i.checked});botShow(r.bots||[])}}catch(err){$('polst').textContent='save failed'}});
+ if(i.dataset.b){const r=await gmF('bots',{id:i.dataset.b,[i.dataset.k]:i.checked});botShow(r.bots||[],r.edge)}
+ if(i.dataset.grp){const r=await gmF('bots',{group:i.dataset.grp,[i.dataset.k]:i.checked});botShow(r.bots||[],r.edge)}
+ if(i.dataset.s){const r=await gmF('bots',{id:i.dataset.s,style:i.value});botShow(r.bots||[],r.edge);poll()}}catch(err){$('polst').textContent='save failed'}});
 $('ctlb').onclick=()=>{const c=$('ctl');c.style.display=c.style.display==='block'?'none':'block';if(c.style.display==='block')ctlLoad()};$('ctlx').onclick=()=>$('ctl').style.display='none';
 if(KEY)poll();else $('lock').style.display='flex';setInterval(poll,POLL_MS);document.addEventListener('visibilitychange',poll);
 </script></body></html>

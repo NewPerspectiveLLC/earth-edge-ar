@@ -35,8 +35,8 @@ function off(){clearInterval(timer);clearInterval(posTimer);timer=null;for(const
 async function tick(){if(!LV.active)return;const S=LV.S;
 try{const r=await fetch(API+'/players',{headers:{authorization:'Bearer '+S.token}}).then(r=>r.json());if(r.error==='not joined'){LV.lost();return}
 if(r.policy)window.EEAR_POLICY=r.policy;
-const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;const st=o.mode==='stealth',sg=st+'|'+o.name;if(others[o.id]&&others[o.id].sg!==sg){scene.remove(others[o.id].g);delete others[o.id]}
- if(!others[o.id]){const nm=o.name+(o.device==='quest'?' (Quest)':'')+(o.bot?' · BOT':o.dummy?' · TEST':'')+(st?' · STEALTH':'');others[o.id]={g:stick(nm,st?'#9a9a9a':colorOf(o.id),st),o,sg,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
+const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;const st=o.mode==='stealth',sg=st+'|'+o.name+'|'+(o.style||'');if(others[o.id]&&others[o.id].sg!==sg){scene.remove(others[o.id].g);delete others[o.id]}
+ if(!others[o.id]){const nm=o.name+(o.device==='quest'?' (Quest)':'')+(o.bot?' · BOT':o.dummy?' · TEST':'')+(st?' · STEALTH':'');const BSY=window.EEAR_BOTSTYLE;others[o.id]={g:stick(nm,st?'#9a9a9a':BSY?BSY.col(o,colorOf(o.id)):colorOf(o.id),st,o.bot&&o.style),o,sg,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}
 const tmp=new T.Vector3();
 function frame(t){const me=getPos();const rc=$('radar').getContext('2d');rc.clearRect(0,0,240,240);rc.strokeStyle='#fff6';rc.beginPath();rc.arc(120,120,118,0,7);rc.stroke();rc.fillStyle='#fff';rc.fillRect(117,117,6,6);
@@ -45,11 +45,11 @@ anim(g,o.entrance,(t-born)/1000,t);g.position.add(g.userData.pos);
 tmp.copy(cam.position).sub(g.position);g.rotation.y=Math.atan2(tmp.x,tmp.z);// billboard around vertical
 const d=Math.max(1,tmp.length()),s=Math.max(1,d/60);g.scale.setScalar(s);// min on-screen size
 if(g.userData.label)g.userData.label.userData.meta.distM=Math.hypot(g.position.x,g.position.z);const pulse=.75+.25*Math.sin(t/1000*Math.PI*2*1.5);g.traverse(m=>{if(m.material&&m.userData.base)m.material.opacity=m.userData.base*pulse});
-const rr=Math.min(110,Math.hypot(target.x,target.z)/10);const a=Math.atan2(target.x,-target.z);rc.fillStyle=g.userData.col;rc.beginPath();rc.arc(120+rr*Math.sin(a),120-rr*Math.cos(a),5,0,7);rc.fill()}}
+const rr=Math.min(110,Math.hypot(target.x,target.z)/10);const a=Math.atan2(target.x,-target.z);rc.fillStyle=g.userData.style==='plaid'&&window.EEAR_BOTSTYLE?rc.createPattern(window.EEAR_BOTSTYLE.plaidSmall(),'repeat'):g.userData.col;rc.beginPath();rc.arc(120+rr*Math.sin(a),120-rr*Math.cos(a),g.userData.style?6:5,0,7);rc.fill();if(g.userData.style==='plaid'){rc.strokeStyle='#9be89b';rc.lineWidth=1.5;rc.stroke()}}}
 return{frame}}
 export const colorOf=id=>'hsl('+(parseInt(id.slice(0,4),16)%360)+',100%,60%)';
 // stick figure: head circle, spine waist->neck, two arms, hip bar; core + wide glow pass, additive x-ray
-export function stick(name,col,stealth){const g=new T.Group(),c=new T.Color(col);g.userData.col=col;
+export function stick(name,col,stealth,style){const g=new T.Group(),c=new T.Color(col);g.userData.col=col;g.userData.style=style||null;
 const pts={hipL:[-.18,0],hipR:[.18,0],waist:[0,0],neck:[0,.55],sh:[0,.5]};
 function tube(a,b,r,op,dash){const v1=new T.Vector3(a[0],a[1],0),v2=new T.Vector3(b[0],b[1],0);const len=v1.distanceTo(v2);const m=new T.Mesh(new T.CylinderGeometry(r,r,len,6),new T.MeshBasicMaterial({color:c,transparent:true,opacity:op,blending:T.AdditiveBlending,depthTest:false,depthWrite:false}));
 m.position.copy(v1).add(v2).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v2.clone().sub(v1).normalize());m.renderOrder=999;m.userData.base=op*(stealth?.4:1);return m}
@@ -59,7 +59,9 @@ seg(pts.waist,pts.neck);seg(pts.hipL,pts.hipR);
 const mkArm=side=>{const p=new T.Group();p.position.set(0,.5,0);body.add(p);seg([0,0],[side*.12,-.42],p);return p};g.userData.armL=mkArm(-1);g.userData.armR=mkArm(1);
 const ring=new T.Mesh(new T.TorusGeometry(.12,.025,6,20),new T.MeshBasicMaterial({color:c,transparent:true,opacity:.35,blending:T.AdditiveBlending,depthTest:false,depthWrite:false}));ring.position.y=.7;ring.renderOrder=999;ring.userData.base=.35*(stealth?.4:1);body.add(ring);
 const halo=new T.Mesh(new T.CircleGeometry(.2,20),ring.material.clone());halo.material.opacity=.15;halo.userData.base=.15*(stealth?.4:1);halo.position.y=.7;halo.renderOrder=998;body.add(halo);
-if(stealth)body.traverse(m=>{if(m.isMesh&&m.geometry.type==='CylinderGeometry')m.scale.y=.5});// dashed look: shortened segments
+if(stealth)body.traverse(m=>{if(m.isMesh&&m.geometry.type==='CylinderGeometry')m.scale.y=.5});
+/* plaid BOT style: tartan texture on body + head ring + marker disc, normal-blended so the navy reads over camera too */
+if(style==='plaid'&&!stealth&&window.EEAR_BOTSTYLE){const tx=window.EEAR_BOTSTYLE.tex(T,1,2);body.traverse(m=>{if(m.isMesh){m.material.map=tx;m.material.color.set('#ffffff');m.material.blending=T.NormalBlending;m.userData.base=Math.max(m.userData.base||0,m.material.opacity>.3?.95:.5);m.material.needsUpdate=true}});halo.scale.setScalar(1.3)}// dashed look: shortened segments
 const cv=document.createElement('canvas');cv.width=256;cv.height=64;const x=cv.getContext('2d');x.font='bold 36px sans-serif';x.fillStyle=col;x.textAlign='center';x.fillText(name,128,44);
 const sp=window.mkLabel?window.mkLabel(name,col,{title:'Player '+name,color:col}):new T.Sprite();sp.position.y=1.05;g.add(sp);g.userData.label=sp;return g}
 // entrances; figure floats at waist height ~1.0 m
