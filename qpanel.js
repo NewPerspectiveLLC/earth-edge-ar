@@ -22,7 +22,7 @@ export function makePanel(T,{items,sections,title='Layers'}){
  const top=H/2-GAP-BH*.6-GAP;const tw=(W-(sections.length+1)*GAP)/sections.length;
  sections.forEach((s,i)=>{const b=mkBtn('tab',s,null,s);b.mesh.scale.x=tw/BW;b.mesh.position.set(-W/2+GAP+tw/2+i*(tw+GAP),top-BH/2,0);root.add(b.mesh)});
  const pages=sections.map((s)=>{const pg=new T.Group();root.add(pg);items.filter(i=>i.section===s).forEach((it,j)=>{const b=mkBtn(it.kind,it.label,it,s);const r=Math.floor(j/COLS),c=j%COLS;b.mesh.position.set(-W/2+GAP+BW/2+c*(BW+GAP),top-BH-GAP-BH/2-r*(BH+GAP),0);pg.add(b.mesh)});return pg});
- P.setTab=i=>{P.tab=i;pages.forEach((p,j)=>p.visible=j===i);P.refresh()};
+ P.setTab=i=>{P.tab=i;pages.forEach((p,j)=>p.visible=j===i);/* board shrinks to the current tab's rows (top edge fixed) */const rows=Math.max(1,Math.ceil(items.filter(x=>x.section===sections[i]).length/COLS)),Ht=GAP+BH*.6+GAP+BH+GAP+rows*(BH+GAP);board.scale.y=Ht/H;board.position.y=H/2-Ht/2;P.refresh()};
  P.refresh=()=>{for(const b of btns)b.draw()};
  const rc=new T.Raycaster();
  P.hit=(o,d)=>{if(!root.visible)return null;rc.set(o,d);rc.far=5;const vis=btns.filter(b=>{let x=b.mesh;while(x){if(!x.visible)return false;x=x.parent}return true}).map(b=>b.mesh);const h=rc.intersectObjects(vis,false)[0];return h?Object.assign(h.object.userData.btn,{_d:h.distance}):null};
@@ -31,21 +31,21 @@ export function makePanel(T,{items,sections,title='Layers'}){
  P.setHover=set=>{for(const b of btns)b.hover=set.has(b);P.refresh()};
  P.setTab(0);return P}
 export function xrRays(T,{renderer,scene,panel,xrToWorld,onToggle}){
- const S={srcs:new Map(),last:null,presses:0,ses:null};const M=new T.Matrix4(),o=new T.Vector3(),d=new T.Vector3();
+ const pn=()=>typeof panel==='function'?panel():panel;const S={srcs:new Map(),last:null,presses:0,ses:null};const M=new T.Matrix4(),o=new T.Vector3(),d=new T.Vector3();
  const line=()=>{const g=new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3(0,0,-1)]);const l=new T.Line(g,new T.LineBasicMaterial({color:0x9fd8ff,depthTest:false,transparent:true,opacity:1}));l.renderOrder=10001;l.frustumCulled=false;l.material.userData.pf=1;l.visible=false;scene.add(l);return l};
  const st=src=>{let s=S.srcs.get(src);if(!s){s={line:line(),hover:null,down:null,t:0};S.srcs.set(src,s)}return s};
  const pulse=src=>{try{const h=src.gamepad&&src.gamepad.hapticActuators&&src.gamepad.hapticActuators[0];if(h&&h.pulse)h.pulse(.6,40);else if(h&&h.playEffect)h.playEffect('dual-rumble',{duration:40,strongMagnitude:.6})}catch(e){}};
  const attach=ses=>{S.ses=ses;
-  ses.addEventListener('selectstart',e=>{const s=st(e.inputSource);s.down=panel.root.visible?s.hover:null});
+  ses.addEventListener('selectstart',e=>{const s=st(e.inputSource);s.down=pn().root.visible?s.hover:null});
   ses.addEventListener('selectend',e=>{const s=st(e.inputSource),b=s.down;s.down=null;if(!b||b!==s.hover)return;const now=performance.now();if(now-s.t<180)return;s.t=now;
-   panel.press(b);S.presses++;S.last={key:b.key,label:b.label,hand:e.inputSource.handedness,state:b.item&&b.item.get?b.item.get():null,t:now};pulse(e.inputSource);onToggle&&onToggle(b)});
+   pn().press(b);S.presses++;S.last={key:b.key,label:b.label,hand:e.inputSource.handedness,state:b.item&&b.item.get?b.item.get():null,t:now};pulse(e.inputSource);onToggle&&onToggle(b)});
   ses.addEventListener('end',()=>{for(const s of S.srcs.values())scene.remove(s.line);S.srcs.clear();S.ses=null})};
  S.tick=()=>{const ses=renderer.xr.getSession();if(!ses)return;if(ses!==S.ses)attach(ses);const fr=renderer.xr.getFrame(),ref=renderer.xr.getReferenceSpace();if(!fr||!ref)return;const hov=new Set();
   for(const src of ses.inputSources){if(!src.targetRaySpace||src.targetRayMode==='gaze')continue;const s=st(src);const p=fr.getPose(src.targetRaySpace,ref);if(!p){s.line.visible=false;continue}
    M.fromArray(p.transform.matrix).premultiply(xrToWorld());o.setFromMatrixPosition(M);d.set(0,0,-1).transformDirection(M);
-   const b=panel.hit(o,d);s.hover=b;if(b)hov.add(b);s.line.visible=panel.root.visible;const L=b?b._d:2;s.line.position.copy(o);s.line.quaternion.setFromUnitVectors(new T.Vector3(0,0,-1),d);s.line.scale.set(1,1,L);s.line.material.color.set(b?0xffffff:0x9fd8ff)}
+   const b=pn().hit(o,d);s.hover=b;if(b)hov.add(b);s.line.visible=pn().root.visible;const L=b?b._d:2;s.line.position.copy(o);s.line.quaternion.setFromUnitVectors(new T.Vector3(0,0,-1),d);s.line.scale.set(1,1,L);s.line.material.color.set(b?0xffffff:0x9fd8ff)}
   for(const s of S.srcs.values())if(![...ses.inputSources].some(x=>S.srcs.get(x)===s))s.line.visible=false;
-  panel.setHover(hov)};
+  pn().setHover(hov)};
  return S}
 export function summon(T,panel,cam){const p=new T.Vector3(),q=new T.Quaternion();cam.getWorldPosition(p);cam.getWorldQuaternion(q);const e=new T.Euler().setFromQuaternion(q,'YXZ');const f=new T.Vector3(-Math.sin(e.y),0,-Math.cos(e.y));
  const r=panel.root;if(r.parent){r.parent.updateMatrixWorld(true)}const w=p.clone().addScaledVector(f,.7);w.y-=.18;const lw=r.parent?r.parent.worldToLocal(w.clone()):w;r.position.copy(lw);r.visible=true;r.updateMatrixWorld(true);

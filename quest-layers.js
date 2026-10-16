@@ -13,8 +13,13 @@ function apply(){QGAP();QAPV();
  if(window.QANTI)for(const k in QANTI)QANTI[k].setAttribute('visible',on(k)&&on('vxAnti')&&on('labels'));
  const gr=document.getElementById('grid');gr&&gr.setAttribute('visible',on('grid'));
  if(!on('labels'))document.querySelectorAll('a-text').forEach(el=>{if(isLabel(el)&&!panelEl(el))el.setAttribute('visible',false)});
+ for(const el of qLabels())if(QLOFF.has(qlk(el)))el.setAttribute('visible',false);
  localStorage.eearQLayers=JSON.stringify(QL);hud();P&&P.refresh()}
 const panelEl=el=>false;
+/* universal labels: per-label off set (first line of the a-text = key), persisted */
+const QLOFF=window.QLOFF=new Set(JSON.parse(localStorage.eearQLabelsOff||'[]'));const qlk=el=>String(el.getAttribute('value')||'').split('\n')[0].trim();
+const qLabels=()=>[...document.querySelectorAll('a-text')].filter(el=>isLabel(el)&&el.id!=='flyT'&&!el.closest('#others'));
+window.qLabelSet=(k,on)=>{if(on)QLOFF.delete(k);else QLOFF.add(k);localStorage.eearQLabelsOff=JSON.stringify([...QLOFF]);apply()};
 function hud(){const b=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};b('ocB','Ocean: '+(on('ocean')?'on':'off'));b('sxB','Saucers/roads/ghost: '+(on('saucers')&&on('roads')&&on('ghost')?'on':'off'))}
 // HUD buttons that used to flip coarse groups now go through the registry
 const ocB=document.getElementById('ocB'),sxB=document.getElementById('sxB');
@@ -31,7 +36,7 @@ add('Local','shore','PT shoreline',()=>[G().shore]);add('Local','coast','Coastli
 add('Places','places','Local places',()=>domCat('places').map(obj3));add('Places','poles','Poles',()=>domCat('poles').map(obj3));add('Places','pyramids','Pyramids',()=>domCat('pyramids').map(obj3));add('Places','icecube','IceCube',()=>[G().icecube]);add('Places','edges','Earth edges N/E/S/W',()=>domCat('edges').map(obj3));
 add('Places','saucers','Saucers & pads',()=>tagged('saucers'));add('Places','ghost','GhostBot',()=>tagged('ghost'));
 add('Labels','labels','Labels (master)',()=>[...document.querySelectorAll('a-text')].filter(isLabel).filter(e=>e.getAttribute('visible')!==false||true).slice(0,0).concat([...document.querySelectorAll('a-text[data-qcat="places"]')].map(obj3)));
-R.push({section:'Labels',key:'labelsAllOn',label:'All labels ON',kind:'action',run:()=>{QL.labels=1;apply()}});R.push({section:'Labels',key:'labelsAllOff',label:'All labels OFF',kind:'action',run:()=>{QL.labels=0;apply()}});
+R.push({section:'Labels',key:'labelsAllOn',label:'All labels ON',kind:'action',run:()=>{QL.labels=1;QLOFF.clear();localStorage.eearQLabelsOff='[]';apply()}});R.push({section:'Labels',key:'labelsAllOff',label:'All labels OFF',kind:'action',run:()=>{QL.labels=0;apply()}});
 const camOnQ=()=>localStorage.eearCam!=='off';
 R.push({section:'View',key:'camera',label:'Camera passthrough',kind:'toggle',get:camOnQ,set:v=>{if(v!==camOnQ())window.camToggleQ()},objs:()=>[window.QSKY]});
 R.push({section:'View',key:'smoothTurn',label:'Smooth turn (else snap 30°)',kind:'toggle',get:()=>!!(window.QFLY&&QFLY.smooth),set:v=>{QFLY.smooth=!!v;localStorage.eearSmoothTurn=v?'1':'0'},objs:()=>[]});
@@ -42,11 +47,17 @@ const LVo=()=>window.EEAR_LIVE;R.push({section:'View',key:'live',label:'Live tra
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
 const SECTIONS=['Vortex','Earth','Local','Places','Labels','View'];
 for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera')QL[it.key]=1;
-const P=makePanel(T,{items:R,sections:SECTIONS,title:'Earth Edge AR Layers'});sc.object3D.add(P.root);
-P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+let P=null,nL=-1;const base=R.slice();
+function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;
+ const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
+ items.splice(at,0,...T0.map(t=>({section:'Labels',key:'lab:'+t,label:t,kind:'toggle',get:()=>!QLOFF.has(t),set:v=>qLabelSet(t,v),objs:()=>qLabels().filter(el=>qlk(el)===t).map(obj3)})));
+ const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone();if(P)sc.object3D.remove(P.root);
+ P=makePanel(T,{items,sections:SECTIONS,title:'Earth Edge AR Layers'});sc.object3D.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+ if(vis){P.root.position.copy(pos);P.root.quaternion.copy(q);P.root.visible=true}window.QPANEL=P;window.QREG=items}
+build();
 const rig=document.getElementById('rig').object3D;
-const X=xrRays(T,{renderer:sc.renderer,scene:sc.object3D,panel:P,xrToWorld:()=>{rig.updateMatrixWorld(true);return rig.matrixWorld}});
+const X=xrRays(T,{renderer:sc.renderer,scene:sc.object3D,panel:()=>P,xrToWorld:()=>{rig.updateMatrixWorld(true);return rig.matrixWorld}});
 AFRAME.registerComponent('qlayers-tick',{tick(){if(sc.renderer.xr.isPresenting)X.tick()}});sc.setAttribute('qlayers-tick','');
-window.QPANEL_TOGGLE=()=>{if(P.root.visible){P.root.visible=false}else{P.refresh();summon(T,P,sc.camera)}};
-window.QPANEL=P;window.QREG=R;window.QXR=X;window.QAPPLY=apply;
+window.QPANEL_TOGGLE=()=>{if(P.root.visible){P.root.visible=false}else{build();P.refresh();summon(T,P,sc.camera)}};
+window.QXR=X;window.QPANEL_BUILD=build;window.QAPPLY=apply;
 apply();
