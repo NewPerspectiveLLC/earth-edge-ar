@@ -8,9 +8,10 @@
 // foot-tap layer and hand-gesture layer (snaps on 2 & 4, points, open palms, flourishes, mic gestures), articulated gloves,
 // and secondary motion on tails / hat / bow tie. Other singers use a simpler library and no extra layers.
 import * as THREE from 'three';
-import * as BEAT from './beat.js?v=1792191473999';
+import * as BEAT from './beat.js?v=1792258810108';
+import { GARDEN as GARDEN_REG, PERFORMERS as PF_REG } from './figures-registry.js?v=1792258810108';
 
-export const GARDEN = { lat: 48.1316475, lon: -122.7992293, name: "Matt's Meditation Garden" };
+export const GARDEN = GARDEN_REG;
 const PI = Math.PI, TAU = 2 * PI, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
 const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
@@ -502,21 +503,21 @@ export function initPerformers(scene, where, camera, opts = {}) {
 }
 function placeRoot() { const v = typeof S.where === 'function' ? S.where(GARDEN.lat, GARDEN.lon) : S.where; if (v) S.root.position.set(v.x, v.y ?? 0, v.z); }
 const keyOf = singers => (singers || []).map(s => norm(s.id || s.name)).join('+');
-const GAP0 = PI / 12, GAP = PI / 6;   // cushions sit at k*30deg; performers stand in the gaps (15 + k*30 deg)
+const GAP0 = PF_REG.gap0Deg * PI / 180, GAP = PF_REG.gapDeg * PI / 180;   // cushions sit at k*30deg; performers stand in the gaps (15 + k*30 deg)
 /** showPerformers(singers:[{id,name}]) - rise in one bot per singer (no-op if the same set is already up) */
 export function showPerformers(singers) {
   if (!S) throw new Error('initPerformers first'); singers = (singers || []).filter(Boolean); const key = keyOf(singers);
   if (key === S.key) return; hidePerformers(); S.key = key; if (!singers.length) return;
   placeRoot(); const pp = (S.opts.getPlayerPos && S.opts.getPlayerPos()) || S.camera.getWorldPosition(new THREE.Vector3());
-  let c = Math.atan2(pp.x - S.root.position.x, -(pp.z - S.root.position.z)); if (!isFinite(c) || Math.hypot(pp.x - S.root.position.x, pp.z - S.root.position.z) < 1) c = 200 * PI / 180;
-  const n = singers.length, step = n > 3 ? GAP : 2 * GAP, avoid = (S.opts.avoidBearing ?? 90) * PI / 180;
+  let c = Math.atan2(pp.x - S.root.position.x, -(pp.z - S.root.position.z)); if (!isFinite(c) || Math.hypot(pp.x - S.root.position.x, pp.z - S.root.position.z) < 1) c = PF_REG.fallbackBearingDeg * PI / 180;
+  const n = singers.length, step = n > 3 ? GAP : 2 * GAP, avoid = (S.opts.avoidBearing ?? PF_REG.avoidBearingDeg) * PI / 180;
   c = GAP0 + Math.round((c - GAP0) / GAP) * GAP; if (n % 2 === 0 && step === 2 * GAP) c += 0; else if (n % 2 === 0) c += GAP / 2 * 0;
   const spots = cc => singers.map((_, i) => cc + (i - (n - 1) / 2) * step);
-  const clear = cc => spots(cc).every(a => Math.abs(angD(a, avoid)) > 45 * PI / 180);
+  const clear = cc => spots(cc).every(a => Math.abs(angD(a, avoid)) > PF_REG.avoidSepDeg * PI / 180);
   for (let k = 1; k < 12 && !clear(c); k++) { const cand = c + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * GAP; if (clear(cand)) { c = cand; break; } }
   // even counts with 30deg spacing would land on cushions; nudge by half a gap so every spot is in a gap
   const offs = (n % 2 === 0 && step === GAP) ? GAP / 2 : 0;
-  const R = S.opts.radius ?? 3;
+  const R = S.opts.radius ?? PF_REG.radius;
   spots(c + offs).forEach((a, i) => { const s = singers[i];
     const b = (builderFor(s) || genericBot)(s); b.full = !!b.full; b.id = norm(s.id || s.name);
     b.group.position.set(Math.sin(a) * R, 0, -Math.cos(a) * R); b.group.rotation.y = Math.atan2(b.group.position.x, b.group.position.z);

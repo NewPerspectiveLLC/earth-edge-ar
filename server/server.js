@@ -193,7 +193,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    if(cc!=='no-store'&&q.headers['if-none-match']===tag){r.writeHead(304,h);return r.end()}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,h);r.end(d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -253,6 +253,17 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   return send(r,{me:{team:teamOf(P.team_id),device:P.device,mode:P.mode},seeStealth:see,policy:pol,teamOnly:!!s.teamOnly,players:L.map(pubP)})}
  case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);let m=j.mode==='stealth'?'stealth':'regular';const dev=P.device||devOf(j.device,q.headers['user-agent']);if(m==='stealth'&&!stealthOk(dev)){run("update gplayers set mode='regular' where id=?",P.id);return send(r,{ok:0,mode:'regular',stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop})}run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
  case'/api/policy':return send(r,{policy:getPol()})
+ /* public read-only figure feed for figures.html: server-side bots + TEST ghosts + a COUNT of live human players (never their positions).
+    Matt's Shadow follows Matt's real fix, so only its status is published; ghosts parked at a non-landmark (custom) target are hidden too. */
+ case'/api/figures':{if(q.method!=='GET')return send(r,{error:'GET only'},405);if(limited('gf:'+ip,120,60000))return send(r,{error:'rate limited'},429);
+  const lmk=(la,lo)=>GH_LOCAL.find(x=>Math.abs(x[1]-la)<5e-4&&Math.abs(x[2]-lo)<5e-4);const cut=now-LIVE_MS;
+  const bots=Object.entries(BOTS).map(([n,d])=>{const s=BS[n]||{},o={id:n,kind:d.kind,group:d.group||null,ray:d.ang??null,style:s.style||'default',paused:!!s.paused,hidden:!!s.hidden};
+   if(d.kind==='shadow')return{...o,private:true,frozen:!!s.frozen,note:"follows Matt Ready's live fix + 20-60 m offset; position not published"};
+   return{...o,lat:s.lat,lon:s.lon,anchor:{lat:s.alat,lon:s.alon},heading:s.hdg}});
+  const ghosts=Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n]||{},L=lmk(s.tlat,s.tlon),o={id:n,wander:!!s.wander,wanderMaxM:150,live:true};
+   return L?{...o,lat:s.lat,lon:s.lon,target:{lat:s.tlat,lon:s.tlon,place:s.place}}:{...o,private:true,note:'parked at a custom (non-landmark) spot; position not published'}});
+  const HP=all('select id,device,mode from gplayers where live=1 and seen>?',cut).filter(p=>!isGhost(p.id)&&!isBot(p.id));const byDev={};for(const p of HP)byDev[p.device||'unknown']=(byDev[p.device||'unknown']||0)+1;
+  return send(r,{t:now,edge:{lat:EDGE.lat,lon:EDGE.lon,r:EDGE.r,name:EDGE.name},bots,ghosts,players:{live:HP.length,byDevice:byDev,windowMs:LIVE_MS},renDances:Object.keys(REND)})}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
   const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);

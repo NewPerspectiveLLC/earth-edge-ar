@@ -3,7 +3,8 @@
 // with edge-lit petals, and floating orbs. Cheap fake bloom: radial halo sprites + fresnel shells (no post-processing),
 // 2 point lights. setNight(t 0..1): glow ~2.5x at night, subtle by day. Normal blending everywhere (safe over iOS video).
 import * as THREE from 'three';
-export const GARDEN = { lat: 48.1316475, lon: -122.7992293, name: "Matt's Meditation Garden" };
+import { GARDEN as GARDEN_REG, CIRCLE as CIRCLE_REG } from './figures-registry.js?v=1792258810108';
+export const GARDEN = GARDEN_REG;
 const PI = Math.PI, TAU = 2 * PI, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const PURPLE = 0xa45cff, TEAL = 0x2ff5df, GOLD = 0xffc46b;
 
@@ -24,7 +25,7 @@ function fresnelShell(geo, color, power = 2.2, op = .55) { // rim-glow shell (fa
 export function buildCircle(opts = {}) {
   const R = rng(opts.seed ?? 12), root = new THREE.Group(); root.name = 'MeditationCircle';
   const em = [], halos = [], shells = [], orbs = [], lights = [];
-  const stoneR = opts.stoneRadius ?? 3.6, paveIn = .95, paveOut = 2.55;
+  const stoneR = opts.stoneRadius ?? CIRCLE_REG.stoneRadius, paveIn = CIRCLE_REG.paveIn, paveOut = CIRCLE_REG.paveOut;
   // ---- textures
   const stoneMap = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#6d6a74'; g.fillRect(0, 0, w, h); for (let i = 0; i < 1800; i++) { const v = 80 + R() * 70 | 0; g.fillStyle = `rgba(${v},${v - 4},${v + 8},.35)`; g.fillRect(R() * w, R() * h, 2 + R() * 6, 2 + R() * 6); } });
   const veinMap = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); g.lineCap = 'round';
@@ -60,7 +61,7 @@ export function buildCircle(opts = {}) {
   const cushP = cushTex('#c58cff', '#5a1fb0'), cushT = cushTex('#7ffff0', '#0f8f86');
   const cushMs = [M({ map: cushP, color: 0xffffff, emissive: PURPLE, emissiveMap: cushP, emissiveIntensity: .4, roughness: .95 }), M({ map: cushT, color: 0xffffff, emissive: TEAL, emissiveMap: cushT, emissiveIntensity: .4, roughness: .95 })];
   const pipeMs = [new THREE.MeshBasicMaterial({ color: 0xe2c2ff }), new THREE.MeshBasicMaterial({ color: 0xb8fff6 })];
-  const cushG = new THREE.SphereGeometry(.25, 18, 9), pipeG = new THREE.TorusGeometry(.245, .011, 5, 28), cushR = opts.cushionRadius ?? (stoneR - .58);
+  const cushG = new THREE.SphereGeometry(.25, 18, 9), pipeG = new THREE.TorusGeometry(.245, .011, 5, 28), cushR = opts.cushionRadius ?? (stoneR - CIRCLE_REG.cushionInset);
   for (let i = 0; i < 12; i++) { const a = i * TAU / 12, k = i % 2, c = new THREE.Mesh(cushG, cushMs[k]); c.scale.set(1, .38, 1); c.position.set(Math.sin(a) * cushR, .1, -Math.cos(a) * cushR); root.add(c);
     const piping = new THREE.Mesh(pipeG, pipeMs[k]); piping.rotation.x = PI / 2; piping.position.copy(c.position).setY(.105); root.add(piping);
     const h = halo(k ? TEAL : PURPLE, .85, .13); h.position.copy(c.position).setY(.2); root.add(h); halos.push(h); }
