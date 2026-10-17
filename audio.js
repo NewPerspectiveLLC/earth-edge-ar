@@ -96,15 +96,17 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
  // decode the saved song lazily on first tap (needs an AudioContext)
  setOn.pend=async()=>{if(user&&user.pending){const r=user.pending,keep=track;user=null;await loadUser(r.blob,r.name,r.singers||[MATT]);track=keep;localStorage.eearMusT=track;trackUI()}};
  $('musB').onclick=async()=>{if(!on){graph();await ctx.resume().catch(()=>{});if(track==='user')await setOn.pend()}setOn(!on)};
- const fw=[0,0,0],up=[0,0,0];
- function frame(){const L=getListener&&getListener();if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
+ const fw=[0,0,0],up=[0,0,0];let lastL=null,duck=1;
+ function frame(){const L=getListener&&getListener();lastL=L||null;if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
   const dE=10*Math.cos(el)*Math.sin(b*D),dN=10*Math.cos(el)*Math.cos(b*D),dU=10*Math.sin(el);
-  const now=performance.now();if(now-lastR>500){lastR=now;$('musR').textContent=curName()+' · '+fmt(d)+' · '+CMP[Math.round(b/22.5)%16]+' · vol '+Math.round(DGAIN(d)*100)+'%'}
-  if(!ctx||!on)return;const h=L.hdg*D,p=(L.pitch||0)*D,t=ctx.currentTime;dg.gain.setTargetAtTime(DGAIN(d),t,.3);
+  const now=performance.now();if(now-lastR>500){lastR=now;$('musR').textContent=curName()+' · '+fmt(d)+' · '+CMP[Math.round(b/22.5)%16]+' · vol '+Math.round(DGAIN(d)*duck*100)+'%'+(window.EEAR_PILLARS&&EEAR_PILLARS.near?' · 🔺 '+EEAR_PILLARS.near:'')}
+  if(!ctx||!on)return;const h=L.hdg*D,p=(L.pitch||0)*D,t=ctx.currentTime;dg.gain.setTargetAtTime(DGAIN(d)*duck,t,.3);
   fw[0]=Math.sin(h)*Math.cos(p);fw[1]=Math.sin(p);fw[2]=-Math.cos(h)*Math.cos(p);up[0]=-Math.sin(h)*Math.sin(p);up[1]=Math.cos(p);up[2]=Math.cos(h)*Math.sin(p);
   const l=ctx.listener;if(l.forwardX){l.positionX.setTargetAtTime(0,t,.05);l.positionY.setTargetAtTime(0,t,.05);l.positionZ.setTargetAtTime(0,t,.05);
    l.forwardX.setTargetAtTime(fw[0],t,.05);l.forwardY.setTargetAtTime(fw[1],t,.05);l.forwardZ.setTargetAtTime(fw[2],t,.05);l.upX.setTargetAtTime(up[0],t,.05);l.upY.setTargetAtTime(up[1],t,.05);l.upZ.setTargetAtTime(up[2],t,.05)}
   else{l.setPosition(0,0,0);l.setOrientation(fw[0],fw[1],fw[2],up[0],up[1],up[2])}
   if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
- window.EEAR_AUDIO={TRACKS,get startedAt(){return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame};
+ window.EEAR_AUDIO={TRACKS,get startedAt(){return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame,
+ /* d44 pillar proximity music (pillars.js?v=1792260464493): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
+ get listener(){return lastL},get out(){return vol},async buffer(id){graph();const T=TRACKS.find(t=>t.id===id);return T&&T.urls?fileBuf(T):null},setDuck(v){duck=Math.max(0,Math.min(1,+v||0))},get duck(){return duck}};
  return{frame,SRC}}

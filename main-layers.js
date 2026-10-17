@@ -1,5 +1,5 @@
 // index.html WebXR (Quest browser AR): the same 3D Layers panel as quest.html, driven by LAY/applyLayers so it stays in sync with the 2D Layers sheet + localStorage.eearLayers.
-import*as T from'three';import{makePanel,xrRays,summon}from'./qpanel.js?v=1792258810108';
+import*as T from'three';import{makePanel,xrRays,summon}from'./qpanel.js?v=1792260464493';
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.EEAR&&window.applyLayers&&window.layRefresh){clearInterval(iv);r()}},200)});
 await wait();
 const{ren,scene,LAY}=EEAR;const L=window.LAYERS;
@@ -20,7 +20,7 @@ function build(){const T0=[...new Set((window.LABELS||[]).filter(x=>x.parent).ma
  const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
  items.splice(at,0,...T0.map(t=>({section:'Labels',key:'lab:'+t,label:t,kind:'toggle',get:()=>!LOFF.has(t),set:v=>labelSet(t,v),objs:()=>LABELS.filter(x=>lk(x)===t)})));
  const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone();if(P)scene.remove(P.root);
- P=makePanel(T,{items,sections:['Vortex','Earth','Local','Places','Sky','Labels','View'],title:'Earth Edge AR Layers'});scene.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+ P=makePanel(T,{items,sections:['Vortex','Earth','Local','Places','Sky','Labels','View'],title:"Matt's Reality Layers"});scene.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
  if(vis){P.root.position.copy(pos);P.root.quaternion.copy(q);P.root.visible=true}window.MPANEL=P;window.MREG=items}
 build();
 const I=new T.Matrix4();const X=xrRays(T,{renderer:ren,scene,panel:()=>P,xrToWorld:()=>I});

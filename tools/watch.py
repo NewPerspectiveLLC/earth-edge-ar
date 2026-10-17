@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Earth Edge AR - read-only GM watcher (does NOT join the game, never appears as a player).
+"""Matt's Reality (Live Geometry) - read-only GM watcher (does NOT join the game, never appears as a player).
 
   python3 tools/watch.py                    # one snapshot table
   python3 tools/watch.py --follow           # live, re-polls every 3 s (--every N); add --sse for the SSE stream on the LAN
@@ -40,7 +40,7 @@ def age(s): return f"{s}s" if s < 120 else (f"{s//60}m" if s < 7200 else f"{s//3
 
 def table(snap):
     t = datetime.datetime.fromtimestamp(snap['server_time']/1000, PT_TZ).strftime('%Y-%m-%d %H:%M:%S PT')
-    out = [f"Earth Edge AR live: {snap['count']} player(s) seen in last {snap['window_ms']//1000}s - server time {t}"]
+    out = [f"Matt's Reality live: {snap['count']} player(s) seen in last {snap['window_ms']//1000}s - server time {t}"]
     hdr = f"{'name':<16}{'game/team':<20}{'lat, lon':<24}{'acc':>6}{'hdg':>6}  {'from Ready Athletics':<22}{'nearest landmark':<40}{'seen':>6}  flags"
     out += [hdr, '-'*len(hdr)]
     for p in sorted(snap['players'], key=lambda p: p['last_seen_age_s']):
@@ -93,7 +93,7 @@ def png(snap, path, size=900):
         d.ellipse([x-8, y-8, x+8, y+8], fill=col, outline=(255, 255, 255), width=2)
         tag(x, y, f"{p['name']} ({age(p['last_seen_age_s'])}{', stealth' if p['stealth'] else ''})", (255, 255, 255))
     t = datetime.datetime.fromtimestamp(snap['server_time']/1000, PT_TZ).strftime('%Y-%m-%d %H:%M:%S PT')
-    d.rectangle([0, size-24, size, size], fill=(0, 0, 0)); d.text((8, size-21), f"Earth Edge AR GM watch - {snap['count']} player(s) - {t}" + ('  -  map © OpenStreetMap contributors' if tiles_ok else '  (map tiles unavailable)'), fill=(255, 255, 255), font=F)
+    d.rectangle([0, size-24, size, size], fill=(0, 0, 0)); d.text((8, size-21), f"Matt's Reality GM watch - {snap['count']} player(s) - {t}" + ('  -  map © OpenStreetMap contributors' if tiles_ok else '  (map tiles unavailable)'), fill=(255, 255, 255), font=F)
     img.save(path); return path
 
 def main():

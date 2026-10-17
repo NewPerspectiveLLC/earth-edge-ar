@@ -1,4 +1,4 @@
-// daynight.js — real day/night cycle for Earth Edge AR (index.html + quest.html).
+// daynight.js — real day/night cycle for Matt's Reality (index.html + quest.html).
 // Night factor comes from the REAL sun altitude (astronomy-engine, same clock as the Sun/Moon bodies).
 // Clock: Real (default) · Fast cycle (1 day ≈ 10 min) · preview slider / ?t=HH:MM or ?t=ISO.
 // Night scene: sky gradient + sidereal-rotating star field (camera off / desktop / VR only), cool hemi light,
@@ -77,7 +77,7 @@ export function initDayNight(T,o){/* o: {scene, skyGroup(), skyRadius, base:()=>
  const N={clock:C,f:0,phase:'day',sunAlt:90,U,built:null};
  const hemi=new T.HemisphereLight(0xbfd8ff,0x3a3020,.9),sun=new T.DirectionalLight(0xffffff,1),moon=new T.DirectionalLight(0x9ab0ff,0);hemi.name='dnHemi';o.scene.add(hemi,sun,moon,sun.target,moon.target);N.lights={hemi,sun,moon};
  const stars=starField(T,o.skyRadius*.95);N.stars=stars;let starParent=null;
- let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792258810108').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
+ let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792260464493').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
  N.build=async(parent,proj)=>{await tp;if(N.built)N.built.parent&&N.built.parent.remove(N.built);const G=new T.Group();G.name='nightGlow';N.built=G;N.mats=[];
   for(const S of SITES){const sg=new T.Group();sg.userData.layer=o.layerOf?o.layerOf(S.key):undefined;G.add(sg);const c=proj(S.lat,S.lon,0);
    const bm=beamMat(T,S.col,U);for(const[r,h]of[[3.5,1500],[1.2,1500]]){const b=new T.Mesh(new T.CylinderGeometry(r,r,h,20,1,true),bm);b.position.copy(c).y+=h/2;b.renderOrder=9;b.frustumCulled=false;sg.add(b)}
@@ -106,7 +106,7 @@ export function initDayNight(T,o){/* o: {scene, skyGroup(), skyRadius, base:()=>
   const sp=o.skyGroup&&o.skyGroup();if(sp&&starParent!==sp){sp.add(stars);starParent=sp}
   const pass=o.pass();stars.visible=!pass&&N.starOp>.01;stars.material.uniforms.op.value=N.starOp;o.applySky&&o.applySky(cols,N.f,pass);
   window.EEAR_NIGHT={f:N.f,phase:N.phase,sunAlt:alt,moonAlt:m.altitude,illum,date:d,mode:C.label()};
-  if(Math.abs(N.f-lastF)>.004||N.phase!==lastPh){lastF=N.f;lastPh=N.phase;for(const k of['EEAR_CIRCLE','EEAR_REN','EEAR_PERFORMERS'])try{window[k]&&typeof window[k].setNight==='function'&&window[k].setNight(N.f)}catch(e){console.warn(k,e)}
+  if(Math.abs(N.f-lastF)>.004||N.phase!==lastPh){lastF=N.f;lastPh=N.phase;for(const k of['EEAR_CIRCLE','EEAR_REN','EEAR_PERFORMERS','EEAR_PILLARS'])try{window[k]&&typeof window[k].setNight==='function'&&window[k].setNight(N.f)}catch(e){console.warn(k,e)}
    window.dispatchEvent(new CustomEvent('eear:night',{detail:{f:N.f,phase:N.phase,sunAlt:alt}}))}};
  N.frame=t=>{U.t.value=t/1000;stars.material.uniforms.t.value=t/1000;if(t-last>(C.mode==='fast'||C.ov!=null?100:1000)){last=t;N.update()}
   const g=N.f,pulse=.82+.18*Math.sin(t/1000*1.6);U.op.value=g*pulse;UT.op.value=g*1.6*(.9+.1*Math.sin(t/1000*.9));UTG.op.value=g*.5;UG.op.value=window.EEAR_CIRCLE?0:g;

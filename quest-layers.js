@@ -1,5 +1,5 @@
 // quest.html: one registry for every layer toggle -> 3D in-headset Layers panel (Y button) + 2D HUD + localStorage (QL).
-import{makePanel,xrRays,summon}from'./qpanel.js?v=1792258810108';
+import{makePanel,xrRays,summon}from'./qpanel.js?v=1792260464493';
 const T=AFRAME.THREE;
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.QVXG&&window.QGEO&&window.QGHOST&&window.QGAP&&window.QAPV){clearInterval(iv);r()}},200)});
 await wait();
@@ -56,7 +56,7 @@ function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort(
  const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
  items.splice(at,0,...T0.map(t=>({section:'Labels',key:'lab:'+t,label:t,kind:'toggle',get:()=>!QLOFF.has(t),set:v=>qLabelSet(t,v),objs:()=>qLabels().filter(el=>qlk(el)===t).map(obj3)})));
  const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone(),par=P&&P.root.parent||sc.object3D;if(P&&P.root.parent)P.root.parent.remove(P.root);
- P=makePanel(T,{items,sections:SECTIONS,title:'Earth Edge AR Layers'});par.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+ P=makePanel(T,{items,sections:SECTIONS,title:"Matt's Reality Layers"});par.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
  if(vis){P.root.position.copy(pos);P.root.quaternion.copy(q);P.root.visible=true}window.QPANEL=P;window.QREG=items}
 build();
 const rig=document.getElementById('rig').object3D;

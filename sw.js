@@ -1,4 +1,4 @@
-/* Earth Edge AR service worker: always-fresh HTML + version.json (network, no-store), versioned (?v=) same-origin assets cached per build.
+/* Live Geometry / Matt's Reality service worker: always-fresh HTML + version.json (network, no-store), versioned (?v=) same-origin assets cached per build.
    Works under / (tunnel) and /earth-edge-ar/ (Pages): scope = the folder sw.js is served from. */
 const C='eear-assets';
 self.addEventListener('install',()=>self.skipWaiting());

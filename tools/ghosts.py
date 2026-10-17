@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Earth Edge AR - control the two server-side dummy ghost players (Ghost-1, Ghost-2) via /api/gm/ghost.
+"""Matt's Reality (Live Geometry) - control the two server-side dummy ghost players (Ghost-1, Ghost-2) via /api/gm/ghost.
 
   python3 tools/ghosts.py list                          # where they are, their targets, wander on/off
   python3 tools/ghosts.py move Ghost-1 48.11,-122.80    # move to lat,lon (then wanders ~150 m around it)

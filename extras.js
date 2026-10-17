@@ -1,4 +1,4 @@
-// Earth Edge AR extras: ocean, coastline, road paths, saucers + pads, GhostBot rig, vortex layers.
+// Matt's Reality (Live Geometry) extras: ocean, coastline, road paths, saucers + pads, GhostBot rig, vortex layers.
 // Shared by index.html (three 0.160) and quest.html (A-Frame's THREE). Everything takes THREE as T.
 const D=Math.PI/180;
 const mPer=la=>[111320,111320*Math.cos(la*D)];
@@ -8,8 +8,8 @@ const toL=(o,a,l)=>{const[my,mx]=mPer(o[0]);return[(l-o[1])*mx,-(a-o[0])*my]};
 export function passMat(T,m,add=true){m.blending=T.CustomBlending;m.blendEquation=T.AddEquation;m.blendSrc=T.SrcAlphaFactor;m.blendDst=add?T.OneFactor:T.OneMinusSrcAlphaFactor;m.blendSrcAlpha=T.ZeroFactor;m.blendDstAlpha=T.OneFactor;m.transparent=true;m.depthWrite=false;m.userData.pf=1;m.userData.add=add;return m}
 export const U={t:{value:0}};
 // ---------- OCEAN: masked water from OSM coastline, cheap animated shader, fades out past 8 km from viewer
-export async function makeOcean(T,origin,groundY){const J=await (await fetch('coast.json?v=1792258810108')).json();const[S,W,N,E]=J.bbox;
- const[x0,z0]=toL(origin,N,W),[x1,z1]=toL(origin,S,E);const tex=await new T.TextureLoader().loadAsync('ocean-mask.png?v=1792258810108');tex.flipY=false;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;
+export async function makeOcean(T,origin,groundY){const J=await (await fetch('coast.json?v=1792260464493')).json();const[S,W,N,E]=J.bbox;
+ const[x0,z0]=toL(origin,N,W),[x1,z1]=toL(origin,S,E);const tex=await new T.TextureLoader().loadAsync('ocean-mask.png?v=1792260464493');tex.flipY=false;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;
  const m=new T.ShaderMaterial({depthTest:false,extensions:{derivatives:true},uniforms:{t:U.t,mask:{value:tex},b0:{value:new T.Vector2(x0,z0)},b1:{value:new T.Vector2(x1,z1)},me:{value:new T.Vector2()}},
   vertexShader:'varying vec2 vP;void main(){vec4 w=modelMatrix*vec4(position,1.);vP=position.xz;gl_Position=projectionMatrix*viewMatrix*w;}',
   fragmentShader:`uniform float t;uniform sampler2D mask;uniform vec2 b0,b1,me;varying vec2 vP;

@@ -1,4 +1,4 @@
-// Performer bots for Earth Edge AR: singer bots that rise in at Matt's Meditation Garden whenever a track with vocals plays.
+// Performer bots for Matt's Reality: singer bots that rise in at Matt's Meditation Garden whenever a track with vocals plays.
 // Track metadata: { id, singers:[{id,name}] }. No singers (instrumentals like 'disco') -> no performers (Ren just dances).
 // One bot per singer, between the circle's cushions on a ~3 m arc around the Garden pillar, facing outward toward the player.
 // They DANCE on the shared beat grid (beat.js, same engine as Ren): per-song choreography saved per singer under
@@ -8,8 +8,8 @@
 // foot-tap layer and hand-gesture layer (snaps on 2 & 4, points, open palms, flourishes, mic gestures), articulated gloves,
 // and secondary motion on tails / hat / bow tie. Other singers use a simpler library and no extra layers.
 import * as THREE from 'three';
-import * as BEAT from './beat.js?v=1792258810108';
-import { GARDEN as GARDEN_REG, PERFORMERS as PF_REG } from './figures-registry.js?v=1792258810108';
+import * as BEAT from './beat.js?v=1792260464493';
+import { GARDEN as GARDEN_REG, PERFORMERS as PF_REG } from './figures-registry.js?v=1792260464493';
 
 export const GARDEN = GARDEN_REG;
 const PI = Math.PI, TAU = 2 * PI, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;

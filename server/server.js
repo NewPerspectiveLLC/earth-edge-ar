@@ -1,4 +1,4 @@
-// Earth Edge AR server v2: static + API. node server.js <webroot> <certdir> <port>
+// Live Geometry / Matt's Reality (repo: earth-edge-ar) server v2: static + API. node server.js <webroot> <certdir> <port>
 // Config via env or server/config.json (chmod 600): GM_KEY, GM_EMAIL, BASE_URL, MAIL_MODE=dev|resend|smtp, RESEND_KEY, MAIL_FROM, SMS_MODE=dev|twilio, TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM
 // Stores ONLY: account (display name, email/phone if given, role), game/team setup, and per-game player position fixes (lat, lon, accuracy, time).
 const https=require('https'),fs=require('fs'),path=require('path'),crypto=require('crypto');
@@ -28,7 +28,9 @@ const send=(r,o,c=200,h={})=>{r.writeHead(c,{'content-type':'application/json','
 const os=require('os');
 const xaiKey=()=>{if(process.env.XAI_API_KEY)return process.env.XAI_API_KEY.trim();try{return fs.readFileSync(path.join(os.homedir(),'.eear-secrets','xai_api_key'),'utf8').trim()}catch(e){return''}};
 const REN_MODEL=()=>process.env.REN_MODEL||'grok-4.20-0309-non-reasoning';
-const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's Earth Edge AR game. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
+/* d44: Matt Ready pillars (public OSM spots) from <webroot>/pillars.json, re-read when the file changes */
+let PIL={m:0,v:null};function pillarsPub(){try{const f=path.join(root,'pillars.json'),st=fs.statSync(f);if(st.mtimeMs!==PIL.m){const j=JSON.parse(fs.readFileSync(f,'utf8'));PIL={m:st.mtimeMs,v:{count:j.pillars.length,image:j.image,url:'pillars.json',items:j.pillars.map(p=>({id:p.id,name:p.name,kind:p.kind,area:p.area,lat:p.lat,lon:p.lon}))}}}return PIL.v}catch(e){return null}}
+const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's game Live Geometry, set in the world called Matt's Reality (also known as Ready Security Services Map 1 and Base Geometry Reality). Around town stand purple triangular Matt Ready pillars that each play the Disco Jam when you walk up to them. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
 const REN_DF=path.join(__dirname,'ren-dances.json');let REND={};try{REND=JSON.parse(fs.readFileSync(REN_DF,'utf8'))}catch(e){}
 const renSave=()=>{try{fs.writeFileSync(REN_DF,JSON.stringify(REND),{mode:0o600})}catch(e){console.error('ren dance save',e.message)}};
 const RL={};function limited(k,max,ms=900000){const n=Date.now();RL[k]=(RL[k]||[]).filter(t=>n-t<ms);if(RL[k].length>=max)return true;RL[k].push(n);return false}
@@ -93,7 +95,7 @@ const sig=s=>crypto.sign(null,Buffer.from(s),ID.priv).toString('base64');
 const audit=(ip,a,d)=>run('insert into audit values(?,?,?,?)',Date.now(),ip,a,JSON.stringify(d||{}));
 function stats(){const n=Date.now();return{players_online:one('select count(*) n from gplayers where live=1 and seen>?',n-LIVE_MS).n,games_running:one('select count(distinct game_id) n from gplayers where live=1 and seen>?',n-LIVE_MS).n,teams_count:one('select count(*) n from teams').n,uptime_s:Math.round((n-START)/1000)}}
 async function heartbeat(){const reg=cfg('REGISTRY_URL');if(!reg||!reg.startsWith('https://'))return;
- const body=JSON.stringify({id:instId,name:cfg('INSTANCE_NAME')||'Earth Edge AR',url:cfg('BASE_URL'),owner:cfg('INSTANCE_OWNER')||'',area:cfg('INSTANCE_AREA')||'',lat:+cfg('INSTANCE_LAT')||null,lon:+cfg('INSTANCE_LON')||null,pubkey:ID.pub,stats:stats(),ts:Date.now(),nonce:rid(12)});
+ const body=JSON.stringify({id:instId,name:cfg('INSTANCE_NAME')||"Live Geometry: Matt's Reality",url:cfg('BASE_URL'),owner:cfg('INSTANCE_OWNER')||'',area:cfg('INSTANCE_AREA')||'',lat:+cfg('INSTANCE_LAT')||null,lon:+cfg('INSTANCE_LON')||null,pubkey:ID.pub,stats:stats(),ts:Date.now(),nonce:rid(12)});
  try{await fetch(reg+'/api/registry/heartbeat',{method:'POST',headers:{'content-type':'application/json','x-sig':sig(body)},body})}catch(e){console.error('heartbeat',e.message)}}
 setInterval(heartbeat,60000);setTimeout(heartbeat,3000);
 const isKeyGM=U=>U&&U.id==='gm';// GM key header only (constant-time compare in me()); rate-limited below
@@ -207,8 +209,8 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   if(!usr){const id=rid(8);run('insert into users values(?,?,?,?,?,?)',id,(j.name||addr.split('@')[0]).slice(0,24),email||null,phone||null,email&&email===cfg('GM_EMAIL').toLowerCase()?'gm':'player',now);usr=one('select * from users where id=?',id)}
   const t=rid(24),code=String(crypto.randomInt(0,1e6)).padStart(6,'0');run('insert into login_tokens values(?,?,?,?,0)',H(t),usr.id,H(usr.id+code),now+15*60000);
   const link=(cfg('BASE_URL')||('https://'+q.headers.host))+'/api/auth/verify?t='+t+(j.next?'&next='+encodeURIComponent(j.next):'');
-  if(email)await sendEmail(email,'Your Earth Edge AR sign-in link',`Sign in: ${link}\nOr enter code ${code}. Expires in 15 minutes.`);
-  else await sendSMS(phone,`Earth Edge AR code ${code} (15 min). Link: ${link}`);
+  if(email)await sendEmail(email,"Your Live Geometry (Matt's Reality) sign-in link",`Sign in: ${link}\nOr enter code ${code}. Expires in 15 minutes.`);
+  else await sendSMS(phone,`Live Geometry code ${code} (15 min). Link: ${link}`);
   return send(r,{ok:1,dev:(email?cfg('MAIL_MODE'):cfg('SMS_MODE'))||'dev'})}
  case'/api/auth/verify':{const t=u.searchParams.get('t')||'';const row=one('select * from login_tokens where hash=? and used=0 and exp>?',H(t),now);
   if(!row){r.writeHead(400,{'content-type':'text/html'});return r.end('Link expired or already used. <a href=/login.html>Try again</a>')}
@@ -263,7 +265,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   const ghosts=Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n]||{},L=lmk(s.tlat,s.tlon),o={id:n,wander:!!s.wander,wanderMaxM:150,live:true};
    return L?{...o,lat:s.lat,lon:s.lon,target:{lat:s.tlat,lon:s.tlon,place:s.place}}:{...o,private:true,note:'parked at a custom (non-landmark) spot; position not published'}});
   const HP=all('select id,device,mode from gplayers where live=1 and seen>?',cut).filter(p=>!isGhost(p.id)&&!isBot(p.id));const byDev={};for(const p of HP)byDev[p.device||'unknown']=(byDev[p.device||'unknown']||0)+1;
-  return send(r,{t:now,edge:{lat:EDGE.lat,lon:EDGE.lon,r:EDGE.r,name:EDGE.name},bots,ghosts,players:{live:HP.length,byDevice:byDev,windowMs:LIVE_MS},renDances:Object.keys(REND)})}
+  return send(r,{t:now,pillars:pillarsPub(),edge:{lat:EDGE.lat,lon:EDGE.lon,r:EDGE.r,name:EDGE.name},bots,ghosts,players:{live:HP.length,byDevice:byDev,windowMs:LIVE_MS},renDances:Object.keys(REND)})}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
   const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);
@@ -317,4 +319,4 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   let G=U.role==='gm'?all('select * from games'):all('select * from games where owner=?',U.id);if(gid)G=G.filter(g=>g.id===gid);const ids=G.map(g=>g.id);
   const L=all('select * from gplayers where live=1 and seen>?',now-LIVE_MS).filter(p=>ids.includes(p.game_id));
   return send(r,{games:G.map(g=>({id:g.id,name:g.name,code:g.code})),players:L.map(p=>({...pubP(p),track:u.searchParams.get('trails')?all('select lat,lon,acc,t from gfixes where pid=? order by t desc limit 500',p.id).reverse():undefined}))})}
- default:send(r,{error:'no'},404)}}catch(e){console.error(e);send(r,{error:'server'},500)}})}).listen(+port,'0.0.0.0',()=>console.log('listening',port));
+ default:send(r,{error:'no'},404)}}catch(e){console.error(e);send(r,{error:'server'},500)}})}).listen(+port,'0.0.0.0',()=>console.log("Live Geometry — Matt's Reality server listening",port));
