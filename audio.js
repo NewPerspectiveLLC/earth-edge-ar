@@ -3,12 +3,14 @@
 // floor 0.15 so it is audible anywhere in the world (200 m 0.50, 500 m 0.32, 1 km 0.22, 1.7 km 0.17, >=2.2 km 0.15). Listener = app ENU position + true heading + pitch, updated every frame.
 // Song: built-in ORIGINAL procedural loop "Happy's Trails Vortex" (12-step arpeggio motif = 12 wedges, kick, bass, hats; generated live, no samples),
 // or the user's own file (saved in IndexedDB) / URL. Audio starts only from a tap (iOS unlock). navigator.audioSession='playback' where supported.
+import * as DJM from './dj.js?v=1792274910186';
+/* d45: track 'dj' = the Master DJ queue (dj.js, server /api/dj): the current DJ track, synced to server time, auto-advancing; paused/empty = silence. Default track; one-time migration moves saved built-in/Disco Jam choices to it. */
 export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden"};
 export const SONG="Happy's Trails Vortex";
 /* tracks: built-in procedural loop, shipped loop files (AudioBufferSourceNode loop=true = sample-exact, no seam), the user's own saved file */
 /* disco: original instrumental, 120 BPM, 32 bars = exactly 64.000 s (3,072,000 samples @48k), mastered -14 LUFS; loopEnd 64.0 skips MP3/AAC padding; trim matches the built-in loop */
 const MATT={id:'mattready',name:'Matt Ready'};
-export const TRACKS=[{id:'happys-trails-vortex',title:SONG,name:SONG,singers:[MATT],builtin:true,tempo:124},{id:'disco-jam',title:'Disco Jam (instrumental)',name:'Disco Jam (instrumental)',singers:[],urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3'],loopEnd:64.0,tempo:120,trim:.7}];
+export const TRACKS=[{id:'dj',title:'Master DJ (live queue)',name:'🎧 Master DJ (live queue)',singers:[],dj:true},{id:'happys-trails-vortex',title:SONG,name:SONG,singers:[MATT],builtin:true,tempo:124},{id:'disco-jam',title:'Disco Jam (instrumental)',name:'Disco Jam (instrumental)',singers:[],urls:['audio/disco-jam-loop.m4a','audio/disco-jam-loop.mp3'],loopEnd:64.0,tempo:120,trim:.7}];
 const slug=n=>String(n).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'singer';
 export const parseSingers=t=>String(t||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).slice(0,8).map(n=>({id:/^matt\s*ready$/i.test(n)?'mattready':slug(n),name:n.slice(0,60)}));
 /* event for performers.js: window 'eear:track' {trackId,title,singers,playing,tempo} on play / stop / switch */
@@ -46,7 +48,7 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
   try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
   pan=ctx.createPanner();Object.assign(pan,{panningModel:'HRTF',distanceModel:'inverse',refDistance:10,rolloffFactor:0,maxDistance:1e6,coneInnerAngle:360,coneOuterAngle:360});dg=ctx.createGain();dg.gain.value=.15;
   const comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;vol=ctx.createGain();vol.gain.value=V();
-  bus=ctx.createGain();bus.gain.value=1.4;bus.connect(comp);comp.connect(pan);pan.connect(dg);dg.connect(vol);vol.connect(ctx.destination);
+  bus=ctx.createGain();bus.gain.value=1.4;bus.connect(comp);djG=ctx.createGain();djG.gain.value=0;{const n=DJM.attach(ctx);n&&n.connect(djG)}djG.connect(bus);comp.connect(pan);pan.connect(dg);dg.connect(vol);vol.connect(ctx.destination);
   const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)/* iOS unlock */}
  // ---- built-in original loop: 124 bpm, 16ths; 12-step motif over a 4-chord cycle (I-V-vi-IV in D major), kick on beats, offbeat bass, hats
  const BPM=124,S16=60/BPM/4,ROOT=62,CH=[[0,4,7],[7,11,14],[9,12,16],[5,9,12]],MOT=[0,1,2,1,2,3,2,3,4,3,4,5];
@@ -65,13 +67,15 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
  function startBuiltIn(){stopUser();if(!seqT){nextT=ctx.currentTime+.06;stAt=nextT-step*S16;seqT=setInterval(seq,50);seq()}}
  function stopBuiltIn(){clearInterval(seqT);seqT=null}
  function stopUser(){if(userSrc){try{userSrc.stop()}catch(e){}userSrc.disconnect();userSrc=null}}
- let stAt=null;const bufs={};let track=({vortex:'happys-trails-vortex',disco:'disco-jam'})[localStorage.eearMusT]||localStorage.eearMusT||'happys-trails-vortex';
+ let stAt=null;const bufs={};let track=({vortex:'happys-trails-vortex',disco:'disco-jam'})[localStorage.eearMusT]||localStorage.eearMusT||'dj';if(!localStorage.eearDJm){localStorage.eearDJm='1';if(track!=='user'){track='dj';localStorage.eearMusT='dj'}}
+ const DJ_TRIM=.7;let djG=null;
  async function fileBuf(T){if(bufs[T.id])return bufs[T.id];let last;for(const u of T.urls){try{const r=await fetch(window.EEAR_V?u+'?v='+EEAR_V:u);if(!r.ok)throw new Error('HTTP '+r.status);const b=await ctx.decodeAudioData(await r.arrayBuffer());/* trim decoder priming/padding: loop the exact decoded buffer */return bufs[T.id]=b}catch(e){last=e}}throw last}
- function trackUI(){const sel=$('musT');const L=TRACKS.map(t=>[t.id,t.name+(t.builtin?' (built-in)':'')]).concat(user?[['user',(user.name||'My song')+' (my file)']]:[]);sel.innerHTML=L.map(([i,n])=>`<option value="${i}">${n.replace(/</g,'&lt;')}</option>`).join('');if(!L.some(x=>x[0]===track))track='happys-trails-vortex';sel.value=track}
- function curMeta(){const T=TRACKS.find(t=>t.id===track);if(track==='user'&&user)return{trackId:'user-'+slug(user.name||'song'),title:user.name,singers:(user.singers||[MATT]).map(x=>x.id==='matt-ready'?{...x,id:'mattready'}:x),tempo:null};const t=T||TRACKS[0];return{trackId:t.id,title:t.title,singers:t.singers,tempo:t.tempo}}
+ function trackUI(){const sel=$('musT');const L=TRACKS.map(t=>[t.id,t.name+(t.builtin?' (built-in)':'')]).concat(user?[['user',(user.name||'My song')+' (my file)']]:[]);sel.innerHTML=L.map(([i,n])=>`<option value="${i}">${n.replace(/</g,'&lt;')}</option>`).join('');if(!L.some(x=>x[0]===track))track='dj';sel.value=track}
+ function curMeta(){const T=TRACKS.find(t=>t.id===track);if(track==='dj'){const it=DJM.DJ.current,pl=DJM.DJ.at().playing;return{trackId:'dj-'+(it?it.id:'none'),title:it?it.title+' — '+it.artist:'Master DJ',singers:[],tempo:pl&&it?it.bpm||null:null}}if(track==='user'&&user)return{trackId:'user-'+slug(user.name||'song'),title:user.name,singers:(user.singers||[MATT]).map(x=>x.id==='matt-ready'?{...x,id:'mattready'}:x),tempo:null};const t=T||TRACKS[0];return{trackId:t.id,title:t.title,singers:t.singers,tempo:t.tempo}}
  function emit(playing){trackEvent({...curMeta(),playing:!!playing})}
- function curName(){return track==='user'&&user?user.name:(TRACKS.find(t=>t.id===track)||TRACKS[0]).name}
+ function curName(){if(track==='dj'){const c=DJM.DJ.at();return c.item?(c.playing?'🎧 ':'🎧 (paused) ')+c.item.title+' — '+c.item.artist:'🎧 Master DJ (queue empty)'}return track==='user'&&user?user.name:(TRACKS.find(t=>t.id===track)||TRACKS[0]).name}
  async function startTrack(){$('musE').textContent='';setTimeout(()=>emit(true),0);const T=TRACKS.find(t=>t.id===track);$('musNm').textContent=curName();lastR=0;
+  if(track==='dj'){stopBuiltIn();stopUser();stAt=null;const it=DJM.DJ.current;renTempo(it&&it.bpm||120);return}
   if(track==='user'&&user){if(user.pending)await setOn.pend();if(user&&user.buf)return startUser()}
   if(!T||T.builtin){stopUser();renTempo(124);return startBuiltIn()}
   try{$('musNm').textContent=T.name+' (loading…)';const b=await fileBuf(T);if(track!==T.id||!on)return;stopBuiltIn();stopUser();userSrc=ctx.createBufferSource();userSrc.buffer=b;userSrc.loop=true;userSrc.loopStart=0;userSrc.loopEnd=Math.min(T.loopEnd||b.duration,b.duration);const tg=ctx.createGain();tg.gain.value=T.trim||1;userSrc.connect(tg);tg.connect(bus);const t0=ctx.currentTime+.05;userSrc.start(t0,0);stAt=t0;renTempo(T.tempo||120);$('musNm').textContent=T.name}
@@ -95,9 +99,9 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
  idbGet('song').then(r=>{if(r&&r.blob){user={pending:r,name:r.name,singers:r.singers||[MATT]};$('musWho').value=user.singers.map(x=>x.name).join(', ')}trackUI();$('musNm').textContent=curName()}).catch(()=>trackUI());trackUI();
  // decode the saved song lazily on first tap (needs an AudioContext)
  setOn.pend=async()=>{if(user&&user.pending){const r=user.pending,keep=track;user=null;await loadUser(r.blob,r.name,r.singers||[MATT]);track=keep;localStorage.eearMusT=track;trackUI()}};
- $('musB').onclick=async()=>{if(!on){graph();await ctx.resume().catch(()=>{});if(track==='user')await setOn.pend()}setOn(!on)};
+ $('musB').onclick=async()=>{if(!on){graph();DJM.unlock();await ctx.resume().catch(()=>{});if(track==='user')await setOn.pend()}setOn(!on)};
  const fw=[0,0,0],up=[0,0,0];let lastL=null,duck=1;
- function frame(){const L=getListener&&getListener();lastL=L||null;if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
+ function frame(){{const dw=on&&track==='dj';DJM.want('beacon',dw);if(djG)djG.gain.value=dw?DJ_TRIM:0}const L=getListener&&getListener();lastL=L||null;if(!L)return;const d=Math.hypot(dist(L.lat,L.lon,SRC.lat,SRC.lon),L.alt||0),b=brg(L.lat,L.lon,SRC.lat,SRC.lon),el=Math.atan2(-(L.alt||0),dist(L.lat,L.lon,SRC.lat,SRC.lon));curD=d;
   const dE=10*Math.cos(el)*Math.sin(b*D),dN=10*Math.cos(el)*Math.cos(b*D),dU=10*Math.sin(el);
   const now=performance.now();if(now-lastR>500){lastR=now;$('musR').textContent=curName()+' · '+fmt(d)+' · '+CMP[Math.round(b/22.5)%16]+' · vol '+Math.round(DGAIN(d)*duck*100)+'%'+(window.EEAR_PILLARS&&EEAR_PILLARS.near?' · 🔺 '+EEAR_PILLARS.near:'')}
   if(!ctx||!on)return;const h=L.hdg*D,p=(L.pitch||0)*D,t=ctx.currentTime;dg.gain.setTargetAtTime(DGAIN(d)*duck,t,.3);
@@ -106,7 +110,8 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
    l.forwardX.setTargetAtTime(fw[0],t,.05);l.forwardY.setTargetAtTime(fw[1],t,.05);l.forwardZ.setTargetAtTime(fw[2],t,.05);l.upX.setTargetAtTime(up[0],t,.05);l.upY.setTargetAtTime(up[1],t,.05);l.upZ.setTargetAtTime(up[2],t,.05)}
   else{l.setPosition(0,0,0);l.setOrientation(fw[0],fw[1],fw[2],up[0],up[1],up[2])}
   if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
- window.EEAR_AUDIO={TRACKS,get startedAt(){return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame,
- /* d44 pillar proximity music (pillars.js?v=1792265745763): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
+ addEventListener('eear:dj',e=>{if(track!=='dj')return;$('musNm').textContent=curName();lastR=0;const it=e.detail&&e.detail.item;renTempo(it&&it.bpm||120);emit(on)});
+ window.EEAR_AUDIO={TRACKS,DJ:DJM.DJ,get startedAt(){if(track==='dj'){const a=DJM.DJ.el;return a&&ctx&&!a.paused?ctx.currentTime-a.currentTime:null}return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame,
+ /* d44 pillar proximity music (pillars.js?v=1792274910186): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
  get listener(){return lastL},get out(){return vol},async buffer(id){graph();const T=TRACKS.find(t=>t.id===id);return T&&T.urls?fileBuf(T):null},setDuck(v){duck=Math.max(0,Math.min(1,+v||0))},get duck(){return duck}};
  return{frame,SRC}}

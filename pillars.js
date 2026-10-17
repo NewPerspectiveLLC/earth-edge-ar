@@ -1,10 +1,10 @@
-// pillars.js (d44): Matt Ready triangular-prism billboard pillars scattered around Port Townsend + proximity music.
+// pillars.js (d44): Matt Ready triangular-prism billboard pillars scattered around Port Townsend + proximity music (Master DJ).
 // Data: pillars.json (OSM-derived public spots: street-corner right-of-way, parks, landmarks, trails). Placement/size/audio constants live in figures-registry.js (PILLARS).
 // Rendering: one shared prism geometry, one unlit material per image (default PILLAR_IMAGE; a pillar may set "image" to override), InstancedMesh, per-instance distance cull.
-// Audio: every pillar plays the Disco Jam from its own spot. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
+// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792274910186) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792265745763';
+import { PILLARS } from './figures-registry.js?v=1792274910186';
 export const PILLAR_IMAGE = PILLARS.image;               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;
 const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 * Math.cos(a * D); return Math.hypot(x, y) };
@@ -64,43 +64,36 @@ export function initPillars(parent, toLocal, cam, opts = {}) {
     S.list.forEach((p, i) => { if (!p._w) return; put(S.plinth, i, p, p._w); put(S.cap, i, p, p._w); put(S.ring, i, p, p._w); all++ });
     S.plinth.instanceMatrix.needsUpdate = S.cap.instanceMatrix.needsUpdate = S.ring.instanceMatrix.needsUpdate = true; S.placed = all;
   }
-  // ---------------- proximity music ----------------
-  let pb = null, buf = null, loading = false, lastScan = 0;
-  function voiceStop(vc, t, fade = A.fadeS) { try { vc.g.gain.cancelScheduledValues(t); vc.g.gain.setValueAtTime(vc.g.gain.value, t); vc.g.gain.linearRampToValueAtTime(0, t + fade); vc.src.stop(t + fade + .05) } catch (e) { } vc.dead = true; setTimeout(() => { try { vc.src.disconnect(); vc.g.disconnect(); vc.pan.disconnect() } catch (e) { } }, (fade + .3) * 1000) }
-  function loopBase(ctx) {   // align to the beacon when it plays the same track, else a fixed epoch: every pillar shares one loop phase
-    const AU = window.EEAR_AUDIO; if (AU && AU.track === A.trackId && AU.on && AU.startedAt != null) return AU.startedAt;
-    if (S.epoch == null) S.epoch = ctx.currentTime; return S.epoch;
-  }
+  // ---------------- proximity music (d45: the CURRENT Master DJ track, not a fixed loop) ----------------
+  // dj.js owns ONE streaming <audio> synced to server time; its output node feeds up to PILLARS.audio.voices gain -> HRTF panner chains here.
+  // Paused / empty DJ queue = silence. Switching pillars never restarts the song (same element, same clock).
+  let pb = null, tr = null, lastScan = 0;
+  function voiceStop(vc, t, fade = A.fadeS) { try { vc.g.gain.cancelScheduledValues(t); vc.g.gain.setValueAtTime(vc.g.gain.value, t); vc.g.gain.linearRampToValueAtTime(0, t + fade) } catch (e) { } vc.dead = true; setTimeout(() => { try { tr.disconnect(vc.g); vc.g.disconnect(); vc.pan.disconnect() } catch (e) { } }, (fade + .3) * 1000) }
   function voiceStart(ctx, p) {
-    const T = (window.EEAR_AUDIO.TRACKS || []).find(t => t.id === A.trackId) || {}, LE = Math.min(T.loopEnd || buf.duration, buf.duration);
-    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.loopStart = 0; src.loopEnd = LE;
-    const g = ctx.createGain(); g.gain.value = 0; const tr = ctx.createGain(); tr.gain.value = (T.trim || 1) * A.levelTrim;
+    const g = ctx.createGain(); g.gain.value = 0;
     const pan = ctx.createPanner(); Object.assign(pan, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1, rolloffFactor: 0, maxDistance: 1e6, coneInnerAngle: 360, coneOuterAngle: 360 });
-    src.connect(tr); tr.connect(g); g.connect(pan); pan.connect(pb);
-    const t0 = ctx.currentTime + .06, base = loopBase(ctx); S.base = base; const off = (((t0 - base) % LE) + LE) % LE; src.start(t0, off);
-    return { p, src, g, pan, base, t0 };
+    tr.connect(g); g.connect(pan); pan.connect(pb); return { p, g, pan, t0: ctx.currentTime + .06 };
   }
   function audioFrame(now) {
-    const AU = window.EEAR_AUDIO; if (!AU || !S.ready) return; const ctx = AU.ctx, L = AU.listener;
-    if (!ctx || !AU.on || !L) { if (S.voices.length && ctx) { const t = ctx.currentTime; S.voices.forEach(vc => voiceStop(vc, t, .05)); S.voices = [] } AU && AU.setDuck && AU.setDuck(1);
-      if (L && !S.toastd && now - lastScan > 1000) { lastScan = now; const n = nearest(L, 1)[0]; if (n && n.d < A.silentM) { S.toastd = true; window.eearToast && eearToast('🔺 A Matt Ready pillar is playing the Disco Jam nearby. Tap 🎵 Music to hear it.', 5000) } } return }
-    if (!pb) { pb = ctx.createGain(); pb.gain.value = 1; pb.connect(AU.out) }
-    if (!buf) { if (!loading) { loading = true; AU.buffer(A.trackId).then(b => buf = b).catch(e => { S.err = 'audio: ' + (e.message || e) }).finally(() => loading = false) } return }
+    const AU = window.EEAR_AUDIO, DJ = window.EEAR_DJ; if (!AU || !S.ready) return; const ctx = AU.ctx, L = AU.listener;
+    if (!ctx || !AU.on || !L || !DJ || !DJ.node) { if (S.voices.length && ctx) { const t = ctx.currentTime; S.voices.forEach(vc => voiceStop(vc, t, .05)); S.voices = [] } DJ && DJ.want('pillars', false); AU && AU.setDuck && AU.setDuck(1);
+      if (L && !S.toastd && now - lastScan > 1000) { lastScan = now; const n = nearest(L, 1)[0]; if (n && n.d < A.silentM) { S.toastd = true; const c = DJ && DJ.current; window.eearToast && eearToast('🔺 A Matt Ready pillar is playing the Master DJ' + (c ? ' (' + c.title + ')' : '') + ' nearby. Tap 🎵 Music to hear it.', 5000) } } return }
+    if (!pb) { pb = ctx.createGain(); pb.gain.value = 1; pb.connect(AU.out); tr = ctx.createGain(); tr.gain.value = A.levelTrim * (A.djTrim || .7); DJ.node.connect(tr) }
     const t = ctx.currentTime;
     if (now - lastScan > A.scanMs) { lastScan = now;
       const want = nearest(L, A.voices).filter(c => c.d < A.silentM + 5), ids = new Set(want.map(c => c.p.id));
-      const base = loopBase(ctx);
-      for (const vc of S.voices) if (!ids.has(vc.p.id) || Math.abs(vc.base - base) > .02) voiceStop(vc, t);
+      for (const vc of S.voices) if (!ids.has(vc.p.id)) voiceStop(vc, t);
       S.voices = S.voices.filter(vc => !vc.dead);
       for (const c of want) if (!S.voices.some(vc => vc.p.id === c.p.id)) S.voices.push(voiceStart(ctx, c.p));
+      DJ.want('pillars', want.length > 0);
       S.near = want[0] ? want[0].p.name + ' ' + Math.round(want[0].d) + ' m' : null; S.nearD = want[0] ? want[0].d : null;
     }
-    let mx = 0;
+    const live = DJ.at().playing; let mx = 0;
     for (const vc of S.voices) { const p = vc.p, h = dist(L.lat, L.lon, p.lat, p.lon), up = PILLARS.heightM / 2 - 1.6 - (L.alt || 0), d = Math.hypot(h, up), gn = pillarGain(d);
-      mx = Math.max(mx, gn); vc.g.gain.setTargetAtTime(gn, Math.max(t, vc.t0), A.tauS);
+      if (live) mx = Math.max(mx, gn); vc.g.gain.setTargetAtTime(gn, Math.max(t, vc.t0), A.tauS);
       const [e, n] = brgEN(L.lat, L.lon, p.lat, p.lon), pp = vc.pan;   // same ENU listener frame as audio.js (listener at origin, -Z = north)
       if (pp.positionX) { pp.positionX.setTargetAtTime(e, t, .05); pp.positionY.setTargetAtTime(up, t, .05); pp.positionZ.setTargetAtTime(-n, t, .05) } else pp.setPosition(e, up, -n) }
-    AU.setDuck(1 - A.duck * mx);   // the Garden beacon ducks while a pillar is audible
+    AU.setDuck(1 - A.duck * mx);   // the Garden beacon ducks while a pillar is audible (no duck while the DJ is paused)
   }
   function nearest(L, k) { const out = []; for (const p of S.list) { const d = Math.hypot(dist(L.lat, L.lon, p.lat, p.lon), (L.alt || 0)); if (out.length < k || d < out[out.length - 1].d) { out.push({ p, d }); out.sort((a, b) => a.d - b.d); if (out.length > k) out.pop() } } return out }
   const api = {

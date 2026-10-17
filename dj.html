@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792274910186><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792274910186></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — Master DJ</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry DJ"><meta name=description content="Live Geometry: Matt's Reality Master DJ: one global playlist for everyone in the world"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792274910186><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792274910186>
+<style>
+:root{--p:#a45cff;--c:#2ff5df}
+html,body{margin:0;background:#0b0912;color:#eee;font:14px system-ui,-apple-system,sans-serif}
+body{padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom))}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:18px;margin:0}h1 small{display:block;font-size:12px;color:#aaa;font-weight:400;margin-top:2px}
+h2{font-size:14px;margin:18px 0 6px;color:#ddd;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card{background:#171225;border:1px solid #a45cff55;border-radius:12px;padding:12px;margin-top:10px}
+#np .t{font-size:18px;font-weight:700}#np .a{color:#bbb;margin-top:2px}#np .g{font-size:12px;color:var(--c);margin-top:4px}
+.bar{height:6px;background:#ffffff1a;border-radius:3px;margin:10px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--c));width:0}
+.tm{display:flex;justify-content:space-between;font-size:11px;color:#aaa}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+button{background:#2a2140;color:#fff;border:1px solid #ffffff2a;border-radius:9px;padding:9px 12px;font:600 14px system-ui;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.4;cursor:default}button.big{font-size:18px;padding:9px 16px}button.pri{background:var(--p);border-color:#d4b0ff}
+.row{display:flex;align-items:center;gap:6px;padding:7px 6px;border-bottom:1px solid #ffffff12;border-radius:8px}
+.row.cur{background:#a45cff33;outline:1px solid #a45cff88}.row.drag{opacity:.4}.row.over{box-shadow:0 -2px 0 var(--c) inset}
+.row .n{width:22px;text-align:right;color:#888;font-size:12px;flex:none}.row .h{cursor:grab;color:#777;flex:none;padding:0 2px;user-select:none}
+.row .m{flex:1;min-width:0}.row .m b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .m span{font-size:11.5px;color:#aaa}
+.row button{padding:6px 8px;font-size:13px;flex:none}
+#lock{display:flex;gap:6px;align-items:center;flex-wrap:wrap}#lock input{flex:1;min-width:160px;padding:9px;font-size:16px;border-radius:8px;border:1px solid #555;background:#000;color:#fff}
+#msg{min-height:1.2em;color:#ffb36b;font-size:12.5px;margin-top:6px}.ok{color:#7dffb0!important}
+select{font-size:14px;padding:6px;border-radius:8px;background:#000;color:#fff;border:1px solid #555}
+#cred{font-size:11.5px;color:#aaa;line-height:1.45}#cred a{color:#c9a6ff}
+a{color:#c9a6ff}.ro .w{display:none}
+</style></head><body><div class=wrap>
+<h1>🎧 Master DJ <small>Live Geometry · Matt&#39;s Reality: one playlist for everyone in the world. Every Matt Ready pillar and every in-app music player set to “Master DJ” plays the song shown here, in sync.</small></h1>
+<div class=card id=np><div class=t id=npT>Connecting…</div><div class=a id=npA></div><div class=g id=npG></div>
+<div class=bar><i id=npB></i></div><div class=tm><span id=npE>0:00</span><span id=npS></span><span id=npD>0:00</span></div>
+<div class=ctl><button class="big w" id=bPrev title="Previous track">⏮</button><button class="big pri w" id=bPP title="Pause / resume for everyone">⏸</button><button class="big w" id=bNext title="Next track">⏭</button><button class=w id=bShuf>🔀 Shuffle</button><button class=w id=bReset title="Reload the seeded 15-track DJ set">↺ Seed set</button><button id=bListen title="Hear the DJ on this device (tap needed for audio)">🔈 Listen here</button></div></div>
+<div class=card><div id=lock><input id=k type=password autocomplete=off placeholder="GM key (same as the GM page)"><button id=go class=pri>Unlock controls</button><button id=lo style="display:none">Lock</button></div><div id=msg></div></div>
+<h2>Queue <span id=qn style="color:#888;font-weight:400"></span><small style="color:#888;font-weight:400">drag ☰ or use ↑ ↓ to reorder · ▶ plays now · loops at the end</small></h2>
+<div id=q></div>
+<h2>Library <select id=gf><option value="">All genres</option></select><small style="color:#888;font-weight:400">+ adds to the end · ⤴ plays next</small></h2>
+<div id=lib></div>
+<h2>Credits</h2><div id=cred class=card></div>
+<p style="font-size:12px;color:#888">Back to <a href=gm.html>GM map</a> · <a href=./>Live Geometry</a> · <a href=figures.html>Figures</a></p>
+</div>
+<script>window.EEAR_DJ_NOUI=1</script>
+<script type=module>
+import { DJ } from './dj.js?v=1792274910186';
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BASE=DJ.base;let KEY=localStorage.eearGM||'',LIB=null,canW=false;
+const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const msg=(t,ok)=>{$('msg').textContent=t||'';$('msg').className=ok?'ok':''};
+async function op(o){if(!KEY){msg('Enter the GM key to control the DJ.');return}try{const r=await fetch(BASE+'/api/dj',{method:'POST',headers:{'x-gm-key':KEY,'content-type':'application/json'},body:JSON.stringify(o),cache:'no-store'});const j=await r.json().catch(()=>({}));
+ if(r.status===403){canW=false;msg('That GM key was not accepted.');render();return}if(!r.ok){msg(j.error||('HTTP '+r.status));return}canW=true;msg('✓ '+o.op+(o.id?' '+o.id:''),true);await DJ.fetchState();render()}catch(e){msg('Server not reachable: '+e.message)}}
+async function checkKey(){if(!KEY){canW=false;render();return}try{const r=await fetch(BASE+'/api/gm/policy',{headers:{'x-gm-key':KEY},cache:'no-store'});canW=r.ok;msg(r.ok?'Controls unlocked.':'That GM key was not accepted.',r.ok)}catch(e){canW=false;msg('Server not reachable from here ('+e.message+'). Showing the offline order.')}render()}
+$('go').onclick=()=>{KEY=$('k').value.trim();if(!KEY)return;localStorage.eearGM=KEY;$('k').value='';checkKey()};$('k').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+$('lo').onclick=()=>{KEY='';canW=false;render();msg('Locked on this page (the key stays saved for the GM map).')};
+$('bPrev').onclick=()=>op({op:'prev'});$('bNext').onclick=()=>op({op:'next'});$('bShuf').onclick=()=>op({op:'shuffle'});
+$('bReset').onclick=()=>{if(confirm('Replace the queue with the seeded 15-track DJ set?'))op({op:'reset'})};
+$('bPP').onclick=()=>op({op:DJ.at().playing?'pause':'resume'});
+let ac=null,lis=false;$('bListen').onclick=()=>{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();const n=DJ.attach(ac);n&&n.connect(ac.destination)}lis=!lis;if(lis){ac.resume();DJ.unlock()}DJ.want('page',lis);$('bListen').textContent=lis?'🔇 Stop listening':'🔈 Listen here'};
+let lastSig='';
+function render(){const st=DJ.state,c=DJ.at();document.body.classList.toggle('ro',!canW);$('lo').style.display=canW?'':'none';$('k').style.display=$('go').style.display=canW?'none':'';
+ if(!st){$('npT').textContent='Connecting…';return}const it=c.item;
+ $('npT').textContent=it?(c.playing?'':'⏸ ')+it.title:'Queue is empty (silence)';$('npA').textContent=it?it.artist:'';$('npG').textContent=it?[it.genre,it.bpm?it.bpm+' BPM':'',it.license].filter(Boolean).join(' · '):'';
+ $('npS').textContent=(DJ.source==='offline'?'offline order (server unreachable)':c.playing?'live for everyone':'paused for everyone');$('bPP').textContent=c.playing?'⏸':'▶';
+ const sig=JSON.stringify([st.rev,c.index,canW,DJ.source]);if(sig===lastSig)return;lastSig=sig;
+ $('qn').textContent='('+st.queue.length+' tracks, '+fmt(st.queue.reduce((a,x)=>a+x.duration,0))+')';
+ $('q').innerHTML=st.queue.map((x,i)=>`<div class="row${i===c.index?' cur':''}" draggable=${canW} data-q="${x.qid}"><span class="h w">☰</span><span class=n>${i+1}</span><div class=m><b>${i===c.index?'🎧 ':''}${esc(x.title)}</b><span>${esc(x.artist)} · ${esc(x.genre||'')} · ${fmt(x.duration)}</span></div><button class=w data-a=play title="Play now">▶</button><button class=w data-a=up ${i?'':'disabled'}>↑</button><button class=w data-a=dn ${i<st.queue.length-1?'':'disabled'}>↓</button><button class=w data-a=rm title="Remove">✕</button></div>`).join('')||'<div class=row>Empty. Add songs from the library below.</div>';
+ libRender()}
+function libRender(){if(!LIB)return;const g=$('gf').value;$('lib').innerHTML=LIB.tracks.filter(t=>!g||t.genre===g).map(t=>`<div class=row data-id="${t.id}"><div class=m><b>${esc(t.title)}</b><span>${esc(t.artist)} · ${esc(t.genre)} · ${fmt(t.duration)} · ${esc(t.license)}</span></div><button class=w data-a=add title="Add to the end">+</button><button class=w data-a=next title="Play next">⤴</button><button class=w data-a=now title="Play now">▶</button></div>`).join('')}
+$('q').onclick=e=>{const b=e.target.closest('button');if(!b)return;const row=b.closest('.row'),qid=row.dataset.q,st=DJ.state,i=st.queue.findIndex(x=>x.qid===qid);
+ ({play:()=>op({op:'play',qid}),up:()=>op({op:'move',qid,to:i-1}),dn:()=>op({op:'move',qid,to:i+1}),rm:()=>op({op:'remove',qid})})[b.dataset.a]?.()};
+$('lib').onclick=e=>{const b=e.target.closest('button');if(!b)return;const id=b.closest('.row').dataset.id;({add:()=>op({op:'add',id}),next:()=>op({op:'add',id,next:true}),now:()=>op({op:'add',id,next:true,playNow:true})})[b.dataset.a]?.()};
+$('gf').onchange=libRender;
+// drag reorder (desktop + touch via pointer)
+let dragQ=null;$('q').addEventListener('dragstart',e=>{const r=e.target.closest('.row');if(!r||!canW)return;dragQ=r.dataset.q;r.classList.add('drag');e.dataTransfer.effectAllowed='move'});
+$('q').addEventListener('dragover',e=>{if(!dragQ)return;e.preventDefault();document.querySelectorAll('#q .over').forEach(x=>x.classList.remove('over'));const r=e.target.closest('.row');r&&r.classList.add('over')});
+$('q').addEventListener('drop',e=>{e.preventDefault();const r=e.target.closest('.row');document.querySelectorAll('#q .over,#q .drag').forEach(x=>x.classList.remove('over','drag'));if(!r||!dragQ||r.dataset.q===dragQ){dragQ=null;return}const to=DJ.state.queue.findIndex(x=>x.qid===r.dataset.q);op({op:'move',qid:dragQ,to});dragQ=null});
+$('q').addEventListener('dragend',()=>{dragQ=null;document.querySelectorAll('#q .over,#q .drag').forEach(x=>x.classList.remove('over','drag'))});
+let tq=null;$('q').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||!canW||!e.target.classList.contains('h'))return;tq=e.target.closest('.row');tq.classList.add('drag');e.preventDefault()},{passive:false});
+addEventListener('pointermove',e=>{if(!tq)return;document.querySelectorAll('#q .over').forEach(x=>x.classList.remove('over'));const r=document.elementFromPoint(e.clientX,e.clientY)?.closest('#q .row');r&&r.classList.add('over')});
+addEventListener('pointerup',e=>{if(!tq)return;const r=document.elementFromPoint(e.clientX,e.clientY)?.closest('#q .row'),q=tq.dataset.q;document.querySelectorAll('#q .over,#q .drag').forEach(x=>x.classList.remove('over','drag'));tq=null;if(r&&r.dataset.q!==q)op({op:'move',qid:q,to:DJ.state.queue.findIndex(x=>x.qid===r.dataset.q)})});
+document.querySelectorAll('.h').forEach(h=>h.style.touchAction='none');
+fetch('audio/dj/library.json',{cache:'no-cache'}).then(r=>r.json()).then(j=>{LIB=j;[...new Set(j.tracks.map(t=>t.genre))].sort().forEach(g=>$('gf').insertAdjacentHTML('beforeend',`<option>${esc(g)}</option>`));libRender();
+ $('cred').innerHTML='<b>Music credits</b> (freely licensed only):<br>'+j.tracks.map(t=>t.licenseUrl?`“${esc(t.title)}” ${esc(t.artist)} (<a href="https://incompetech.com" target=_blank rel=noopener>incompetech.com</a>), licensed under <a href="${esc(t.licenseUrl)}" target=_blank rel=noopener>${esc(t.license)}</a>`:`“${esc(t.title)}”: ${esc(t.attribution)}`).join('<br>')+'<br><span style="color:#888">Kevin MacLeod tracks were transcoded to 96 kbps MP3 and loudness-normalized for phones.</span>'});
+addEventListener('eear:dj',()=>{lastSig='';render()});
+setInterval(()=>{const st=DJ.state,c=DJ.at();if(st&&c.item){$('npE').textContent=fmt(c.offset);$('npD').textContent=fmt(c.item.duration);$('npB').style.width=Math.min(100,100*c.offset/c.item.duration)+'%'}render()},500);
+if(KEY)checkKey();else render();
+</script></body></html>

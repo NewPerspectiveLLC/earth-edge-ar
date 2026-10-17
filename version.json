@@ -1,1 +1,1 @@
-{"v": "1792265745763", "note": "d44d: pillar keep-out fix (2 pillars relocated, none within 400 m of the private keep-out): 96 pillars"}
+{"v": "1792274910186", "note": "d45: Master DJ: one global queue (server /api/dj + SSE, GM-key writes), dj.html control page, pillars + in-app music play the current DJ track synced to server time; 25-track freely licensed library"}

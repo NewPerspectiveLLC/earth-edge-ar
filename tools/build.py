@@ -15,7 +15,7 @@ def fix(txt):
     return (m.group(1) or '')+p+'?v='+V
   return PAT.sub(sub,txt)
 HEAD='<meta name=eear-v content=%s><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=%s></script>'%(V,V)
-for f in ['index.html','quest.html','gm.html','figures.html']:
+for f in ['index.html','quest.html','gm.html','figures.html','dj.html']:
   s=open(f).read()
   s=re.sub(r'<meta name=eear-v content=\d+><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater\.js\?v=\d+></script>','',s)
   s=fix(s)

@@ -30,7 +30,7 @@ const xaiKey=()=>{if(process.env.XAI_API_KEY)return process.env.XAI_API_KEY.trim
 const REN_MODEL=()=>process.env.REN_MODEL||'grok-4.20-0309-non-reasoning';
 /* d44: Matt Ready pillars (public OSM spots) from <webroot>/pillars.json, re-read when the file changes */
 let PIL={m:0,v:null};function pillarsPub(){try{const f=path.join(root,'pillars.json'),st=fs.statSync(f);if(st.mtimeMs!==PIL.m){const j=JSON.parse(fs.readFileSync(f,'utf8'));PIL={m:st.mtimeMs,v:{count:j.pillars.length,image:j.image,url:'pillars.json',items:j.pillars.map(p=>({id:p.id,name:p.name,kind:p.kind,area:p.area,lat:p.lat,lon:p.lon}))}}}return PIL.v}catch(e){return null}}
-const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's game Live Geometry, set in the world called Matt's Reality (also known as Ready Security Services Map 1 and Base Geometry Reality). Around town stand purple triangular Matt Ready pillars that each play the Disco Jam when you walk up to them. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
+const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's game Live Geometry, set in the world called Matt's Reality (also known as Ready Security Services Map 1 and Base Geometry Reality). Around town stand purple triangular Matt Ready pillars that each play the current Master DJ song (one global playlist Matt steers) when you walk up to them. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
 const REN_DF=path.join(__dirname,'ren-dances.json');let REND={};try{REND=JSON.parse(fs.readFileSync(REN_DF,'utf8'))}catch(e){}
 const renSave=()=>{try{fs.writeFileSync(REN_DF,JSON.stringify(REND),{mode:0o600})}catch(e){console.error('ren dance save',e.message)}};
 const RL={};function limited(k,max,ms=900000){const n=Date.now();RL[k]=(RL[k]||[]).filter(t=>n-t<ms);if(RL[k].length>=max)return true;RL[k].push(n);return false}
@@ -179,6 +179,38 @@ async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.include
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
  const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}
 const ghState=()=>({ghosts:Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n];return{id:n,pid:d.pid,dummy:true,lat:s.lat,lon:s.lon,heading:s.wander?s.hdg:null,wander:s.wander,target:{lat:s.tlat,lon:s.tlon,place:s.place},updated:s.updated}})});
+/* ---- d45 Master DJ: ONE global queue that plays to everyone in Matt's Reality (pillars + in-app music player). Library = <webroot>/audio/dj/library.json
+   (static, freely licensed only). State in sqlite kv 'djState' (not data.json). Public read: GET /api/dj, SSE /api/dj/stream. Writes: POST /api/dj {op,...} with the GM key (X-GM-Key).
+   Clock = server time: queue[index] started at startedAt (ms); tracks auto-advance and the queue loops at the end (normalised every second + on every read). */
+let DJL={m:0,v:null};function djLib(){try{const f=path.join(root,'audio','dj','library.json'),st=fs.statSync(f);if(st.mtimeMs!==DJL.m)DJL={m:st.mtimeMs,v:JSON.parse(fs.readFileSync(f,'utf8'))};return DJL.v}catch(e){return DJL.v||{tracks:[],seed:[]}}}
+const djTrack=id=>(djLib().tracks||[]).find(t=>t.id===id);
+const djItem=t=>({qid:rid(4),id:t.id,title:t.title,artist:t.artist,genre:t.genre||null,bpm:t.bpm||null,url:t.url,duration:+t.duration,license:t.license,licenseUrl:t.licenseUrl||null});
+const djSeed=()=>({queue:(djLib().seed||[]).map(djTrack).filter(Boolean).map(djItem),index:0,startedAt:Date.now(),playing:true,pausedOffset:0,rev:1,updated:Date.now()});
+let DJ=null;const djSave=()=>run("insert into kv values('djState',?) on conflict(k) do update set v=excluded.v",JSON.stringify(DJ));
+try{const v=one("select v from kv where k='djState'");DJ=v?JSON.parse(v.v):null}catch(e){DJ=null}if(!DJ||!Array.isArray(DJ.queue)){DJ=djSeed();djSave()}
+function djNorm(now){const Q=DJ.queue;let ch=false;if(!Q.length){if(DJ.index){DJ.index=0;ch=true}return ch}if(!(DJ.index>=0&&DJ.index<Q.length)){DJ.index=0;ch=true}if(!DJ.playing)return ch;
+ const tot=Q.reduce((a,x)=>a+(+x.duration||0),0)*1000;if(!(tot>0))return ch;let el=now-DJ.startedAt;if(el<0){DJ.startedAt=now;return true}
+ if(el>=tot){const k=Math.floor(el/tot);DJ.startedAt+=k*tot;el-=k*tot;ch=true}
+ for(let i=0;i<=Q.length&&el>=(+Q[DJ.index].duration||0)*1000;i++){const d=(+Q[DJ.index].duration||0)*1000;DJ.startedAt+=d;el-=d;DJ.index=(DJ.index+1)%Q.length;ch=true}return ch}
+const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json'}};
+const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
+setInterval(()=>{try{if(djNorm(Date.now())){DJ.rev++;djSave();djPush()}}catch(e){console.error('dj',e.message)}},1000);
+function djOp(j,now){djNorm(now);const Q=DJ.queue,op=String(j.op||''),at=qid=>Q.findIndex(x=>x.qid===qid),cur=Q[DJ.index]&&Q[DJ.index].qid,restart=i=>{DJ.index=i;DJ.startedAt=now;DJ.pausedOffset=0};
+ switch(op){
+ case'add':{const ids=Array.isArray(j.ids)?j.ids:[j.id];const T=ids.map(djTrack);if(!ids.length||T.some(t=>!t))return'unknown library track';if(Q.length+T.length>200)return'queue limit 200';
+  const it=T.map(djItem);if(j.next&&Q.length)Q.splice(DJ.index+1,0,...it);else Q.push(...it);if(Q.length===it.length)restart(0);if(j.playNow){restart(Q.indexOf(it[0]));DJ.playing=true}break}
+ case'remove':{const i=at(j.qid);if(i<0)return'no such queue item';Q.splice(i,1);if(i<DJ.index)DJ.index--;else if(i===DJ.index)restart(Q.length?DJ.index%Q.length:0);break}
+ case'move':{const i=at(j.qid);let to=Math.round(+j.to);if(i<0||!isFinite(to))return'qid + to required';to=Math.max(0,Math.min(Q.length-1,to));const[x]=Q.splice(i,1);Q.splice(to,0,x);DJ.index=Math.max(0,Q.findIndex(y=>y.qid===cur));break}
+ case'order':{const o=Array.isArray(j.qids)?j.qids:[];if(o.length!==Q.length||new Set(o).size!==o.length||o.some(q=>at(q)<0))return'qids must be a permutation of the queue';const M=new Map(Q.map(x=>[x.qid,x]));DJ.queue=o.map(q=>M.get(q));DJ.index=Math.max(0,DJ.queue.findIndex(y=>y.qid===cur));break}
+ case'play':{if(j.qid==null&&j.index==null){if(!DJ.playing){DJ.startedAt=now-(DJ.pausedOffset||0);DJ.playing=true}break}const i=j.qid!=null?at(j.qid):Math.round(+j.index);if(!(i>=0&&i<Q.length))return'no such queue item';restart(i);DJ.playing=true;break}
+ case'next':case'prev':{if(!Q.length)return'queue is empty';restart((DJ.index+(op==='next'?1:Q.length-1))%Q.length);if(!DJ.playing)DJ.pausedOffset=0;break}
+ case'pause':if(DJ.playing){DJ.pausedOffset=Math.max(0,now-DJ.startedAt);DJ.playing=false}break;
+ case'resume':if(!DJ.playing){DJ.startedAt=now-(DJ.pausedOffset||0);DJ.playing=true}break;
+ case'shuffle':{if(Q.length<2)break;const c=Q.splice(DJ.index,1)[0];for(let i=Q.length-1;i>0;i--){const k=crypto.randomInt(0,i+1);[Q[i],Q[k]]=[Q[k],Q[i]]}Q.unshift(c);DJ.index=0;break}
+ case'clear':DJ.queue=[];DJ.index=0;DJ.pausedOffset=0;break;
+ case'reset':{const r=DJ.rev;DJ=djSeed();DJ.rev=r;break}
+ default:return'op must be add, remove, move, order, play, next, prev, pause, resume, shuffle, clear or reset'}
+ DJ.rev++;DJ.updated=now;djSave();djPush();return null}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
@@ -193,9 +225,12 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    const cc=ext==='.html'?'no-cache':(base==='version.json'||base==='sw.js'||base==='updater.js')?'no-store':u.searchParams.has('v')?'public, max-age=31536000, immutable':'no-cache';
    const h={'content-type':types[ext]||'application/octet-stream','cache-control':cc,'etag':tag};if(base==='sw.js')h['service-worker-allowed']='/';
    if(cc!=='no-store'&&q.headers['if-none-match']===tag){r.writeHead(304,h);return r.end()}
-   fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,h);r.end(d)})})}
+   h['accept-ranges']='bytes';const rg=/^bytes=(\d*)-(\d*)$/.exec(q.headers.range||'');/* d45: byte ranges (Safari <audio> needs 206 to stream/seek the DJ tracks) */
+   if(rg&&(rg[1]||rg[2])){let a=rg[1]?+rg[1]:Math.max(0,stt.size-(+rg[2])),z=rg[1]&&rg[2]?Math.min(+rg[2],stt.size-1):stt.size-1;if(a>z||a>=stt.size){r.writeHead(416,{'content-range':'bytes */'+stt.size});return r.end()}
+    r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
+   fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -266,6 +301,15 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    return L?{...o,lat:s.lat,lon:s.lon,target:{lat:s.tlat,lon:s.tlon,place:s.place}}:{...o,private:true,note:'parked at a custom (non-landmark) spot; position not published'}});
   const HP=all('select id,device,mode from gplayers where live=1 and seen>?',cut).filter(p=>!isGhost(p.id)&&!isBot(p.id));const byDev={};for(const p of HP)byDev[p.device||'unknown']=(byDev[p.device||'unknown']||0)+1;
   return send(r,{t:now,pillars:pillarsPub(),edge:{lat:EDGE.lat,lon:EDGE.lon,r:EDGE.r,name:EDGE.name},bots,ghosts,players:{live:HP.length,byDevice:byDev,windowMs:LIVE_MS},renDances:Object.keys(REND)})}
+// ---- d45 Master DJ: public read + SSE; writes need the GM key
+ case'/api/dj':{if(q.method==='GET'){if(limited('dj:'+ip,240,60000))return send(r,{error:'rate limited'},429);return send(r,djView(now))}
+  if(q.method!=='POST')return send(r,{error:'GET or POST'},405);if(limited('djw:'+ip,120,60000))return send(r,{error:'rate limited'},429);
+  if(!isKeyGM(U)){audit(ip,'dj-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
+  const e=djOp(j,now);if(e)return send(r,{error:e,state:djView(now)},400);audit(ip,'dj-'+j.op,{id:j.id,qid:j.qid,to:j.to});return send(r,djView(now))}
+ case'/api/dj/stream':{if(limited('djs:'+ip,30,60000)||DJC.size>=500)return send(r,{error:'rate limited'},429);
+  r.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache, no-transform','x-accel-buffering':'no'});r.flushHeaders&&r.flushHeaders();r.write(': '+' '.repeat(2048)+'\n\n');
+  r.write('event: dj\ndata: '+JSON.stringify(djView(now))+'\n\n');DJC.add(r);const ka=setInterval(()=>{try{r.write('event: t\ndata: '+Date.now()+'\n\n')}catch(e){}},20000),stop=setTimeout(()=>r.end(),30*60000);
+  q.on('close',()=>{DJC.delete(r);clearInterval(ka);clearTimeout(stop)});return}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
   const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);
