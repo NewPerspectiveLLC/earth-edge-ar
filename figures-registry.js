@@ -1,6 +1,6 @@
 // figures-registry.js: single source of truth for WHERE the in-scene figures stand (pure data, no imports, safe to load anywhere).
 // Used by ren.js, performers.js, circle.js (the game) and figures.html (the live dashboard). Frame: x = east m, y = up m, z = -north m,
-// relative to each anchor's ground point. Server-side bots/ghosts (server/server.js?v=1792260464493) are published live at GET /api/figures.
+// relative to each anchor's ground point. Server-side bots/ghosts (server/server.js?v=1792260765790) are published live at GET /api/figures.
 export const GARDEN = { lat: 48.1316475, lon: -122.7992293, name: "Matt's Meditation Garden" };   // vortex pin (Matt's Google Maps link)
 export const CAPPYS = { lat: 48.13165, lon: -122.79921, name: "Cappy's Trails" };                   // Cappy's Trails pillar
 export const READY_ATHLETICS = { lat: 48.11035, lon: -122.80591, name: 'Ready Athletics' };
@@ -29,5 +29,5 @@ export function performerSpots(n, cDeg = PERFORMERS.fallbackBearingDeg) {
 }
 // d44 Matt Ready pillars: equilateral triangular prisms (same image on all 3 faces) at OSM public spots listed in pillars.json (id, name, kind, area, lat, lon, optional image).
 // image = the ONE constant to swap for a photo of Matt (a pillar entry may carry its own "image" override). Audio: Disco Jam from each pillar, nearest `voices` only.
-export const PILLARS = { url: 'pillars.json?v=1792260464493', image: 'pillar-matt.jpg', heightM: 1.8, sideM: 0.7, plinthM: .08, capM: .05, visibleM: 2500,
+export const PILLARS = { url: 'pillars.json?v=1792260765790', image: 'pillar-matt.jpg', heightM: 1.8, sideM: 0.7, plinthM: .08, capM: .05, visibleM: 2500,
   audio: { trackId: 'disco-jam', fullM: 3, silentM: 55, voices: 2, duck: .8, fadeS: .35, tauS: .25, scanMs: 250, levelTrim: 1 } };

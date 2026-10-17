@@ -1,7 +1,7 @@
 {
 "src": "OpenStreetMap contributors (ODbL) via Overpass, fetched 2026-10-17; public places only (street-corner right-of-way 4 m NE of intersection centre, park/landmark/trail points); stratified 490 m grid, seed 44; keep-out radius around a private area; water (harbor/lagoon polygons) excluded",
 "image": "pillar-matt.jpg",
-"count": 97,
+"count": 96,
 "pillars": [
 {
 "id": "p001",
@@ -525,6 +525,14 @@
 },
 {
 "id": "p066",
+"name": "City Dock (at John Pope Marine Park)",
+"kind": "park",
+"area": "Downtown Water St",
+"lat": 48.1152989,
+"lon": -122.7533024
+},
+{
+"id": "p067",
 "name": "Haller Fountain",
 "kind": "landmark",
 "area": "Downtown Water St",
@@ -532,7 +540,7 @@
 "lon": -122.7572599
 },
 {
-"id": "p067",
+"id": "p068",
 "name": "YMCA (out front)",
 "kind": "park",
 "area": "Uptown (Lawrence St)",
@@ -540,20 +548,12 @@
 "lon": -122.7728012
 },
 {
-"id": "p068",
+"id": "p069",
 "name": "Bell Tower (out front)",
 "kind": "landmark",
 "area": "Downtown Water St",
 "lat": 48.115057,
 "lon": -122.7585368
-},
-{
-"id": "p069",
-"name": "City Dock",
-"kind": "landmark",
-"area": "Downtown Water St",
-"lat": 48.1149257,
-"lon": -122.7527654
 },
 {
 "id": "p070",
@@ -581,7 +581,7 @@
 },
 {
 "id": "p073",
-"name": "Taylor St & Water St",
+"name": "Union Wharf (at Taylor St & Water St)",
 "kind": "intersection",
 "area": "Downtown Water St",
 "lat": 48.1144383,
@@ -605,14 +605,6 @@
 },
 {
 "id": "p076",
-"name": "Union Wharf",
-"kind": "trail",
-"area": "Downtown Water St",
-"lat": 48.1135273,
-"lon": -122.7557811
-},
-{
-"id": "p077",
 "name": "Jefferson County Courthouse (out front)",
 "kind": "landmark",
 "area": "Uptown (Lawrence St)",
@@ -620,7 +612,7 @@
 "lon": -122.7680123
 },
 {
-"id": "p078",
+"id": "p077",
 "name": "Ready Athletics trail",
 "kind": "trail",
 "area": "Westside / Ready Athletics vicinity",
@@ -628,7 +620,7 @@
 "lon": -122.80521
 },
 {
-"id": "p079",
+"id": "p078",
 "name": "Madrona Blvd & Morning Star Way",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -636,7 +628,7 @@
 "lon": -122.8116587
 },
 {
-"id": "p080",
+"id": "p079",
 "name": "Austin Matthew Ln & Towne Point Ave",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -644,7 +636,7 @@
 "lon": -122.7991517
 },
 {
-"id": "p081",
+"id": "p080",
 "name": "14th St & McPherson St",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -652,7 +644,7 @@
 "lon": -122.8001405
 },
 {
-"id": "p082",
+"id": "p081",
 "name": "Gateway Park",
 "kind": "park",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -660,7 +652,7 @@
 "lon": -122.7700739
 },
 {
-"id": "p083",
+"id": "p082",
 "name": "Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way)",
 "kind": "intersection",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -668,7 +660,7 @@
 "lon": -122.7754335
 },
 {
-"id": "p084",
+"id": "p083",
 "name": "Discovery Rd & Howard St",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -676,12 +668,20 @@
 "lon": -122.8053226
 },
 {
-"id": "p085",
+"id": "p084",
 "name": "12th St & Hill St",
 "kind": "intersection",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
 "lat": 48.1086575,
 "lon": -122.7844025
+},
+{
+"id": "p085",
+"name": "Port Townsend Boat Haven (at Benedict St & Washington St)",
+"kind": "intersection",
+"area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+"lat": 48.1079253,
+"lon": -122.7743683
 },
 {
 "id": "p086",
@@ -693,14 +693,6 @@
 },
 {
 "id": "p087",
-"name": "Port Townsend Boat Haven (at Patrol Boat Pier)",
-"kind": "landmark",
-"area": "Kah Tai Lagoon / Boat Haven / Sims Way",
-"lat": 48.107061,
-"lon": -122.7729139
-},
-{
-"id": "p088",
 "name": "Minnie Nakano Park",
 "kind": "park",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -708,7 +700,7 @@
 "lon": -122.7836209
 },
 {
-"id": "p089",
+"id": "p088",
 "name": "9th St & Sheridan St",
 "kind": "intersection",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -716,7 +708,7 @@
 "lon": -122.7903057
 },
 {
-"id": "p090",
+"id": "p089",
 "name": "9th St & Rainier St",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -724,7 +716,7 @@
 "lon": -122.8059248
 },
 {
-"id": "p091",
+"id": "p090",
 "name": "Larry Scott Memorial Trail",
 "kind": "trail",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -732,7 +724,7 @@
 "lon": -122.7798791
 },
 {
-"id": "p092",
+"id": "p091",
 "name": "5th St & 7th St",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -740,7 +732,7 @@
 "lon": -122.8106503
 },
 {
-"id": "p093",
+"id": "p092",
 "name": "Cliff St & South Park Ave",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -748,7 +740,7 @@
 "lon": -122.8027995
 },
 {
-"id": "p094",
+"id": "p093",
 "name": "Bishop Play Park",
 "kind": "park",
 "area": "Westside / Ready Athletics vicinity",
@@ -756,7 +748,7 @@
 "lon": -122.7957129
 },
 {
-"id": "p095",
+"id": "p094",
 "name": "Evans Vista & Rainier St",
 "kind": "intersection",
 "area": "Westside / Ready Athletics vicinity",
@@ -764,7 +756,7 @@
 "lon": -122.8051792
 },
 {
-"id": "p096",
+"id": "p095",
 "name": "1st St & Grant St",
 "kind": "intersection",
 "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
@@ -772,7 +764,7 @@
 "lon": -122.7913258
 },
 {
-"id": "p097",
+"id": "p096",
 "name": "Larry Scott Memorial Trail",
 "kind": "trail",
 "area": "Westside / Ready Athletics vicinity",
