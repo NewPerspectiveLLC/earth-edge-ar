@@ -179,13 +179,13 @@ async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.include
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
  const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}
 const ghState=()=>({ghosts:Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n];return{id:n,pid:d.pid,dummy:true,lat:s.lat,lon:s.lon,heading:s.wander?s.hdg:null,wander:s.wander,target:{lat:s.tlat,lon:s.tlon,place:s.place},updated:s.updated}})});
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
  if(!u.pathname.startsWith('/api/')){let dp;try{dp=decodeURIComponent(u.pathname)}catch(e){return r.writeHead(400),r.end()}
   // static allowlist: decoded + normalized + case-insensitive (macOS FS is case-insensitive). Never serve server/, cert/, logs/, dotfiles, db/key/log files.
   const rel=path.posix.normalize('/'+dp.replace(/\\/g,'/')).toLowerCase();
-  if(rel.includes('\0')||/(^|\/)(server|cert|logs|node_modules)(\/|$)/.test(rel)||/(^|\/)\./.test(rel)||(!rel.endsWith('/')&&!/\.(html|js|json|png|jpg|jpeg|webp|css|glb|gltf|svg|ico|txt|mp3|wav|m4a)$/.test(rel))||/\.(pem|key|sqlite|log|err|bak.*)$/.test(rel)||/gm-key|config\.json|ed25519/.test(rel))return r.writeHead(404),r.end('not found');
+  if(rel.includes('\0')||/(^|\/)(server|cert|logs|node_modules)(\/|$)/.test(rel)||/(^|\/)\./.test(rel)||(!rel.endsWith('/')&&!/\.(html|js|json|png|jpg|jpeg|webp|css|glb|gltf|svg|ico|txt|mp3|wav|m4a|webmanifest|md|geojson)$/.test(rel))||/\.(pem|key|sqlite|log|err|bak.*)$/.test(rel)||/gm-key|config\.json|ed25519/.test(rel))return r.writeHead(404),r.end('not found');
   let f=path.normalize(path.join(root,dp));if(!f.startsWith(path.normalize(root)+path.sep))return r.writeHead(404),r.end();
   if(fs.existsSync(f)&&fs.statSync(f).isDirectory())f=path.join(f,'index.html');
   /* caching: HTML no-cache (always revalidate), version.json + sw.js + updater.js no-store, ?v=<build> assets immutable, others ETag revalidation */
