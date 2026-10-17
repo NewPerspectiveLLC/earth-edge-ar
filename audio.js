@@ -107,6 +107,6 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
   else{l.setPosition(0,0,0);l.setOrientation(fw[0],fw[1],fw[2],up[0],up[1],up[2])}
   if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
  window.EEAR_AUDIO={TRACKS,get startedAt(){return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return pan},SRC,frame,
- /* d44 pillar proximity music (pillars.js?v=1792260765790): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
+ /* d44 pillar proximity music (pillars.js?v=1792265745763): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
  get listener(){return lastL},get out(){return vol},async buffer(id){graph();const T=TRACKS.find(t=>t.id===id);return T&&T.urls?fileBuf(T):null},setDuck(v){duck=Math.max(0,Math.min(1,+v||0))},get duck(){return duck}};
  return{frame,SRC}}

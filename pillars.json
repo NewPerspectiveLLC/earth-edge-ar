@@ -405,11 +405,11 @@
 },
 {
 "id": "p051",
-"name": "27th St & Sherman St",
+"name": "Hancock St & Hastings Ave",
 "kind": "intersection",
 "area": "Hastings / Middle Point",
-"lat": 48.1193012,
-"lon": -122.7938463
+"lat": 48.1201329,
+"lon": -122.7957831
 },
 {
 "id": "p052",
@@ -509,11 +509,11 @@
 },
 {
 "id": "p064",
-"name": "Baker View Park",
-"kind": "park",
+"name": "18th St & Wilson St",
+"kind": "intersection",
 "area": "Castle Hill / Central",
-"lat": 48.1159974,
-"lon": -122.7884084
+"lat": 48.1129662,
+"lon": -122.7882401
 },
 {
 "id": "p065",

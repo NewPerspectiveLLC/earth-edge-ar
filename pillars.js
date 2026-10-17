@@ -4,7 +4,7 @@
 // Audio: every pillar plays the Disco Jam from its own spot. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792260765790';
+import { PILLARS } from './figures-registry.js?v=1792265745763';
 export const PILLAR_IMAGE = PILLARS.image;               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;
 const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 * Math.cos(a * D); return Math.hypot(x, y) };
