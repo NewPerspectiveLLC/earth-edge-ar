@@ -37,7 +37,7 @@ export function step(dt) {
   S.boost = tau(S.boost, Math.pow(10, ORB.linger.boostDb * lt / 20), dt, .25); S.gain = g * S.boost; S.dist = d; return S;
 }
 let lastT = 0;
-/** step once per animation frame no matter how many callers (audio.js?v=1792277924923 + orbball.js) */
+/** step once per animation frame no matter how many callers (audio.js?v=1792279505907 + orbball.js) */
 export function frame(nowMs = performance.now()) { if (nowMs - lastT < 4) return S; let dt = lastT ? Math.min(2, (nowMs - lastT) / 1000) : 0; lastT = nowMs;   /* wall-clock: sub-step slow frames so the orbit never slows down */
   while (dt > .1) { step(.05); dt -= .05 } return step(dt) }
 window.EEAR_ORB = S;

@@ -1,5 +1,5 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792277924923><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792277924923></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — GM</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry"><meta name=description content="Live Geometry: Matt's Reality (Ready Security Services Map 1 · Base Geometry Reality)"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792277924923><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792277924923>
-<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js?v=1792277924923></script>
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792279505907><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792279505907></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — GM</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry"><meta name=description content="Live Geometry: Matt's Reality (Ready Security Services Map 1 · Base Geometry Reality)"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792279505907><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792279505907>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js?v=1792279505907></script>
 <style>
 html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;background:#000;color:#eee;overflow:hidden}
 #map{position:fixed;inset:0;background:#111}
@@ -66,8 +66,8 @@ const LM=[["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff'],['Po
 const pin=(t,cls,g,dy)=>L.marker([t[1],t[2]],{icon:L.divIcon({className:'',html:`<div class="lm ${cls}"><div class=i style="background:${t[3]}"></div><div class=t style="${dy?'top:'+dy+'px':''}">${esc(t[0])}</div></div>`,iconSize:[0,0]}),keyboard:false}).addTo(g).bindTooltip(esc(t[0]));
 VX.forEach((t,i)=>pin(t,'vx',vxG,i===2?-22:0));LM.forEach(t=>pin(t,'',lmG));
 $('lmlab').onclick=()=>{document.body.classList.toggle('hidelm');$('lmlab').classList.toggle('on',!document.body.classList.contains('hidelm'))};$('lmlab').classList.add('on');
-fetch('streets.json?v=1792277924923').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
-fetch('sheridan.json?v=1792277924923').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
+fetch('streets.json?v=1792279505907').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
+fetch('sheridan.json?v=1792279505907').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
 // ---- players
 const RA=[48.11035,-122.80591];
 function hcol(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+(h%360)+',95%,55%)'}

@@ -1,5 +1,5 @@
 // Opt-in multiplayer + glowing x-ray stick figures. Nothing leaves the device until the user consents and joins.
-import*as T from'three';import{liveUI}from'./liveui.js?v=1792277924923';
+import*as T from'three';import{liveUI}from'./liveui.js?v=1792279505907';
 export function initMP({scene,cam,getPos,toLocal}){
 const API=(window.EEAR_API||'')+'/api';let timer=null,others={};window.MP_OTHERS=others;
 const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#radar{position:fixed;left:8px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 134px);z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;

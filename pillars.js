@@ -2,10 +2,10 @@
 // Data: pillars.json (OSM-derived public spots: street-corner right-of-way, parks, landmarks, trails). Placement/size/audio constants live in figures-registry.js (PILLARS).
 // Rendering: one shared prism geometry with 3 face groups, unlit 'contain' materials (whole image fitted unstretched, leftover bands = dark neon-purple gradient);
 // default faces = PILLARS.images; a pillar may set "image" (all 3 faces) or "images" [3] to override. InstancedMesh, per-instance distance cull.
-// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792277924923) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
+// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792279505907) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792277924923';
+import { PILLARS } from './figures-registry.js?v=1792279505907';
 export const PILLAR_IMAGE = PILLARS.image;
 export const PILLAR_FACES = PILLARS.images || [PILLAR_IMAGE, PILLAR_IMAGE, PILLAR_IMAGE];   // d46: per-face images (faces 0,1 = Project Driftwood orb-matt.jpg, face 2 = pillar-matt.jpg)               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;
@@ -25,9 +25,9 @@ function prismGeo(side, h, y0) {
 /* unlit 'contain' image material (instancing-aware): fits the whole image on a face of aspect faceA (w/h) without stretching; leftover bands get a dark neon-purple gradient */
 const FIT_V = 'varying vec2 vUv;\nvoid main(){vUv=uv;vec4 p=vec4(position,1.);\n#ifdef USE_INSTANCING\np=instanceMatrix*p;\n#endif\ngl_Position=projectionMatrix*modelViewMatrix*p;}';
 const FIT_F = 'uniform sampler2D map;uniform float faceA,imgA,lum;varying vec2 vUv;\nvoid main(){vec2 u=vUv;vec2 s=imgA>faceA?vec2(1.,faceA/imgA):vec2(imgA/faceA,1.);vec2 q=(u-.5)/s+.5;\n'
- + 'float inside=step(0.,q.x)*step(q.x,1.)*step(0.,q.y)*step(q.y,1.);float e=max(max(-q.x,q.x-1.),max(-q.y,q.y-1.));\n'
- + 'vec3 band=mix(vec3(.30,.04,.55),vec3(.035,.005,.07),clamp(e*s.y*6.,0.,1.))+vec3(.55,.1,.9)*exp(-e*s.y*90.);\n'
- + 'vec4 c=texture2D(map,clamp(q,0.,1.));gl_FragColor=vec4(mix(band,c.rgb,inside)*lum,1.);\n#include <colorspace_fragment>\n}';
+ + 'float inside=step(0.,q.x)*step(q.x,1.)*step(0.,q.y)*step(q.y,1.);float e=max(0.,max(max(-q.x,q.x-1.),max(-q.y,q.y-1.)));/* >=0: exp() below must not overflow inside the image */\n'
+ + 'vec3 band=mix(vec3(.30,.04,.55),vec3(.035,.005,.07),clamp(e*s.y*6.,0.,1.))+vec3(.55,.1,.9)*exp(-min(e*s.y*90.,30.));\n'
+ + 'vec3 c=inside>.5?texture2D(map,clamp(q,0.,1.)).rgb:band;gl_FragColor=vec4(c*lum,1.);\n#include <colorspace_fragment>\n}';
 export function fitMaterial(tex, faceA) { const m = new THREE.ShaderMaterial({ uniforms: { map: { value: tex }, faceA: { value: faceA }, imgA: { value: faceA }, lum: { value: 1 } }, vertexShader: FIT_V, fragmentShader: FIT_F, side: THREE.FrontSide });
   const up = () => { const im = tex.image; if (im && im.width) m.uniforms.imgA.value = im.width / im.height }; if (tex.image) up(); else tex.onUpdate = up; m.userData.up = up; return m }
 function capGeo(side, h, y0) {   // closed triangular slab (plinth / cap), flat-shaded
