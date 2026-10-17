@@ -904,29 +904,29 @@
     ],
     [
      "p066",
-     48.1152013,
-     -122.7572599,
+     48.1152989,
+     -122.7533024,
      51.8156,
-     "landmark"
-    ],
-    [
-     "p067",
-     48.1151747,
-     -122.7728012,
-     50.4093,
      "park"
     ],
     [
-     "p068",
-     48.115057,
-     -122.7585368,
-     54.6282,
+     "p067",
+     48.1152013,
+     -122.7572599,
+     50.4093,
      "landmark"
     ],
     [
+     "p068",
+     48.1151747,
+     -122.7728012,
+     54.6282,
+     "park"
+    ],
+    [
      "p069",
-     48.1149257,
-     -122.7527654,
+     48.115057,
+     -122.7585368,
      53.2219,
      "landmark"
     ],
@@ -974,71 +974,71 @@
     ],
     [
      "p076",
-     48.1135273,
-     -122.7557811,
-     71.4913,
-     "trail"
-    ],
-    [
-     "p077",
      48.1124045,
      -122.7680123,
-     72.8975,
+     71.4913,
      "landmark"
     ],
     [
-     "p078",
+     "p077",
      48.112,
      -122.80521,
-     68.6787,
+     72.8975,
      "trail"
     ],
     [
-     "p079",
+     "p078",
      48.1119739,
      -122.8116587,
+     68.6787,
+     "intersection"
+    ],
+    [
+     "p079",
+     48.1119658,
+     -122.7991517,
      70.085,
      "intersection"
     ],
     [
      "p080",
-     48.1119658,
-     -122.7991517,
+     48.1100024,
+     -122.8001405,
      82.6712,
      "intersection"
     ],
     [
      "p081",
-     48.1100024,
-     -122.8001405,
-     81.2649,
-     "intersection"
-    ],
-    [
-     "p082",
      48.1097966,
      -122.7700739,
-     79.8587,
+     81.2649,
      "park"
     ],
     [
-     "p083",
+     "p082",
      48.1090189,
      -122.7754335,
+     79.8587,
+     "intersection"
+    ],
+    [
+     "p083",
+     48.1088575,
+     -122.8053226,
      78.4524,
      "intersection"
     ],
     [
      "p084",
-     48.1088575,
-     -122.8053226,
+     48.1086575,
+     -122.7844025,
      77.0461,
      "intersection"
     ],
     [
      "p085",
-     48.1086575,
-     -122.7844025,
+     48.1079253,
+     -122.7743683,
      75.6398,
      "intersection"
     ],
@@ -1051,79 +1051,72 @@
     ],
     [
      "p087",
-     48.107061,
-     -122.7729139,
-     72.8272,
-     "landmark"
-    ],
-    [
-     "p088",
      48.1069291,
      -122.7836209,
-     71.421,
+     72.8272,
      "park"
     ],
     [
-     "p089",
+     "p088",
      48.106407,
      -122.7903057,
+     71.421,
+     "intersection"
+    ],
+    [
+     "p089",
+     48.1063245,
+     -122.8059248,
      70.0147,
      "intersection"
     ],
     [
      "p090",
-     48.1063245,
-     -122.8059248,
-     74.2212,
-     "intersection"
-    ],
-    [
-     "p091",
      48.1057596,
      -122.7798791,
-     75.6275,
+     74.2212,
      "trail"
     ],
     [
-     "p092",
+     "p091",
      48.1052212,
      -122.8106503,
+     75.6275,
+     "intersection"
+    ],
+    [
+     "p092",
+     48.1043413,
+     -122.8027995,
      77.0338,
      "intersection"
     ],
     [
      "p093",
-     48.1043413,
-     -122.8027995,
-     78.44,
-     "intersection"
-    ],
-    [
-     "p094",
      48.1041554,
      -122.7957129,
-     68.5961,
+     78.44,
      "park"
     ],
     [
-     "p095",
+     "p094",
      48.1016811,
      -122.8051792,
+     68.5961,
+     "intersection"
+    ],
+    [
+     "p095",
+     48.1005447,
+     -122.7913258,
      70.0023,
      "intersection"
     ],
     [
      "p096",
-     48.1005447,
-     -122.7913258,
-     71.4086,
-     "intersection"
-    ],
-    [
-     "p097",
      48.1000411,
      -122.8132261,
-     72.8149,
+     71.4086,
      "trail"
     ]
    ]
@@ -1143,7 +1136,7 @@
    "sha256": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
    "description": "Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom.",
    "mapping": "the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch.",
-   "used_by": "all 97 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own \"image\" field (none do)"
+   "used_by": "all 96 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own \"image\" field (none do)"
   }
  ],
  "data_files": [
@@ -1235,8 +1228,8 @@
   },
   {
    "file": "pillars.json",
-   "bytes": 14934,
-   "sha256": "97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f",
+   "bytes": 14863,
+   "sha256": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
    "content": "d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon)",
    "source": "OSM-derived public spots, 2026-10-17",
    "license": "ODbL"
@@ -1457,7 +1450,7 @@
   "characters": 1,
   "test": 2,
   "vehicles": 1,
-  "pillars": 97
+  "pillars": 96
  },
  "record": "geometry/record.json (full per-object list, sha256 below)",
  "excluded": [
@@ -1467,5 +1460,5 @@
   "other singer performer bots: 0 configured now (one per player-named singer, dynamic)",
   "GhostBot (purple Victorian tux, client-side, walks loops around the viewer): 1"
  ],
- "record_sha256": "fda9ebbee6fd9bf3756298f5bb5ea09ea81439302ae1d2fdba7b012d96622e1d"
+ "record_sha256": "fdeb11a030cf3d7964d1ad1927263921c0cbb88ad91ebc57b7c5e054d62e70e6"
 }

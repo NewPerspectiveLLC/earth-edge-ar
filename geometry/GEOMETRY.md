@@ -68,7 +68,7 @@ Separations: vxRA-vxCappy: 2420.1 m at 11.856°; vxRA-vxGarden: 2419.54 m at 11.
 See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app renders (Natural Earth 1:50m, public domain). `pt-shoreline.geojson` = fresh OSM coastline (Overpass, 2026-10-17) for the Quimper Peninsula incl. Point Hudson, Fort Worden/Point Wilson, North Beach, Kah Tai, Boat Haven, plus lagoons/harbour structures from `shore.json` (© OpenStreetMap contributors, ODbL). `to_vectors.py` converts both to unit vectors. Renders: `/workspace/geometry-globe.png`, `/workspace/geometry-pt.png`.
 
 ## 4. Geometry record
-274 objects. Counts: landmarks 35, saucers 7, lines 7, vortex 25, garden 2, circle 33, night 6, sky 4, trails 11, streets 4, geography 14, far 7, edges 3, bots 15, characters 1, test 2, vehicles 1, pillars 97.
+273 objects. Counts: landmarks 35, saucers 7, lines 7, vortex 25, garden 2, circle 33, night 6, sky 4, trails 11, streets 4, geography 14, far 7, edges 3, bots 15, characters 1, test 2, vehicles 1, pillars 96.
 
 | cat | id | name | type | lat | lon | size | anchor | source |
 |---|---|---|---|---|---|---|---|---|
@@ -250,7 +250,7 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 | test | test.Ghost-2 | Ghost-2 (server TEST fixture, dummy player marker) | test fixture | 48.13165 | -122.79921 | wander_r_m 150 | target point only (live position not recorded) | server.js GHOSTS |
 | vehicles | quest.ship | Quest spaceship cockpit | vehicle | - | - |  | viewer-relative (no world position) | quest.html cockpit()/QSHIP |
 
-### Matt Ready prism pillars (97, from pillars.json sha256 `97243976deddd74b…`)
+### Matt Ready prism pillars (96, from pillars.json sha256 `70872740220fea0a…`)
 Shape: equilateral triangular prism, side 0.7 m, height 1.8 m, texture `pillar-matt.jpg` on all 3 faces; yaw = FNV-1a(id). Full table with yaw in HANDOFF.md §5 / record.json.
 
 | id | name | kind | area | lat | lon | yaw° |
@@ -320,38 +320,37 @@ Shape: equilateral triangular prism, side 0.7 m, height 1.8 m, texture `pillar-m
 | p063 | City Hall | landmark | Point Hudson / east Water St | 48.1161771 | -122.753612 | 44.7842 |
 | p064 | Baker View Park | park | Castle Hill / Central | 48.1159974 | -122.7884084 | 49.003 |
 | p065 | Crest Ave & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1159077 | -122.8058278 | 47.5968 |
-| p066 | Haller Fountain | landmark | Downtown Water St | 48.1152013 | -122.7572599 | 51.8156 |
-| p067 | YMCA (out front) | park | Uptown (Lawrence St) | 48.1151747 | -122.7728012 | 50.4093 |
-| p068 | Bell Tower (out front) | landmark | Downtown Water St | 48.115057 | -122.7585368 | 54.6282 |
-| p069 | City Dock | landmark | Downtown Water St | 48.1149257 | -122.7527654 | 53.2219 |
+| p066 | City Dock (at John Pope Marine Park) | park | Downtown Water St | 48.1152989 | -122.7533024 | 51.8156 |
+| p067 | Haller Fountain | landmark | Downtown Water St | 48.1152013 | -122.7572599 | 50.4093 |
+| p068 | YMCA (out front) | park | Uptown (Lawrence St) | 48.1151747 | -122.7728012 | 54.6282 |
+| p069 | Bell Tower (out front) | landmark | Downtown Water St | 48.115057 | -122.7585368 | 53.2219 |
 | p070 | Adams St & Water St | intersection | Downtown Water St | 48.1148622 | -122.755466 | 79.929 |
 | p071 | 20th St & McNeil St | intersection | Castle Hill / Central | 48.1145182 | -122.7789711 | 81.3352 |
 | p072 | 20th St & Jackman St | intersection | Castle Hill / Central | 48.11448 | -122.7851019 | 77.1164 |
-| p073 | Taylor St & Water St | intersection | Downtown Water St | 48.1144383 | -122.7564773 | 78.5227 |
+| p073 | Union Wharf (at Taylor St & Water St) | intersection | Downtown Water St | 48.1144383 | -122.7564773 | 78.5227 |
 | p074 | Discovery Rd & Grant St | intersection | Castle Hill / Central | 48.1137036 | -122.7914868 | 74.3038 |
 | p075 | Lawrence St & Walker St | intersection | Uptown (Lawrence St) | 48.1135969 | -122.769814 | 75.7101 |
-| p076 | Union Wharf | trail | Downtown Water St | 48.1135273 | -122.7557811 | 71.4913 |
-| p077 | Jefferson County Courthouse (out front) | landmark | Uptown (Lawrence St) | 48.1124045 | -122.7680123 | 72.8975 |
-| p078 | Ready Athletics trail | trail | Westside / Ready Athletics vicinity | 48.112 | -122.80521 | 68.6787 |
-| p079 | Madrona Blvd & Morning Star Way | intersection | Westside / Ready Athletics vicinity | 48.1119739 | -122.8116587 | 70.085 |
-| p080 | Austin Matthew Ln & Towne Point Ave | intersection | Westside / Ready Athletics vicinity | 48.1119658 | -122.7991517 | 82.6712 |
-| p081 | 14th St & McPherson St | intersection | Westside / Ready Athletics vicinity | 48.1100024 | -122.8001405 | 81.2649 |
-| p082 | Gateway Park | park | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1097966 | -122.7700739 | 79.8587 |
-| p083 | Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way) | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1090189 | -122.7754335 | 78.4524 |
-| p084 | Discovery Rd & Howard St | intersection | Westside / Ready Athletics vicinity | 48.1088575 | -122.8053226 | 77.0461 |
-| p085 | 12th St & Hill St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1086575 | -122.7844025 | 75.6398 |
+| p076 | Jefferson County Courthouse (out front) | landmark | Uptown (Lawrence St) | 48.1124045 | -122.7680123 | 71.4913 |
+| p077 | Ready Athletics trail | trail | Westside / Ready Athletics vicinity | 48.112 | -122.80521 | 72.8975 |
+| p078 | Madrona Blvd & Morning Star Way | intersection | Westside / Ready Athletics vicinity | 48.1119739 | -122.8116587 | 68.6787 |
+| p079 | Austin Matthew Ln & Towne Point Ave | intersection | Westside / Ready Athletics vicinity | 48.1119658 | -122.7991517 | 70.085 |
+| p080 | 14th St & McPherson St | intersection | Westside / Ready Athletics vicinity | 48.1100024 | -122.8001405 | 82.6712 |
+| p081 | Gateway Park | park | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1097966 | -122.7700739 | 81.2649 |
+| p082 | Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way) | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1090189 | -122.7754335 | 79.8587 |
+| p083 | Discovery Rd & Howard St | intersection | Westside / Ready Athletics vicinity | 48.1088575 | -122.8053226 | 78.4524 |
+| p084 | 12th St & Hill St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1086575 | -122.7844025 | 77.0461 |
+| p085 | Port Townsend Boat Haven (at Benedict St & Washington St) | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1079253 | -122.7743683 | 75.6398 |
 | p086 | Nora's Neighborhood Park | park | Westside / Ready Athletics vicinity | 48.1078305 | -122.7942766 | 74.2335 |
-| p087 | Port Townsend Boat Haven (at Patrol Boat Pier) | landmark | Kah Tai Lagoon / Boat Haven / Sims Way | 48.107061 | -122.7729139 | 72.8272 |
-| p088 | Minnie Nakano Park | park | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1069291 | -122.7836209 | 71.421 |
-| p089 | 9th St & Sheridan St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.106407 | -122.7903057 | 70.0147 |
-| p090 | 9th St & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1063245 | -122.8059248 | 74.2212 |
-| p091 | Larry Scott Memorial Trail | trail | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1057596 | -122.7798791 | 75.6275 |
-| p092 | 5th St & 7th St | intersection | Westside / Ready Athletics vicinity | 48.1052212 | -122.8106503 | 77.0338 |
-| p093 | Cliff St & South Park Ave | intersection | Westside / Ready Athletics vicinity | 48.1043413 | -122.8027995 | 78.44 |
-| p094 | Bishop Play Park | park | Westside / Ready Athletics vicinity | 48.1041554 | -122.7957129 | 68.5961 |
-| p095 | Evans Vista & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1016811 | -122.8051792 | 70.0023 |
-| p096 | 1st St & Grant St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1005447 | -122.7913258 | 71.4086 |
-| p097 | Larry Scott Memorial Trail | trail | Westside / Ready Athletics vicinity | 48.1000411 | -122.8132261 | 72.8149 |
+| p087 | Minnie Nakano Park | park | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1069291 | -122.7836209 | 72.8272 |
+| p088 | 9th St & Sheridan St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.106407 | -122.7903057 | 71.421 |
+| p089 | 9th St & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1063245 | -122.8059248 | 70.0147 |
+| p090 | Larry Scott Memorial Trail | trail | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1057596 | -122.7798791 | 74.2212 |
+| p091 | 5th St & 7th St | intersection | Westside / Ready Athletics vicinity | 48.1052212 | -122.8106503 | 75.6275 |
+| p092 | Cliff St & South Park Ave | intersection | Westside / Ready Athletics vicinity | 48.1043413 | -122.8027995 | 77.0338 |
+| p093 | Bishop Play Park | park | Westside / Ready Athletics vicinity | 48.1041554 | -122.7957129 | 78.44 |
+| p094 | Evans Vista & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1016811 | -122.8051792 | 68.5961 |
+| p095 | 1st St & Grant St | intersection | Kah Tai Lagoon / Boat Haven / Sims Way | 48.1005447 | -122.7913258 | 70.0023 |
+| p096 | Larry Scott Memorial Trail | trail | Westside / Ready Athletics vicinity | 48.1000411 | -122.8132261 | 71.4086 |
 
 ### Texture asset
 `pillar-matt.jpg` - JPEG 432×1024 px, 39473 B, sha256 `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e`. Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom. Mapping: the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch.

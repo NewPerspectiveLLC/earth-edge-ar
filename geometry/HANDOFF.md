@@ -44,7 +44,7 @@ Each outline is an ordered vertex list of (lat, lon), mapped by P = R·v(lat,lon
 | `sheridan.json` | Sheridan St segments [lat,lon] |  | 5687 | `ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119` | OSM; ODbL |
 | `mountains.json` | Mount Rainier, Mount Baker heightfields |  | 187691 | `1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b` | USGS 3DEP via AWS Terrain Tiles; public domain |
 | `coast.json` | wider OSM coastline used for the ocean mask (bbox 48.01..48.19,-122.915..-122.645) |  | 112277 | `1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400` | OSM Overpass 2026-10-14; ODbL |
-| `pillars.json` | d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon) |  | 14934 | `97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f` | OSM-derived public spots, 2026-10-17; ODbL |
+| `pillars.json` | d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon) |  | 14863 | `70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146` | OSM-derived public spots, 2026-10-17; ODbL |
 | `pillar-matt.jpg` | pillar texture (see textures) |  | 39473 | `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e` | project asset; project |
 | `geometry/vortex-table.json` | vortex normals / antipodes / wedge tests |  | 14140 | `0e51823636a787db29e34eeaee3c55b7133c19a5b868169d6f40b1b8ff606ac5` | computed; - |
 
@@ -71,8 +71,8 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 - **Keeper bots**: Cappy's (48.13165, −122.79921); Ready Athletics (48.11035, −122.80591). **Ren** (AI robot): 4 m east of Cappy's pillar → (48.13165, -122.7991562), h 1.85 hover .32, talk radius 15 m, beam 400 m.
 - **Night glow** (Ready Athletics, Cappy's): beams r 3.5/1.2 h 1500, ring 1–46 m, halos y 40/700; trails (trails.json, 9 ways) as 1 m ribbons + 6 m glow; parcel 998002802 outline ribbon .6 m.
 - **Quest spaceship**: cockpit fixed to the viewer rig (no world position).
-- **Matt Ready prism pillars** (97): equilateral triangular prism, side 0.7 m, total height 1.8 m (plinth .08 side .826, faces .08–1.75, cyan cap .05 side .742), ground ring .55–1.1 m; corner k local (s/√3)(sin 120k, cos 120k) rotated by yaw, so world corner bearing = 180 − yaw − 120k; **yaw = FNV-1a32(id)/2³²·360°**. Sound: Disco Jam, gain 1 ≤ 3 m → raised-cosine → 0 at 55 m, nearest 2 voices. Visible within 2.5 km.
-- **Texture asset `pillar-matt.jpg`** (JPEG, 432×1024 px, 39473 bytes, sha256 `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e`): Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom. Mapping: the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch. Used by: all 97 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own "image" field (none do).
+- **Matt Ready prism pillars** (96): equilateral triangular prism, side 0.7 m, total height 1.8 m (plinth .08 side .826, faces .08–1.75, cyan cap .05 side .742), ground ring .55–1.1 m; corner k local (s/√3)(sin 120k, cos 120k) rotated by yaw, so world corner bearing = 180 − yaw − 120k; **yaw = FNV-1a32(id)/2³²·360°**. Sound: Disco Jam, gain 1 ≤ 3 m → raised-cosine → 0 at 55 m, nearest 2 voices. Visible within 2.5 km.
+- **Texture asset `pillar-matt.jpg`** (JPEG, 432×1024 px, 39473 bytes, sha256 `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e`): Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom. Mapping: the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch. Used by: all 96 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own "image" field (none do).
 
 | id | lat | lon | yaw° | kind |
 |---|---|---|---|---|
@@ -141,38 +141,37 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 | p063 | 48.1161771 | -122.753612 | 44.7842 | landmark |
 | p064 | 48.1159974 | -122.7884084 | 49.003 | park |
 | p065 | 48.1159077 | -122.8058278 | 47.5968 | intersection |
-| p066 | 48.1152013 | -122.7572599 | 51.8156 | landmark |
-| p067 | 48.1151747 | -122.7728012 | 50.4093 | park |
-| p068 | 48.115057 | -122.7585368 | 54.6282 | landmark |
-| p069 | 48.1149257 | -122.7527654 | 53.2219 | landmark |
+| p066 | 48.1152989 | -122.7533024 | 51.8156 | park |
+| p067 | 48.1152013 | -122.7572599 | 50.4093 | landmark |
+| p068 | 48.1151747 | -122.7728012 | 54.6282 | park |
+| p069 | 48.115057 | -122.7585368 | 53.2219 | landmark |
 | p070 | 48.1148622 | -122.755466 | 79.929 | intersection |
 | p071 | 48.1145182 | -122.7789711 | 81.3352 | intersection |
 | p072 | 48.11448 | -122.7851019 | 77.1164 | intersection |
 | p073 | 48.1144383 | -122.7564773 | 78.5227 | intersection |
 | p074 | 48.1137036 | -122.7914868 | 74.3038 | intersection |
 | p075 | 48.1135969 | -122.769814 | 75.7101 | intersection |
-| p076 | 48.1135273 | -122.7557811 | 71.4913 | trail |
-| p077 | 48.1124045 | -122.7680123 | 72.8975 | landmark |
-| p078 | 48.112 | -122.80521 | 68.6787 | trail |
-| p079 | 48.1119739 | -122.8116587 | 70.085 | intersection |
-| p080 | 48.1119658 | -122.7991517 | 82.6712 | intersection |
-| p081 | 48.1100024 | -122.8001405 | 81.2649 | intersection |
-| p082 | 48.1097966 | -122.7700739 | 79.8587 | park |
-| p083 | 48.1090189 | -122.7754335 | 78.4524 | intersection |
-| p084 | 48.1088575 | -122.8053226 | 77.0461 | intersection |
-| p085 | 48.1086575 | -122.7844025 | 75.6398 | intersection |
+| p076 | 48.1124045 | -122.7680123 | 71.4913 | landmark |
+| p077 | 48.112 | -122.80521 | 72.8975 | trail |
+| p078 | 48.1119739 | -122.8116587 | 68.6787 | intersection |
+| p079 | 48.1119658 | -122.7991517 | 70.085 | intersection |
+| p080 | 48.1100024 | -122.8001405 | 82.6712 | intersection |
+| p081 | 48.1097966 | -122.7700739 | 81.2649 | park |
+| p082 | 48.1090189 | -122.7754335 | 79.8587 | intersection |
+| p083 | 48.1088575 | -122.8053226 | 78.4524 | intersection |
+| p084 | 48.1086575 | -122.7844025 | 77.0461 | intersection |
+| p085 | 48.1079253 | -122.7743683 | 75.6398 | intersection |
 | p086 | 48.1078305 | -122.7942766 | 74.2335 | park |
-| p087 | 48.107061 | -122.7729139 | 72.8272 | landmark |
-| p088 | 48.1069291 | -122.7836209 | 71.421 | park |
-| p089 | 48.106407 | -122.7903057 | 70.0147 | intersection |
-| p090 | 48.1063245 | -122.8059248 | 74.2212 | intersection |
-| p091 | 48.1057596 | -122.7798791 | 75.6275 | trail |
-| p092 | 48.1052212 | -122.8106503 | 77.0338 | intersection |
-| p093 | 48.1043413 | -122.8027995 | 78.44 | intersection |
-| p094 | 48.1041554 | -122.7957129 | 68.5961 | park |
-| p095 | 48.1016811 | -122.8051792 | 70.0023 | intersection |
-| p096 | 48.1005447 | -122.7913258 | 71.4086 | intersection |
-| p097 | 48.1000411 | -122.8132261 | 72.8149 | trail |
+| p087 | 48.1069291 | -122.7836209 | 72.8272 | park |
+| p088 | 48.106407 | -122.7903057 | 71.421 | intersection |
+| p089 | 48.1063245 | -122.8059248 | 70.0147 | intersection |
+| p090 | 48.1057596 | -122.7798791 | 74.2212 | trail |
+| p091 | 48.1052212 | -122.8106503 | 75.6275 | intersection |
+| p092 | 48.1043413 | -122.8027995 | 77.0338 | intersection |
+| p093 | 48.1041554 | -122.7957129 | 78.44 | park |
+| p094 | 48.1016811 | -122.8051792 | 68.5961 | intersection |
+| p095 | 48.1005447 | -122.7913258 | 70.0023 | intersection |
+| p096 | 48.1000411 | -122.8132261 | 71.4086 | trail |
 
 ## 6. Excluded (not drawn in the geometry record)
 - real players: live count only (never positions)
@@ -181,4 +180,4 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 - other singer performer bots: 0 configured now (one per player-named singer, dynamic)
 - GhostBot (purple Victorian tux, client-side, walks loops around the viewer): 1
 
-Record: `geometry/record.json` sha256 `fda9ebbee6fd9bf3756298f5bb5ea09ea81439302ae1d2fdba7b012d96622e1d`, generated 2026-10-17T11:08:06-07:00.
+Record: `geometry/record.json` sha256 `fdeb11a030cf3d7964d1ad1927263921c0cbb88ad91ebc57b7c5e054d62e70e6`, generated 2026-10-17T11:13:57-07:00.

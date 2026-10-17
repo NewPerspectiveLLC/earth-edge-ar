@@ -2,7 +2,7 @@
  "spec": "Live Geometry geometry record v1.0",
  "date": "2026-10-17",
  "status": "locked (pillars: as of d44 working tree)",
- "generated": "2026-10-17T11:08:06-07:00",
+ "generated": "2026-10-17T11:13:57-07:00",
  "sphere": {
   "R_m": 6371000.0,
   "frame": "ECEF-like, +Z north pole, +X lat0/lon0; heights spherical"
@@ -25,9 +25,9 @@
   "characters": 1,
   "test": 2,
   "vehicles": 1,
-  "pillars": 97
+  "pillars": 96
  },
- "total": 274,
+ "total": 273,
  "textures": [
   {
    "id": "tex.pillar-matt",
@@ -42,13 +42,13 @@
    "sha256": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
    "description": "Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom.",
    "mapping": "the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch.",
-   "used_by": "all 97 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own \"image\" field (none do)"
+   "used_by": "all 96 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own \"image\" field (none do)"
   }
  ],
  "pillars_meta": {
   "file": "pillars.json",
-  "sha256": "97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f",
-  "count": 97,
+  "sha256": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
+  "count": 96,
   "src": "OpenStreetMap contributors (ODbL) via Overpass, fetched 2026-10-17; public places only (street-corner right-of-way 4 m NE of intersection centre, park/landmark/trail points); stratified 490 m grid, seed 44; keep-out radius around a private area; water (harbor/lagoon polygons) excluded",
   "constants": {
    "heightM": 1.8,
@@ -91,22 +91,22 @@
   }
  ],
  "source_hashes": {
-  "audio.js": "986f97772335a168bfc88ec38bc7d4d816b942cc6d4948b4cfe2589a3beed481",
-  "circle.js": "1cc8d5d0ff6729bc06e3df9fad9975380fc0f577254eccec5021b68e2446f7d5",
+  "audio.js": "734a215c65d4e0c9c7a6914cebfef5fb7c32fb9a5bb38adc1a7e4081cee83963",
+  "circle.js": "45fb127373c85fd526d700a1924762767d834005b20c22ea375d0c328cc1638e",
   "coast.json": "1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400",
   "continents.json": "1dc47aca434d0e27ec41cb20a36116ee7099a714fb53ef2a423f00aeb096ba16",
-  "daynight.js": "2094e3b22c0147800da7a5166290baaef37d68c1fe38952161692ead0909bfd8",
-  "extras.js": "36fea2b97a483639e810bcad70f83448997f3f7357718ea06bfcf00eb518de61",
-  "figures-registry.js": "e9f6df428db6042a9f6e92c9b237c3dff72b74b4ec4b967c87bfdbfad5e03e6a",
-  "index.html": "944cc9199efe8bc3fe134427ae4d60f5efa9098f57f94a5677982757167f204b",
+  "daynight.js": "75902d38e65013070b9568de3304474a25b6a5efd5dfc9ec91d0d00bcc9e5cc5",
+  "extras.js": "5bf7a6a1a8d562da67ca6148137b845ee70117f42e2031d2621cbe1d2ffd9b98",
+  "figures-registry.js": "52a07a4e56d599570304c217e22b45aeafb4ca578a7998c11675eff2dfdbf142",
+  "index.html": "ff13f06f695cb0a6f30f2465d418e62d135ca5167cb4003e6f9cacf15be617b9",
   "landmass.json": "5a7c28c9497cd51d17080d909f3fd747386fbc2cc9110257bafd82c21b461292",
   "mountains.json": "1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b",
   "pillar-matt.jpg": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
-  "pillars.js": "676aedcf40e2d9d494d36b988ffe898b69ba8507fca13758efeb81639978321d",
-  "pillars.json": "97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f",
-  "quest.html": "d58b084112a93b262d9e3e7dd83e2d4e413fb7d6c2de24e009f9605ba4efe953",
-  "ren.js": "db988f335691142a1d298e26e3f7cbd62772aadf8e461e730282eeba0ec15ca2",
-  "server/server.js": "8809566197a6537d4f697c76f4fb26cffe6209c47ad61250f7ce03722f93954a",
+  "pillars.js": "35617834ce8cbf9e5b05dfe038b56a9689a984604c5a4c5f0678b8845c7f762c",
+  "pillars.json": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
+  "quest.html": "61c265993e11b93e58f9fbc4aa551f0bb77b9cf76dafdc1b68aaf80ec884decb",
+  "ren.js": "0a0877cf01ce53badba8d7fcad776a219445626742a7d87e416624fc5efe9f14",
+  "server/server.js": "a44e7678f4057f91d7f16fe31bc432c61e355d0fe2a36801a87974e23e14902a",
   "sheridan.json": "ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119",
   "shore.json": "228da1eb820e1051209e72f0a7f8c72cc31bce8a3c954f045321cd10ff73f12b",
   "streets.json": "97df6e921390ded7ac280e2c429607d3e9ea2c9fced529b25e360ddaaf998580",
@@ -5331,11 +5331,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p066",
-   "name": "Haller Fountain",
+   "name": "City Dock (at John Pope Marine Park)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1152013,
-   "lon": -122.7572599,
+   "lat": 48.1152989,
+   "lon": -122.7533024,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5348,7 +5348,7 @@
     8.184,
     248.184
    ],
-   "kind": "landmark",
+   "kind": "park",
    "area": "Downtown Water St",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -5359,11 +5359,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p067",
-   "name": "YMCA (out front)",
+   "name": "Haller Fountain",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1151747,
-   "lon": -122.7728012,
+   "lat": 48.1152013,
+   "lon": -122.7572599,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5376,8 +5376,8 @@
     9.591,
     249.591
    ],
-   "kind": "park",
-   "area": "Uptown (Lawrence St)",
+   "kind": "landmark",
+   "area": "Downtown Water St",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5387,11 +5387,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p068",
-   "name": "Bell Tower (out front)",
+   "name": "YMCA (out front)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.115057,
-   "lon": -122.7585368,
+   "lat": 48.1151747,
+   "lon": -122.7728012,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5404,8 +5404,8 @@
     5.372,
     245.372
    ],
-   "kind": "landmark",
-   "area": "Downtown Water St",
+   "kind": "park",
+   "area": "Uptown (Lawrence St)",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5415,11 +5415,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p069",
-   "name": "City Dock",
+   "name": "Bell Tower (out front)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1149257,
-   "lon": -122.7527654,
+   "lat": 48.115057,
+   "lon": -122.7585368,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5527,7 +5527,7 @@
   {
    "cat": "pillars",
    "id": "pillar.p073",
-   "name": "Taylor St & Water St",
+   "name": "Union Wharf (at Taylor St & Water St)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
    "lat": 48.1144383,
@@ -5611,11 +5611,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p076",
-   "name": "Union Wharf",
+   "name": "Jefferson County Courthouse (out front)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1135273,
-   "lon": -122.7557811,
+   "lat": 48.1124045,
+   "lon": -122.7680123,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5628,8 +5628,8 @@
     348.509,
     228.509
    ],
-   "kind": "trail",
-   "area": "Downtown Water St",
+   "kind": "landmark",
+   "area": "Uptown (Lawrence St)",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5639,11 +5639,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p077",
-   "name": "Jefferson County Courthouse (out front)",
+   "name": "Ready Athletics trail",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1124045,
-   "lon": -122.7680123,
+   "lat": 48.112,
+   "lon": -122.80521,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5656,8 +5656,8 @@
     347.102,
     227.102
    ],
-   "kind": "landmark",
-   "area": "Uptown (Lawrence St)",
+   "kind": "trail",
+   "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5667,11 +5667,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p078",
-   "name": "Ready Athletics trail",
+   "name": "Madrona Blvd & Morning Star Way",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.112,
-   "lon": -122.80521,
+   "lat": 48.1119739,
+   "lon": -122.8116587,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5684,7 +5684,7 @@
     351.321,
     231.321
    ],
-   "kind": "trail",
+   "kind": "intersection",
    "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -5695,11 +5695,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p079",
-   "name": "Madrona Blvd & Morning Star Way",
+   "name": "Austin Matthew Ln & Towne Point Ave",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1119739,
-   "lon": -122.8116587,
+   "lat": 48.1119658,
+   "lon": -122.7991517,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5723,11 +5723,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p080",
-   "name": "Austin Matthew Ln & Towne Point Ave",
+   "name": "14th St & McPherson St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1119658,
-   "lon": -122.7991517,
+   "lat": 48.1100024,
+   "lon": -122.8001405,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5751,11 +5751,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p081",
-   "name": "14th St & McPherson St",
+   "name": "Gateway Park",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1100024,
-   "lon": -122.8001405,
+   "lat": 48.1097966,
+   "lon": -122.7700739,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5768,8 +5768,8 @@
     338.735,
     218.735
    ],
-   "kind": "intersection",
-   "area": "Westside / Ready Athletics vicinity",
+   "kind": "park",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5779,11 +5779,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p082",
-   "name": "Gateway Park",
+   "name": "Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1097966,
-   "lon": -122.7700739,
+   "lat": 48.1090189,
+   "lon": -122.7754335,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5796,7 +5796,7 @@
     340.141,
     220.141
    ],
-   "kind": "park",
+   "kind": "intersection",
    "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -5807,11 +5807,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p083",
-   "name": "Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way)",
+   "name": "Discovery Rd & Howard St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1090189,
-   "lon": -122.7754335,
+   "lat": 48.1088575,
+   "lon": -122.8053226,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5825,7 +5825,7 @@
     221.548
    ],
    "kind": "intersection",
-   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5835,11 +5835,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p084",
-   "name": "Discovery Rd & Howard St",
+   "name": "12th St & Hill St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1088575,
-   "lon": -122.8053226,
+   "lat": 48.1086575,
+   "lon": -122.7844025,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5853,7 +5853,7 @@
     222.954
    ],
    "kind": "intersection",
-   "area": "Westside / Ready Athletics vicinity",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -5863,11 +5863,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p085",
-   "name": "12th St & Hill St",
+   "name": "Port Townsend Boat Haven (at Benedict St & Washington St)",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1086575,
-   "lon": -122.7844025,
+   "lat": 48.1079253,
+   "lon": -122.7743683,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5919,11 +5919,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p087",
-   "name": "Port Townsend Boat Haven (at Patrol Boat Pier)",
+   "name": "Minnie Nakano Park",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.107061,
-   "lon": -122.7729139,
+   "lat": 48.1069291,
+   "lon": -122.7836209,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5936,7 +5936,7 @@
     347.173,
     227.173
    ],
-   "kind": "landmark",
+   "kind": "park",
    "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -5947,11 +5947,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p088",
-   "name": "Minnie Nakano Park",
+   "name": "9th St & Sheridan St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1069291,
-   "lon": -122.7836209,
+   "lat": 48.106407,
+   "lon": -122.7903057,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5964,7 +5964,7 @@
     348.579,
     228.579
    ],
-   "kind": "park",
+   "kind": "intersection",
    "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -5975,11 +5975,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p089",
-   "name": "9th St & Sheridan St",
+   "name": "9th St & Rainier St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.106407,
-   "lon": -122.7903057,
+   "lat": 48.1063245,
+   "lon": -122.8059248,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5993,7 +5993,7 @@
     229.985
    ],
    "kind": "intersection",
-   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -6003,11 +6003,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p090",
-   "name": "9th St & Rainier St",
+   "name": "Larry Scott Memorial Trail",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1063245,
-   "lon": -122.8059248,
+   "lat": 48.1057596,
+   "lon": -122.7798791,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6020,8 +6020,8 @@
     345.779,
     225.779
    ],
-   "kind": "intersection",
-   "area": "Westside / Ready Athletics vicinity",
+   "kind": "trail",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -6031,11 +6031,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p091",
-   "name": "Larry Scott Memorial Trail",
+   "name": "5th St & 7th St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1057596,
-   "lon": -122.7798791,
+   "lat": 48.1052212,
+   "lon": -122.8106503,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6048,8 +6048,8 @@
     344.373,
     224.373
    ],
-   "kind": "trail",
-   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
     "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
@@ -6059,11 +6059,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p092",
-   "name": "5th St & 7th St",
+   "name": "Cliff St & South Park Ave",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1052212,
-   "lon": -122.8106503,
+   "lat": 48.1043413,
+   "lon": -122.8027995,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6087,11 +6087,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p093",
-   "name": "Cliff St & South Park Ave",
+   "name": "Bishop Play Park",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1043413,
-   "lon": -122.8027995,
+   "lat": 48.1041554,
+   "lon": -122.7957129,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6104,7 +6104,7 @@
     341.56,
     221.56
    ],
-   "kind": "intersection",
+   "kind": "park",
    "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -6115,11 +6115,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p094",
-   "name": "Bishop Play Park",
+   "name": "Evans Vista & Rainier St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1041554,
-   "lon": -122.7957129,
+   "lat": 48.1016811,
+   "lon": -122.8051792,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6132,7 +6132,7 @@
     351.404,
     231.404
    ],
-   "kind": "park",
+   "kind": "intersection",
    "area": "Westside / Ready Athletics vicinity",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -6143,11 +6143,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p095",
-   "name": "Evans Vista & Rainier St",
+   "name": "1st St & Grant St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1016811,
-   "lon": -122.8051792,
+   "lat": 48.1005447,
+   "lon": -122.7913258,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -6161,34 +6161,6 @@
     229.998
    ],
    "kind": "intersection",
-   "area": "Westside / Ready Athletics vicinity",
-   "sound": {
-    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
-    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
-    "voices": "nearest 2 within 55 m, shared loop clock"
-   }
-  },
-  {
-   "cat": "pillars",
-   "id": "pillar.p096",
-   "name": "1st St & Grant St",
-   "type": "Matt Ready prism pillar",
-   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1005447,
-   "lon": -122.7913258,
-   "size": {
-    "h_m": 1.8,
-    "side_m": 0.7
-   },
-   "anchor": "floor, flat local map; yaw about up axis",
-   "source": "pillars.json / pillars.js",
-   "yaw_deg": 71.4086,
-   "corner_bearings_deg": [
-    108.591,
-    348.591,
-    228.591
-   ],
-   "kind": "intersection",
    "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
@@ -6198,7 +6170,7 @@
   },
   {
    "cat": "pillars",
-   "id": "pillar.p097",
+   "id": "pillar.p096",
    "name": "Larry Scott Memorial Trail",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
@@ -6210,11 +6182,11 @@
    },
    "anchor": "floor, flat local map; yaw about up axis",
    "source": "pillars.json / pillars.js",
-   "yaw_deg": 72.8149,
+   "yaw_deg": 71.4086,
    "corner_bearings_deg": [
-    107.185,
-    347.185,
-    227.185
+    108.591,
+    348.591,
+    228.591
    ],
    "kind": "trail",
    "area": "Westside / Ready Athletics vicinity",
