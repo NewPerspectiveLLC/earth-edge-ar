@@ -1,11 +1,11 @@
 // orbball.js (d46): the visible Master DJ "flying sound" orb. Follows orbit.js (the same offsets that drive the HRTF panner in audio.js), so what you see is what you hear.
 // Neon purple plasma/fire ball, 10 m across: fbm value-noise fire surface with scrolling flames + fresnel rim (opaque, 1 draw), animated flame corona billboard (1),
 // two additive glow halos (2), ember/spark particles shed into the world as a trail (1 draw, Points), Matt Ready "Project Driftwood" billboard hanging below it (1) with a
-// purple underglow (1). Everything pulses to the beat (beat.js?v=1792279505907). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
+// purple underglow (1). Everything pulses to the beat (beat.js?v=1792279923523). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
 // Master DJ with Flying sound on and the DJ playing. Also plants ONE copy of the same image on the ground 6-10 m from the player at their first fix: client-side only, never sent.
 import * as THREE from 'three';
-import { ORB, frame as orbFrame } from './orbit.js?v=1792279505907';
-import * as BEAT from './beat.js?v=1792279505907';
+import { ORB, frame as orbFrame } from './orbit.js?v=1792279923523';
+import * as BEAT from './beat.js?v=1792279923523';
 const MOBILE = /iPhone|iPad|iPod|Android|OculusBrowser|Quest|Mobile/i.test(navigator.userAgent);
 const NOISE = `float hh(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}
@@ -67,8 +67,8 @@ export function initOrb(parent, toLocal, cam, opts = {}) {
     U.pulse.value += (pulse - U.pulse.value) * Math.min(1, dt * 20); U.t.value = t; U.lin.value = O.linger || 0;
     if (show) {
       const bob = Math.sin(t * 1.3) * .35; root.position.set(cp.x + O.e, cp.y + O.u + bob, cp.z - O.n);
-      const d = root.position.distanceTo(cp); S.dist = d; const far = d > 35; S.lod = far ? 'far' : 'near';
-      U.oct.value = (MOBILE ? 3 : 5) - (far ? 1 : 0); UC.oct.value = (MOBILE ? 2 : 3) - (far && !MOBILE ? 1 : 0);
+      const d = root.position.distanceTo(cp); S.dist = d; const far = d > 35, vfar = d > 300; S.lod = vfar ? 'tour' : far ? 'far' : 'near';
+      U.oct.value = (MOBILE ? 3 : 5) - (far ? 1 : 0) - (vfar ? 1 : 0); UC.oct.value = (MOBILE ? 2 : 3) - (far && !MOBILE ? 1 : 0);
       const s = 1 + .06 * U.pulse.value; core.scale.setScalar(s); corona.quaternion.copy(cam.getWorldQuaternion(qa)).premultiply(parent.getWorldQuaternion(qb).invert());   // camera-facing billboard in the parent frame
       halo1.material.opacity = .45 + .3 * U.pulse.value + .15 * U.lin.value; halo2.material.opacity = .25 + .2 * U.pulse.value; halo1.scale.setScalar(19 * (1 + .1 * U.pulse.value)).setZ(1);
       mattG.position.set(0, -R - .4 - ORB.imageH, 0); mattG.rotation.y = Math.atan2(cp.x - root.position.x, cp.z - root.position.z); under.position.set(0, -R - .6, 0); under.material.opacity = .45 + .3 * U.pulse.value;
@@ -82,6 +82,7 @@ export function initOrb(parent, toLocal, cam, opts = {}) {
       eV[k] += Math.sin(w) * .8 * dt; eV[k + 2] += Math.cos(w * 1.3) * .8 * dt; eV[k + 1] += .4 * dt; eP[k] += eV[k] * dt; eP[k + 1] += eV[k + 1] * dt; eP[k + 2] += eV[k + 2] * dt }
     eg.attributes.position.needsUpdate = eg.attributes.life.needsUpdate = true; embers.visible = show || eL.some(x => x < 1);
   }
+  root.traverse(o => o.frustumCulled = false);   /* never culled: perspective shrink only, no min size (also on 1-3 km trail tours) */
   const api = { update, root, core, embers, spawn, state: S, get orbit() { return window.EEAR_ORB }, MOBILE, drawCalls: 7 };
   return api;
 }
