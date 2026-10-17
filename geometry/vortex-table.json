@@ -1,0 +1,698 @@
+{
+ "spec": "Live Geometry vortex table v1.0 (2026-10-17, locked)",
+ "R_m": 6371000.0,
+ "k": 12,
+ "step_deg": 30.0,
+ "b0_deg": 0.0,
+ "vortices": [
+  {
+   "id": "vxRA",
+   "name": "Ready Athletics Vortex",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "color": "#ffc800",
+   "source": "index.html TARGETS / daynight.js SITES / figures-registry READY_ATHLETICS",
+   "v": [
+    -0.361755427749,
+    -0.561207404772,
+    0.744432172413
+   ],
+   "E": [
+    0.840510722386,
+    -0.541794910971,
+    0.0
+   ],
+   "N": [
+    0.403329562576,
+    0.625703223002,
+    0.667698090964
+   ],
+   "antipode_latlon": [
+    -48.11035,
+    57.19409000000002
+   ],
+   "antipode_v": [
+    0.361755427749,
+    0.561207404772,
+    -0.744432172413
+   ],
+   "great_circles": [
+    {
+     "k": 0,
+     "bearings_deg": [
+      0.0,
+      180.0
+     ],
+     "normal": [
+      -0.840510722,
+      0.541794911,
+      0.0
+     ],
+     "pole_latlon": [
+      0.0,
+      147.19409
+     ],
+     "inclination_deg": 90.0
+    },
+    {
+     "k": 1,
+     "bearings_deg": [
+      30.0,
+      210.0
+     ],
+     "normal": [
+      -0.526238856,
+      0.782059768,
+      0.333849045
+     ],
+     "pole_latlon": [
+      19.502564,
+      123.936148
+     ],
+     "inclination_deg": 70.497436
+    },
+    {
+     "k": 2,
+     "bearings_deg": [
+      60.0,
+      240.0
+     ],
+     "normal": [
+      -0.070961714,
+      0.812772342,
+      0.578243509
+     ],
+     "pole_latlon": [
+      35.327095,
+      94.98974
+     ],
+     "inclination_deg": 54.672905
+    },
+    {
+     "k": 3,
+     "bearings_deg": [
+      90.0,
+      270.0
+     ],
+     "normal": [
+      0.403329563,
+      0.625703223,
+      0.667698091
+     ],
+     "pole_latlon": [
+      41.88965,
+      57.19409
+     ],
+     "inclination_deg": 48.11035
+    },
+    {
+     "k": 4,
+     "bearings_deg": [
+      120.0,
+      300.0
+     ],
+     "normal": [
+      0.769549008,
+      0.270977431,
+      0.578243509
+     ],
+     "pole_latlon": [
+      35.327095,
+      19.39844
+     ],
+     "inclination_deg": 54.672905
+    },
+    {
+     "k": 5,
+     "bearings_deg": [
+      150.0,
+      330.0
+     ],
+     "normal": [
+      0.929568419,
+      -0.156356545,
+      0.333849045
+     ],
+     "pole_latlon": [
+      19.502564,
+      -9.547968
+     ],
+     "inclination_deg": 70.497436
+    }
+   ],
+   "wedges": [
+    {
+     "k": 0,
+     "bearing_from": 0.0,
+     "bearing_to": 30.0,
+     "color": "#ff3b30",
+     "test": "p.n(0) < 0 and p.n(30) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 1,
+     "bearing_from": 30.0,
+     "bearing_to": 60.0,
+     "color": "#ff9500",
+     "test": "p.n(30) < 0 and p.n(60) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 2,
+     "bearing_from": 60.0,
+     "bearing_to": 90.0,
+     "color": "#ffcc00",
+     "test": "p.n(60) < 0 and p.n(90) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 3,
+     "bearing_from": 90.0,
+     "bearing_to": 120.0,
+     "color": "#9be22d",
+     "test": "p.n(90) < 0 and p.n(120) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 4,
+     "bearing_from": 120.0,
+     "bearing_to": 150.0,
+     "color": "#34c759",
+     "test": "p.n(120) < 0 and p.n(150) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 5,
+     "bearing_from": 150.0,
+     "bearing_to": 180.0,
+     "color": "#00c7be",
+     "test": "p.n(150) < 0 and p.n(180) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 6,
+     "bearing_from": 180.0,
+     "bearing_to": 210.0,
+     "color": "#30b0ff",
+     "test": "p.n(180) < 0 and p.n(210) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 7,
+     "bearing_from": 210.0,
+     "bearing_to": 240.0,
+     "color": "#007aff",
+     "test": "p.n(210) < 0 and p.n(240) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 8,
+     "bearing_from": 240.0,
+     "bearing_to": 270.0,
+     "color": "#5856d6",
+     "test": "p.n(240) < 0 and p.n(270) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 9,
+     "bearing_from": 270.0,
+     "bearing_to": 300.0,
+     "color": "#af52de",
+     "test": "p.n(270) < 0 and p.n(300) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 10,
+     "bearing_from": 300.0,
+     "bearing_to": 330.0,
+     "color": "#ff2d92",
+     "test": "p.n(300) < 0 and p.n(330) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 11,
+     "bearing_from": 330.0,
+     "bearing_to": 360.0,
+     "color": "#ff6482",
+     "test": "p.n(330) < 0 and p.n(360) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    }
+   ],
+   "fill_radius_m": 300.0,
+   "ground_halfline_km": 110,
+   "hub_m": 180
+  },
+  {
+   "id": "vxCappy",
+   "name": "Cappy's (Happy's) Trails Vortex pillar",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "color": "#30ff60",
+   "source": "index.html TARGETS / figures-registry CAPPYS",
+   "v": [
+    -0.36153986171,
+    -0.561017038858,
+    0.744680341157
+   ],
+   "E": [
+    0.840574072543,
+    -0.541696620414,
+    0.0
+   ],
+   "N": [
+    0.403390824094,
+    0.62595898711,
+    0.667421298352
+   ],
+   "antipode_latlon": [
+    -48.13165,
+    57.200789999999984
+   ],
+   "antipode_v": [
+    0.36153986171,
+    0.561017038858,
+    -0.744680341157
+   ],
+   "great_circles": [
+    {
+     "k": 0,
+     "bearings_deg": [
+      0.0,
+      180.0
+     ],
+     "normal": [
+      -0.840574073,
+      0.54169662,
+      -0.0
+     ],
+     "pole_latlon": [
+      -0.0,
+      147.20079
+     ],
+     "inclination_deg": 90.0
+    },
+    {
+     "k": 1,
+     "bearings_deg": [
+      30.0,
+      210.0
+     ],
+     "normal": [
+      -0.526263089,
+      0.782102528,
+      0.333710649
+     ],
+     "pole_latlon": [
+      19.494152,
+      123.935919
+     ],
+     "inclination_deg": 70.505848
+    },
+    {
+     "k": 2,
+     "bearings_deg": [
+      60.0,
+      240.0
+     ],
+     "normal": [
+      -0.070940335,
+      0.812944695,
+      0.578003799
+     ],
+     "pole_latlon": [
+      35.310263,
+      94.987192
+     ],
+     "inclination_deg": 54.689737
+    },
+    {
+     "k": 3,
+     "bearings_deg": [
+      90.0,
+      270.0
+     ],
+     "normal": [
+      0.403390824,
+      0.625958987,
+      0.667421298
+     ],
+     "pole_latlon": [
+      41.86835,
+      57.20079
+     ],
+     "inclination_deg": 48.13165
+    },
+    {
+     "k": 4,
+     "bearings_deg": [
+      120.0,
+      300.0
+     ],
+     "normal": [
+      0.769633738,
+      0.271248074,
+      0.578003799
+     ],
+     "pole_latlon": [
+      35.310263,
+      19.414388
+     ],
+     "inclination_deg": 54.689737
+    },
+    {
+     "k": 5,
+     "bearings_deg": [
+      150.0,
+      330.0
+     ],
+     "normal": [
+      0.929653913,
+      -0.156143541,
+      0.333710649
+     ],
+     "pole_latlon": [
+      19.494152,
+      -9.534339
+     ],
+     "inclination_deg": 70.505848
+    }
+   ],
+   "wedges": [
+    {
+     "k": 0,
+     "bearing_from": 0.0,
+     "bearing_to": 30.0,
+     "color": "#ff3b30",
+     "test": "p.n(0) < 0 and p.n(30) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 1,
+     "bearing_from": 30.0,
+     "bearing_to": 60.0,
+     "color": "#ff9500",
+     "test": "p.n(30) < 0 and p.n(60) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 2,
+     "bearing_from": 60.0,
+     "bearing_to": 90.0,
+     "color": "#ffcc00",
+     "test": "p.n(60) < 0 and p.n(90) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 3,
+     "bearing_from": 90.0,
+     "bearing_to": 120.0,
+     "color": "#9be22d",
+     "test": "p.n(90) < 0 and p.n(120) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 4,
+     "bearing_from": 120.0,
+     "bearing_to": 150.0,
+     "color": "#34c759",
+     "test": "p.n(120) < 0 and p.n(150) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 5,
+     "bearing_from": 150.0,
+     "bearing_to": 180.0,
+     "color": "#00c7be",
+     "test": "p.n(150) < 0 and p.n(180) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 6,
+     "bearing_from": 180.0,
+     "bearing_to": 210.0,
+     "color": "#30b0ff",
+     "test": "p.n(180) < 0 and p.n(210) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 7,
+     "bearing_from": 210.0,
+     "bearing_to": 240.0,
+     "color": "#007aff",
+     "test": "p.n(210) < 0 and p.n(240) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 8,
+     "bearing_from": 240.0,
+     "bearing_to": 270.0,
+     "color": "#5856d6",
+     "test": "p.n(240) < 0 and p.n(270) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 9,
+     "bearing_from": 270.0,
+     "bearing_to": 300.0,
+     "color": "#af52de",
+     "test": "p.n(270) < 0 and p.n(300) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 10,
+     "bearing_from": 300.0,
+     "bearing_to": 330.0,
+     "color": "#ff2d92",
+     "test": "p.n(300) < 0 and p.n(330) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 11,
+     "bearing_from": 330.0,
+     "bearing_to": 360.0,
+     "color": "#ff6482",
+     "test": "p.n(330) < 0 and p.n(360) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    }
+   ],
+   "fill_radius_m": 300.0,
+   "ground_halfline_km": 110,
+   "hub_m": 180
+  },
+  {
+   "id": "vxGarden",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source)",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "color": "#c080ff",
+   "source": "index.html GARDEN / audio.js SRC / figures-registry GARDEN",
+   "v": [
+    -0.361540068289,
+    -0.561016944386,
+    0.744680312036
+   ],
+   "E": [
+    0.840573890074,
+    -0.54169690356,
+    0.0
+   ],
+   "N": [
+    0.403391019172,
+    0.625958826749,
+    0.667421330845
+   ],
+   "antipode_latlon": [
+    -48.1316475,
+    57.20077070000002
+   ],
+   "antipode_v": [
+    0.361540068289,
+    0.561016944386,
+    -0.744680312036
+   ],
+   "great_circles": [
+    {
+     "k": 0,
+     "bearings_deg": [
+      0.0,
+      180.0
+     ],
+     "normal": [
+      -0.84057389,
+      0.541696904,
+      0.0
+     ],
+     "pole_latlon": [
+      0.0,
+      147.200771
+     ],
+     "inclination_deg": 90.0
+    },
+    {
+     "k": 1,
+     "bearings_deg": [
+      30.0,
+      210.0
+     ],
+     "normal": [
+      -0.526262833,
+      0.782102693,
+      0.333710665
+     ],
+     "pole_latlon": [
+      19.494153,
+      123.935901
+     ],
+     "inclination_deg": 70.505847
+    },
+    {
+     "k": 2,
+     "bearings_deg": [
+      60.0,
+      240.0
+     ],
+     "normal": [
+      -0.070940075,
+      0.812944697,
+      0.578003828
+     ],
+     "pole_latlon": [
+      35.310265,
+      94.987174
+     ],
+     "inclination_deg": 54.689735
+    },
+    {
+     "k": 3,
+     "bearings_deg": [
+      90.0,
+      270.0
+     ],
+     "normal": [
+      0.403391019,
+      0.625958827,
+      0.667421331
+     ],
+     "pole_latlon": [
+      41.868353,
+      57.200771
+     ],
+     "inclination_deg": 48.131647
+    },
+    {
+     "k": 4,
+     "bearings_deg": [
+      120.0,
+      300.0
+     ],
+     "normal": [
+      0.769633815,
+      0.271247794,
+      0.578003828
+     ],
+     "pole_latlon": [
+      35.310265,
+      19.414367
+     ],
+     "inclination_deg": 54.689735
+    },
+    {
+     "k": 5,
+     "bearings_deg": [
+      150.0,
+      330.0
+     ],
+     "normal": [
+      0.929653852,
+      -0.156143866,
+      0.333710665
+     ],
+     "pole_latlon": [
+      19.494153,
+      -9.534359
+     ],
+     "inclination_deg": 70.505847
+    }
+   ],
+   "wedges": [
+    {
+     "k": 0,
+     "bearing_from": 0.0,
+     "bearing_to": 30.0,
+     "color": "#ff3b30",
+     "test": "p.n(0) < 0 and p.n(30) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 1,
+     "bearing_from": 30.0,
+     "bearing_to": 60.0,
+     "color": "#ff9500",
+     "test": "p.n(30) < 0 and p.n(60) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 2,
+     "bearing_from": 60.0,
+     "bearing_to": 90.0,
+     "color": "#ffcc00",
+     "test": "p.n(60) < 0 and p.n(90) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 3,
+     "bearing_from": 90.0,
+     "bearing_to": 120.0,
+     "color": "#9be22d",
+     "test": "p.n(90) < 0 and p.n(120) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 4,
+     "bearing_from": 120.0,
+     "bearing_to": 150.0,
+     "color": "#34c759",
+     "test": "p.n(120) < 0 and p.n(150) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 5,
+     "bearing_from": 150.0,
+     "bearing_to": 180.0,
+     "color": "#00c7be",
+     "test": "p.n(150) < 0 and p.n(180) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 6,
+     "bearing_from": 180.0,
+     "bearing_to": 210.0,
+     "color": "#30b0ff",
+     "test": "p.n(180) < 0 and p.n(210) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 7,
+     "bearing_from": 210.0,
+     "bearing_to": 240.0,
+     "color": "#007aff",
+     "test": "p.n(210) < 0 and p.n(240) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 8,
+     "bearing_from": 240.0,
+     "bearing_to": 270.0,
+     "color": "#5856d6",
+     "test": "p.n(240) < 0 and p.n(270) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 9,
+     "bearing_from": 270.0,
+     "bearing_to": 300.0,
+     "color": "#af52de",
+     "test": "p.n(270) < 0 and p.n(300) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 10,
+     "bearing_from": 300.0,
+     "bearing_to": 330.0,
+     "color": "#ff2d92",
+     "test": "p.n(300) < 0 and p.n(330) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    },
+    {
+     "k": 11,
+     "bearing_from": 330.0,
+     "bearing_to": 360.0,
+     "color": "#ff6482",
+     "test": "p.n(330) < 0 and p.n(360) > 0, n(theta)=v x d_theta, n(theta+180)=-n(theta)"
+    }
+   ],
+   "fill_radius_m": 300.0,
+   "ground_halfline_km": 110,
+   "hub_m": 180
+  }
+ ],
+ "separations": {
+  "vxRA-vxCappy": {
+   "m": 2420.1,
+   "bearing": 11.856
+  },
+  "vxRA-vxGarden": {
+   "m": 2419.54,
+   "bearing": 11.825
+  },
+  "vxCappy-vxGarden": {
+   "m": 1.46,
+   "bearing": 259.017
+  }
+ }
+}

@@ -1,0 +1,6228 @@
+{
+ "spec": "Live Geometry geometry record v1.0",
+ "date": "2026-10-17",
+ "status": "locked (pillars: as of d44 working tree)",
+ "generated": "2026-10-17T11:08:06-07:00",
+ "sphere": {
+  "R_m": 6371000.0,
+  "frame": "ECEF-like, +Z north pole, +X lat0/lon0; heights spherical"
+ },
+ "counts_by_category": {
+  "landmarks": 35,
+  "saucers": 7,
+  "lines": 7,
+  "vortex": 25,
+  "garden": 2,
+  "circle": 33,
+  "night": 6,
+  "sky": 4,
+  "trails": 11,
+  "streets": 4,
+  "geography": 14,
+  "far": 7,
+  "edges": 3,
+  "bots": 15,
+  "characters": 1,
+  "test": 2,
+  "vehicles": 1,
+  "pillars": 97
+ },
+ "total": 274,
+ "textures": [
+  {
+   "id": "tex.pillar-matt",
+   "file": "pillar-matt.jpg",
+   "format": "JPEG",
+   "mode": "RGB",
+   "pixels": [
+    432,
+    1024
+   ],
+   "bytes": 39473,
+   "sha256": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
+   "description": "Purple Matt Ready figure: stylised robot-like body with a dark screen face showing a cyan winking smile, purple velvet tailcoat tuxedo with white shirt-front and black bow tie, purple top hat with cyan band, white gloves, holding a black microphone, dark trousers and shoes, on a purple gradient background with a cyan border and the caption 'MATT READY' in yellow at the bottom.",
+   "mapping": "the same full image on all 3 side faces of every pillar; per face u: 0 at corner k -> 1 at corner k+1 (left->right seen from outside), v: 0 at face bottom (y=0.08 m) -> 1 at face top (y=1.75 m); unlit (MeshBasicMaterial, sRGB), front side only. Face 0.70 x 1.67 m (aspect .419) vs image 432x1024 (aspect .422): no crop, <1% stretch.",
+   "used_by": "all 97 pillars (pillars.js PILLAR_IMAGE / figures-registry PILLARS.image); a pillar may override with its own \"image\" field (none do)"
+  }
+ ],
+ "pillars_meta": {
+  "file": "pillars.json",
+  "sha256": "97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f",
+  "count": 97,
+  "src": "OpenStreetMap contributors (ODbL) via Overpass, fetched 2026-10-17; public places only (street-corner right-of-way 4 m NE of intersection centre, park/landmark/trail points); stratified 490 m grid, seed 44; keep-out radius around a private area; water (harbor/lagoon polygons) excluded",
+  "constants": {
+   "heightM": 1.8,
+   "sideM": 0.7,
+   "plinthM": 0.08,
+   "capM": 0.05,
+   "visibleM": 2500,
+   "audio": {
+    "fullM": 3,
+    "silentM": 55,
+    "voices": 2
+   }
+  }
+ },
+ "excluded_human_depictions": [
+  {
+   "what": "real players",
+   "count": "live count only (never positions)",
+   "why": "humans"
+  },
+  {
+   "what": "Matt's Shadow bot",
+   "count": 1,
+   "why": "follows Matt's real location"
+  },
+  {
+   "what": "Matt Ready performer bot (purple tuxedo rig)",
+   "count": 1,
+   "why": "human depiction - pending Matt"
+  },
+  {
+   "what": "other singer performer bots",
+   "count": "0 configured now (one per player-named singer, dynamic)",
+   "why": "human depiction - pending Matt"
+  },
+  {
+   "what": "GhostBot (purple Victorian tux, client-side, walks loops around the viewer)",
+   "count": 1,
+   "why": "human depiction - pending Matt"
+  }
+ ],
+ "source_hashes": {
+  "audio.js": "986f97772335a168bfc88ec38bc7d4d816b942cc6d4948b4cfe2589a3beed481",
+  "circle.js": "1cc8d5d0ff6729bc06e3df9fad9975380fc0f577254eccec5021b68e2446f7d5",
+  "coast.json": "1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400",
+  "continents.json": "1dc47aca434d0e27ec41cb20a36116ee7099a714fb53ef2a423f00aeb096ba16",
+  "daynight.js": "2094e3b22c0147800da7a5166290baaef37d68c1fe38952161692ead0909bfd8",
+  "extras.js": "36fea2b97a483639e810bcad70f83448997f3f7357718ea06bfcf00eb518de61",
+  "figures-registry.js": "e9f6df428db6042a9f6e92c9b237c3dff72b74b4ec4b967c87bfdbfad5e03e6a",
+  "index.html": "944cc9199efe8bc3fe134427ae4d60f5efa9098f57f94a5677982757167f204b",
+  "landmass.json": "5a7c28c9497cd51d17080d909f3fd747386fbc2cc9110257bafd82c21b461292",
+  "mountains.json": "1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b",
+  "pillar-matt.jpg": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
+  "pillars.js": "676aedcf40e2d9d494d36b988ffe898b69ba8507fca13758efeb81639978321d",
+  "pillars.json": "97243976deddd74b7599334fb034d1eebba831cec40d64c4dbe1b92304ecd19f",
+  "quest.html": "d58b084112a93b262d9e3e7dd83e2d4e413fb7d6c2de24e009f9605ba4efe953",
+  "ren.js": "db988f335691142a1d298e26e3f7cbd62772aadf8e461e730282eeba0ec15ca2",
+  "server/server.js": "8809566197a6537d4f697c76f4fb26cffe6209c47ad61250f7ce03722f93954a",
+  "sheridan.json": "ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119",
+  "shore.json": "228da1eb820e1051209e72f0a7f8c72cc31bce8a3c954f045321cd10ff73f12b",
+  "streets.json": "97df6e921390ded7ac280e2c429607d3e9ea2c9fced529b25e360ddaaf998580",
+  "trails.json": "d30d96df2e3ec131183376535aa5e907abd1fb00b80b90b5f8ed4d194b14d120"
+ },
+ "objects": [
+  {
+   "cat": "landmarks",
+   "id": "lm1.pillar",
+   "name": "Ready Athletics (997800502) - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm1.beam",
+   "name": "Ready Athletics (997800502) - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm1.ring",
+   "name": "Ready Athletics (997800502) - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm1.shape",
+   "name": "Ready Athletics (997800502) - type shape (field)",
+   "type": "type shape",
+   "shape": "ground disc r 25 m",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm1.label",
+   "name": "Ready Athletics (997800502) - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm1.saucer",
+   "name": "Ready Athletics (997800502) - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 19.8 m + ring 19.8-22 m + H; saucer: flattened sphere r 13.2 m (y-scale .22), dome r 5.28, rim torus; 8 pad lights at r 23.76; tractor beam cone r 2.5*S..9*S",
+   "lat": 48.1100805,
+   "lon": -122.8055064,
+   "size": {
+    "hover_y_m": 34,
+    "scale": 2.2
+   },
+   "anchor": "floor; offset 30 m east, 30 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "lines",
+   "id": "lm1.line",
+   "name": "Line to Ready Athletics (997800502)",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm2.pillar",
+   "name": "Cappy's Trails garden (998002802) - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm2.beam",
+   "name": "Cappy's Trails garden (998002802) - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm2.ring",
+   "name": "Cappy's Trails garden (998002802) - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm2.shape",
+   "name": "Cappy's Trails garden (998002802) - type shape (park)",
+   "type": "type shape",
+   "shape": "ground disc r 25 m",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm2.label",
+   "name": "Cappy's Trails garden (998002802) - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm2.saucer",
+   "name": "Cappy's Trails garden (998002802) - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.1314883,
+   "lon": -122.7989677,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "lines",
+   "id": "lm2.line",
+   "name": "Line to Cappy's Trails garden (998002802)",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm3.pillar",
+   "name": "Memory's Vault, Fort Worden - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm3.beam",
+   "name": "Memory's Vault, Fort Worden - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm3.ring",
+   "name": "Memory's Vault, Fort Worden - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm3.shape",
+   "name": "Memory's Vault, Fort Worden - type shape (landmark)",
+   "type": "type shape",
+   "shape": "obelisk: 4-sided frustum r 2->0.9 h 14 + pyramid cap h 2.5",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm3.label",
+   "name": "Memory's Vault, Fort Worden - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm3.saucer",
+   "name": "Memory's Vault, Fort Worden - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.1383025,
+   "lon": -122.7644606,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "lines",
+   "id": "lm3.line",
+   "name": "Line to Memory's Vault, Fort Worden",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.1384642,
+   "lon": -122.7647029,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#c060ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm4.pillar",
+   "name": "Port Townsend City Hall - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm4.beam",
+   "name": "Port Townsend City Hall - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm4.ring",
+   "name": "Port Townsend City Hall - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm4.shape",
+   "name": "Port Townsend City Hall - type shape (building)",
+   "type": "type shape",
+   "shape": "box 10x6x10 + 4-sided roof cone r 7.5 h 4",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm4.label",
+   "name": "Port Townsend City Hall - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm4.saucer",
+   "name": "Port Townsend City Hall - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.1160154,
+   "lon": -122.7533698,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "lines",
+   "id": "lm4.line",
+   "name": "Line to Port Townsend City Hall",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#40e0ff"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm5.pillar",
+   "name": "Jefferson County Sheriff's Office - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm5.beam",
+   "name": "Jefferson County Sheriff's Office - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm5.ring",
+   "name": "Jefferson County Sheriff's Office - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm5.shape",
+   "name": "Jefferson County Sheriff's Office - type shape (building)",
+   "type": "type shape",
+   "shape": "box 10x6x10 + 4-sided roof cone r 7.5 h 4",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm5.label",
+   "name": "Jefferson County Sheriff's Office - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm5.saucer",
+   "name": "Jefferson County Sheriff's Office - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.0240021,
+   "lon": -122.7642462,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "lines",
+   "id": "lm5.line",
+   "name": "Line to Jefferson County Sheriff's Office",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.0241638,
+   "lon": -122.764488,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#ff7020"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm6.pillar",
+   "name": "Jefferson Healthcare Hospital - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm6.beam",
+   "name": "Jefferson Healthcare Hospital - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm6.ring",
+   "name": "Jefferson Healthcare Hospital - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm6.shape",
+   "name": "Jefferson Healthcare Hospital - type shape (hospital)",
+   "type": "type shape",
+   "shape": "box 12x7x12 + cross (8x2.4 and 2.4x8 bars, 0.6 thick) at y 9",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm6.label",
+   "name": "Jefferson Healthcare Hospital - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm6.saucer",
+   "name": "Jefferson Healthcare Hospital - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.105839,
+   "lon": -122.7887541,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "lines",
+   "id": "lm6.line",
+   "name": "Line to Jefferson Healthcare Hospital",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.1060007,
+   "lon": -122.7889962,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#ff4060"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm7.pillar",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - pillar",
+   "type": "landmark pillar",
+   "shape": "cylinder 8-sided",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {
+    "r_m": 1.5,
+    "h_m": 120
+   },
+   "anchor": "floor (-1.6 m below eye), flat local map",
+   "source": "index.html TARGETS",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm7.beam",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - light beam",
+   "type": "beam",
+   "shape": "open cylinder, fades upward",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {
+    "r_m": 2.5,
+    "h_m": 200
+   },
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm7.ring",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - ground ring",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {
+    "r_in_m": 5,
+    "r_out_m": 7
+   },
+   "anchor": "floor +0.05 m",
+   "source": "index.html addBeamShape",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm7.shape",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - type shape (building)",
+   "type": "type shape",
+   "shape": "box 10x6x10 + 4-sided roof cone r 7.5 h 4",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {},
+   "anchor": "floor",
+   "source": "index.html addBeamShape",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "landmarks",
+   "id": "lm7.label",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - label",
+   "type": "label",
+   "shape": "sprite pill 160x40, live distance",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {
+    "y_m": 135
+   },
+   "anchor": "floor",
+   "source": "index.html",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "saucers",
+   "id": "lm7.saucer",
+   "name": "Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - saucer + landing pad",
+   "type": "saucer",
+   "shape": "pad: disc r 9 m + ring 9-10 m + H; saucer: flattened sphere r 6 m (y-scale .22), dome r 2.4, rim torus; 8 pad lights at r 10.8",
+   "lat": 48.1138066,
+   "lon": -122.7625811,
+   "size": {
+    "hover_y_m": 22,
+    "scale": 1
+   },
+   "anchor": "floor; offset 18 m east, 18 m south of the landmark (flat)",
+   "source": "index.html buildX + extras.makeSaucer",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "lines",
+   "id": "lm7.line",
+   "name": "Line to Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St)",
+   "type": "line to landmark",
+   "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
+   "lat": 48.1139683,
+   "lon": -122.7628233,
+   "size": {},
+   "anchor": "viewer-relative generator (no viewer position recorded)",
+   "source": "index.html updLocal / quest.html PLACES",
+   "color": "#e0c080"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.pillar",
+   "name": "Ready Athletics Vortex - vortex pillar",
+   "type": "vortex pillar",
+   "shape": "two open cylinders (r 16->9.6 and 6->3.6, h 420) + ring 10-14 m + core line",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "h_m": 420
+   },
+   "anchor": "floor, exact ENU",
+   "source": "extras.makeVortexPillar",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.funnel",
+   "name": "Ready Athletics Vortex - spiral funnel",
+   "type": "spiral",
+   "shape": "6 arms: r(u)=0.6*(2+28u^2), y=0.6*40u, angle=2pi k/6 + 6pi u, u in [0,1]; spins",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "h_m": 24
+   },
+   "anchor": "floor",
+   "source": "extras.makeVortexLocal (scale .6)",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.wedges",
+   "name": "Ready Athletics Vortex - 12 wedge fills",
+   "type": "wedge fill",
+   "shape": "12 x 30 deg circular sectors, wedge k = bearings [30k,30k+30), alpha fades smoothstep(.15,1,r/300)",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "r_m": 300
+   },
+   "anchor": "floor +0.01",
+   "source": "extras.makeVortexWedges(T,300,0)",
+   "color": "#ffc800",
+   "colors": [
+    "#ff3b30",
+    "#ff9500",
+    "#ffcc00",
+    "#9be22d",
+    "#34c759",
+    "#00c7be",
+    "#30b0ff",
+    "#007aff",
+    "#5856d6",
+    "#af52de",
+    "#ff2d92",
+    "#ff6482"
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.ground",
+   "name": "Ready Athletics Vortex - 12 ground half-lines",
+   "type": "great-circle half-lines",
+   "shape": "p(s)=cos(s)v+sin(s)d_theta, theta=30k, 0<=s<=110 km/R, exact ENU incl. curvature drop",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "len_km": 110
+   },
+   "anchor": "floor +0.05",
+   "source": "extras.vortexGroundLines",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.hub",
+   "name": "Ready Athletics Vortex - white hub lines",
+   "type": "hub",
+   "shape": "first 180 m of each of the 12 half-lines, white, 7 px",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "len_m": 180
+   },
+   "anchor": "floor +0.07",
+   "source": "index.html addVortexLocal",
+   "color": "#ffffff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.circles",
+   "name": "Ready Athletics Vortex - 6 world great circles",
+   "type": "great circles",
+   "shape": "full circles at bearings 30k, k=0..5 (through the planet), normals n=v x d_theta (see vortex table)",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "k": 6
+   },
+   "anchor": "world (ENU km); Quest: projected to 3 km shell",
+   "source": "extras.vortexWorldCircles",
+   "color": "#ffc800",
+   "normals": [
+    [
+     -0.840510722,
+     0.541794911,
+     0.0
+    ],
+    [
+     -0.526238856,
+     0.782059768,
+     0.333849045
+    ],
+    [
+     -0.070961714,
+     0.812772342,
+     0.578243509
+    ],
+    [
+     0.403329563,
+     0.625703223,
+     0.667698091
+    ],
+    [
+     0.769549008,
+     0.270977431,
+     0.578243509
+    ],
+    [
+     0.929568419,
+     -0.156356545,
+     0.333849045
+    ]
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.antipode",
+   "name": "Ready Athletics Vortex - antipode marker",
+   "type": "antipode",
+   "shape": "two rings facing viewer: 150-190 and 260-275 (scene km) + label",
+   "lat": -48.11035,
+   "lon": 57.19409,
+   "size": {},
+   "anchor": "world, through the Earth (12,742 km chord)",
+   "source": "index.html buildVW",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxRA.label",
+   "name": "Ready Athletics Vortex - label",
+   "type": "label",
+   "shape": "sprite",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "y_m": 440
+   },
+   "anchor": "floor",
+   "source": "index.html addVortexLocal",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.pillar",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - vortex pillar",
+   "type": "vortex pillar",
+   "shape": "two open cylinders (r 16->9.6 and 6->3.6, h 420) + ring 10-14 m + core line",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "h_m": 420
+   },
+   "anchor": "floor, exact ENU",
+   "source": "extras.makeVortexPillar",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.funnel",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - spiral funnel",
+   "type": "spiral",
+   "shape": "6 arms: r(u)=0.6*(2+28u^2), y=0.6*40u, angle=2pi k/6 + 6pi u, u in [0,1]; spins",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "h_m": 24
+   },
+   "anchor": "floor",
+   "source": "extras.makeVortexLocal (scale .6)",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.wedges",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - 12 wedge fills",
+   "type": "wedge fill",
+   "shape": "12 x 30 deg circular sectors, wedge k = bearings [30k,30k+30), alpha fades smoothstep(.15,1,r/300)",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "r_m": 300
+   },
+   "anchor": "floor +0.01",
+   "source": "extras.makeVortexWedges(T,300,0)",
+   "color": "#30ff60",
+   "colors": [
+    "#ff3b30",
+    "#ff9500",
+    "#ffcc00",
+    "#9be22d",
+    "#34c759",
+    "#00c7be",
+    "#30b0ff",
+    "#007aff",
+    "#5856d6",
+    "#af52de",
+    "#ff2d92",
+    "#ff6482"
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.ground",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - 12 ground half-lines",
+   "type": "great-circle half-lines",
+   "shape": "p(s)=cos(s)v+sin(s)d_theta, theta=30k, 0<=s<=110 km/R, exact ENU incl. curvature drop",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "len_km": 110
+   },
+   "anchor": "floor +0.05",
+   "source": "extras.vortexGroundLines",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.hub",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - white hub lines",
+   "type": "hub",
+   "shape": "first 180 m of each of the 12 half-lines, white, 7 px",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "len_m": 180
+   },
+   "anchor": "floor +0.07",
+   "source": "index.html addVortexLocal",
+   "color": "#ffffff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.circles",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - 6 world great circles",
+   "type": "great circles",
+   "shape": "full circles at bearings 30k, k=0..5 (through the planet), normals n=v x d_theta (see vortex table)",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "k": 6
+   },
+   "anchor": "world (ENU km); Quest: projected to 3 km shell",
+   "source": "extras.vortexWorldCircles",
+   "color": "#30ff60",
+   "normals": [
+    [
+     -0.840574073,
+     0.54169662,
+     -0.0
+    ],
+    [
+     -0.526263089,
+     0.782102528,
+     0.333710649
+    ],
+    [
+     -0.070940335,
+     0.812944695,
+     0.578003799
+    ],
+    [
+     0.403390824,
+     0.625958987,
+     0.667421298
+    ],
+    [
+     0.769633738,
+     0.271248074,
+     0.578003799
+    ],
+    [
+     0.929653913,
+     -0.156143541,
+     0.333710649
+    ]
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.antipode",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - antipode marker",
+   "type": "antipode",
+   "shape": "two rings facing viewer: 150-190 and 260-275 (scene km) + label",
+   "lat": -48.13165,
+   "lon": 57.20079,
+   "size": {},
+   "anchor": "world, through the Earth (12,742 km chord)",
+   "source": "index.html buildVW",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxCappy.label",
+   "name": "Cappy's (Happy's) Trails Vortex pillar - label",
+   "type": "label",
+   "shape": "sprite",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "y_m": 440
+   },
+   "anchor": "floor",
+   "source": "index.html addVortexLocal",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.pillar",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - vortex pillar",
+   "type": "vortex pillar",
+   "shape": "two open cylinders (r 16->9.6 and 6->3.6, h 420) + ring 10-14 m + core line",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "h_m": 420
+   },
+   "anchor": "floor, exact ENU",
+   "source": "extras.makeVortexPillar",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.funnel",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - spiral funnel",
+   "type": "spiral",
+   "shape": "6 arms: r(u)=0.6*(2+28u^2), y=0.6*40u, angle=2pi k/6 + 6pi u, u in [0,1]; spins",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "h_m": 24
+   },
+   "anchor": "floor",
+   "source": "extras.makeVortexLocal (scale .6)",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.wedges",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - 12 wedge fills",
+   "type": "wedge fill",
+   "shape": "12 x 30 deg circular sectors, wedge k = bearings [30k,30k+30), alpha fades smoothstep(.15,1,r/300)",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "r_m": 300
+   },
+   "anchor": "floor +0.01",
+   "source": "extras.makeVortexWedges(T,300,0)",
+   "color": "#c080ff",
+   "colors": [
+    "#ff3b30",
+    "#ff9500",
+    "#ffcc00",
+    "#9be22d",
+    "#34c759",
+    "#00c7be",
+    "#30b0ff",
+    "#007aff",
+    "#5856d6",
+    "#af52de",
+    "#ff2d92",
+    "#ff6482"
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.ground",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - 12 ground half-lines",
+   "type": "great-circle half-lines",
+   "shape": "p(s)=cos(s)v+sin(s)d_theta, theta=30k, 0<=s<=110 km/R, exact ENU incl. curvature drop",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "len_km": 110
+   },
+   "anchor": "floor +0.05",
+   "source": "extras.vortexGroundLines",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.hub",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - white hub lines",
+   "type": "hub",
+   "shape": "first 180 m of each of the 12 half-lines, white, 7 px",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "len_m": 180
+   },
+   "anchor": "floor +0.07",
+   "source": "index.html addVortexLocal",
+   "color": "#ffffff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.circles",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - 6 world great circles",
+   "type": "great circles",
+   "shape": "full circles at bearings 30k, k=0..5 (through the planet), normals n=v x d_theta (see vortex table)",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "k": 6
+   },
+   "anchor": "world (ENU km); Quest: projected to 3 km shell",
+   "source": "extras.vortexWorldCircles",
+   "color": "#c080ff",
+   "normals": [
+    [
+     -0.84057389,
+     0.541696904,
+     0.0
+    ],
+    [
+     -0.526262833,
+     0.782102693,
+     0.333710665
+    ],
+    [
+     -0.070940075,
+     0.812944697,
+     0.578003828
+    ],
+    [
+     0.403391019,
+     0.625958827,
+     0.667421331
+    ],
+    [
+     0.769633815,
+     0.271247794,
+     0.578003828
+    ],
+    [
+     0.929653852,
+     -0.156143866,
+     0.333710665
+    ]
+   ]
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.antipode",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - antipode marker",
+   "type": "antipode",
+   "shape": "two rings facing viewer: 150-190 and 260-275 (scene km) + label",
+   "lat": -48.1316475,
+   "lon": 57.2007707,
+   "size": {},
+   "anchor": "world, through the Earth (12,742 km chord)",
+   "source": "index.html buildVW",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.label",
+   "name": "Matt's Meditation Garden vortex (Happy's Trails Vortex music source) - label",
+   "type": "label",
+   "shape": "sprite",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "y_m": 500
+   },
+   "anchor": "floor",
+   "source": "index.html addVortexLocal",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "vortex",
+   "id": "vxGarden.speaker",
+   "name": "Speaker label: Happy's Trails Vortex - Matt's Meditation Garden",
+   "type": "label",
+   "shape": "sprite",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "y_m": 120
+   },
+   "anchor": "floor",
+   "source": "index.html buildX",
+   "color": "#e0b0ff"
+  },
+  {
+   "cat": "garden",
+   "id": "garden.music",
+   "name": "Music beacon: Happy's Trails Vortex (Matt's Meditation Garden)",
+   "type": "sound source",
+   "shape": "point source, HRTF panner (direction), distance-based volume",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {},
+   "anchor": "ground",
+   "source": "audio.js SRC",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "garden",
+   "id": "garden.fallbackRing",
+   "name": "Garden fallback glow ring (until circle.js loads)",
+   "type": "ring",
+   "shape": "annulus",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "r_in_m": 1,
+    "r_out_m": 9
+   },
+   "anchor": "ground +0.15",
+   "source": "daynight.js / figures-registry GARDEN_FALLBACK_RING",
+   "color": "#c080ff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone00",
+   "name": "Standing stone 0",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316798,
+   "lon": -122.7992293,
+   "size": {
+    "center_y_m": 0.38
+   },
+   "anchor": "bearing 0 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 0
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion00",
+   "name": "Cushion 0",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316746,
+   "lon": -122.7992293,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 0 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 0,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone01",
+   "name": "Standing stone 1",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316755,
+   "lon": -122.7992051,
+   "size": {
+    "center_y_m": 0.44
+   },
+   "anchor": "bearing 30 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 30
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion01",
+   "name": "Cushion 1",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.131671,
+   "lon": -122.799209,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 30 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 30,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone02",
+   "name": "Standing stone 2",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316637,
+   "lon": -122.7991873,
+   "size": {
+    "center_y_m": 0.5
+   },
+   "anchor": "bearing 60 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 60
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion02",
+   "name": "Cushion 2",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316611,
+   "lon": -122.7991941,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 60 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 60,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone03",
+   "name": "Standing stone 3",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316475,
+   "lon": -122.7991808,
+   "size": {
+    "center_y_m": 0.38
+   },
+   "anchor": "bearing 90 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 90
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion03",
+   "name": "Cushion 3",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316475,
+   "lon": -122.7991887,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 90 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 90,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone04",
+   "name": "Standing stone 4",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316313,
+   "lon": -122.7991873,
+   "size": {
+    "center_y_m": 0.44
+   },
+   "anchor": "bearing 120 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 120
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion04",
+   "name": "Cushion 4",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316339,
+   "lon": -122.7991941,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 120 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 120,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone05",
+   "name": "Standing stone 5",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316195,
+   "lon": -122.7992051,
+   "size": {
+    "center_y_m": 0.5
+   },
+   "anchor": "bearing 150 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 150
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion05",
+   "name": "Cushion 5",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.131624,
+   "lon": -122.799209,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 150 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 150,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone06",
+   "name": "Standing stone 6",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316152,
+   "lon": -122.7992293,
+   "size": {
+    "center_y_m": 0.38
+   },
+   "anchor": "bearing 180 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 180
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion06",
+   "name": "Cushion 6",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316204,
+   "lon": -122.7992293,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 180 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 180,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone07",
+   "name": "Standing stone 7",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316195,
+   "lon": -122.7992535,
+   "size": {
+    "center_y_m": 0.44
+   },
+   "anchor": "bearing 210 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 210
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion07",
+   "name": "Cushion 7",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.131624,
+   "lon": -122.7992496,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 210 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 210,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone08",
+   "name": "Standing stone 8",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316313,
+   "lon": -122.7992713,
+   "size": {
+    "center_y_m": 0.5
+   },
+   "anchor": "bearing 240 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 240
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion08",
+   "name": "Cushion 8",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316339,
+   "lon": -122.7992645,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 240 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 240,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone09",
+   "name": "Standing stone 9",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316475,
+   "lon": -122.7992778,
+   "size": {
+    "center_y_m": 0.38
+   },
+   "anchor": "bearing 270 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 270
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion09",
+   "name": "Cushion 9",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316475,
+   "lon": -122.7992699,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 270 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 270,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone10",
+   "name": "Standing stone 10",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316637,
+   "lon": -122.7992713,
+   "size": {
+    "center_y_m": 0.44
+   },
+   "anchor": "bearing 300 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 300
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion10",
+   "name": "Cushion 10",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.1316611,
+   "lon": -122.7992645,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 300 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 300,
+   "color": "#c58cff"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.stone11",
+   "name": "Standing stone 11",
+   "type": "stone",
+   "shape": "dodecahedron r 0.32 detail 1, y-stretch 1.6+0.25*(k%3), z .8, rune-vein emissive",
+   "lat": 48.1316755,
+   "lon": -122.7992535,
+   "size": {
+    "center_y_m": 0.5
+   },
+   "anchor": "bearing 330 deg, r 3.6 m from Garden pin",
+   "source": "circle.js",
+   "bearing": 330
+  },
+  {
+   "cat": "circle",
+   "id": "circle.cushion11",
+   "name": "Cushion 11",
+   "type": "cushion",
+   "shape": "sphere r .25 scaled y .38 + piping torus",
+   "lat": 48.131671,
+   "lon": -122.7992496,
+   "size": {
+    "y_m": 0.1
+   },
+   "anchor": "bearing 330 deg, r 3.02 m",
+   "source": "circle.js",
+   "bearing": 330,
+   "color": "#7ffff0"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb0",
+   "name": "Floating orb 0",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.1316783,
+   "lon": -122.7992169,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 15 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 15
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb1",
+   "name": "Floating orb 1",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.1316558,
+   "lon": -122.7991831,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 75 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 75
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb2",
+   "name": "Floating orb 2",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.131625,
+   "lon": -122.7991955,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 135 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 135
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb3",
+   "name": "Floating orb 3",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.1316167,
+   "lon": -122.7992417,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 195 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 195
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb4",
+   "name": "Floating orb 4",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.1316392,
+   "lon": -122.7992755,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 255 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 255
+  },
+  {
+   "cat": "circle",
+   "id": "circle.orb5",
+   "name": "Floating orb 5",
+   "type": "orb",
+   "shape": "sphere r .07 + fresnel shell r .13 + halo",
+   "lat": 48.13167,
+   "lon": -122.7992631,
+   "size": {
+    "y_m": "1.25 +- .12 (bob)"
+   },
+   "anchor": "bearing 315 deg, r 3.55 m",
+   "source": "circle.js",
+   "bearing": 315
+  },
+  {
+   "cat": "circle",
+   "id": "circle.pavers",
+   "name": "12 pavers (annular wedges) + seams",
+   "type": "pavers",
+   "shape": "12 annular sectors r .95..2.55 m, boundaries at bearings 30k (gap .012 rad), 2 ring seams + 12 radial seams",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "r_in_m": 0.95,
+    "r_out_m": 2.55
+   },
+   "anchor": "ground",
+   "source": "circle.js"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.lotus",
+   "name": "Lotus dais",
+   "type": "dais",
+   "shape": "cylinder r .78/.86 h .18 + rim torus r .8 + 24 petals (12 + 12 offset 15 deg) + fresnel dome r .95 (y .45)",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {
+    "h_m": 0.18
+   },
+   "anchor": "ground, centred on the Garden pin",
+   "source": "circle.js"
+  },
+  {
+   "cat": "circle",
+   "id": "circle.floorGlow",
+   "name": "Circle floor glow",
+   "type": "glow ring",
+   "shape": "annulus .95..3.05 m",
+   "lat": 48.1316475,
+   "lon": -122.7992293,
+   "size": {},
+   "anchor": "ground",
+   "source": "circle.js"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxRA.beams",
+   "name": "Ready Athletics night beams",
+   "type": "beam",
+   "shape": "two open cylinders r 3.5 and 1.2, h 1500",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "h_m": 1500
+   },
+   "anchor": "ground, fades in with night",
+   "source": "daynight.js",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxRA.ring",
+   "name": "Ready Athletics night ring",
+   "type": "ring",
+   "shape": "annulus 1..46 m, pulsing",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "r_in_m": 1,
+    "r_out_m": 46
+   },
+   "anchor": "ground +0.12",
+   "source": "daynight.js",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxRA.halos",
+   "name": "Ready Athletics night halos",
+   "type": "halo sprites",
+   "shape": "screen-size sprites at y 40 and 700 m",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {},
+   "anchor": "ground",
+   "source": "daynight.js",
+   "color": "#ffc800"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxCappy.beams",
+   "name": "Cappy's Trails night beams",
+   "type": "beam",
+   "shape": "two open cylinders r 3.5 and 1.2, h 1500",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "h_m": 1500
+   },
+   "anchor": "ground, fades in with night",
+   "source": "daynight.js",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxCappy.ring",
+   "name": "Cappy's Trails night ring",
+   "type": "ring",
+   "shape": "annulus 1..46 m, pulsing",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "r_in_m": 1,
+    "r_out_m": 46
+   },
+   "anchor": "ground +0.12",
+   "source": "daynight.js",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "night",
+   "id": "night.vxCappy.halos",
+   "name": "Cappy's Trails night halos",
+   "type": "halo sprites",
+   "shape": "screen-size sprites at y 40 and 700 m",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {},
+   "anchor": "ground",
+   "source": "daynight.js",
+   "color": "#30ff60"
+  },
+  {
+   "cat": "sky",
+   "id": "sky.stars",
+   "name": "Star field",
+   "type": "stars",
+   "shape": "seeded random points (Park-Miller seed 7) on the sky sphere r 0.95*skyRadius; opacity by sun altitude",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-centred sky",
+   "source": "daynight.js starField"
+  },
+  {
+   "cat": "sky",
+   "id": "sky.sun",
+   "name": "Sun",
+   "type": "celestial body",
+   "shape": "disc at true topocentric az/alt (astronomy-engine), true angular size, reduced distance",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-centred, real time",
+   "source": "sky.js"
+  },
+  {
+   "cat": "sky",
+   "id": "sky.moon",
+   "name": "Moon",
+   "type": "celestial body",
+   "shape": "as Sun, with phase",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-centred, real time",
+   "source": "sky.js"
+  },
+  {
+   "cat": "sky",
+   "id": "sky.dome",
+   "name": "Sky / dark dome",
+   "type": "sky sphere",
+   "shape": "back-faced sphere r 60 (zenith/horizon/ground gradient)",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-centred",
+   "source": "extras.makeDarkSky / daynight"
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.81579942",
+   "name": "Cappy's trail, OSM way 81579942 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 5 vertices (densified), great-circle segments",
+   "lat": 48.1308607,
+   "lon": -122.7995953,
+   "size": {
+    "length_m_sphere": 535.2,
+    "length_m_src": 536,
+    "vertices": 5
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 81579942,
+   "points": [
+    [
+     48.1285288,
+     -122.7996034
+    ],
+    [
+     48.1288218,
+     -122.7996018
+    ],
+    [
+     48.1309666,
+     -122.7995898
+    ],
+    [
+     48.1326442,
+     -122.799581
+    ],
+    [
+     48.1333419,
+     -122.7996007
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.81579947",
+   "name": "Cappy's trail, OSM way 81579947 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 24 vertices (densified), great-circle segments",
+   "lat": 48.1341279,
+   "lon": -122.7958988,
+   "size": {
+    "length_m_sphere": 701.4,
+    "length_m_src": 702,
+    "vertices": 24
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 81579947,
+   "points": [
+    [
+     48.1326442,
+     -122.799581
+    ],
+    [
+     48.1326408,
+     -122.7976143
+    ],
+    [
+     48.1327045,
+     -122.7974686
+    ],
+    [
+     48.1327655,
+     -122.7973969
+    ],
+    [
+     48.1328367,
+     -122.797391
+    ],
+    [
+     48.1337411,
+     -122.7973079
+    ],
+    [
+     48.1337715,
+     -122.7972566
+    ],
+    [
+     48.1337957,
+     -122.7971775
+    ],
+    [
+     48.133767,
+     -122.7957754
+    ],
+    [
+     48.1337762,
+     -122.7956488
+    ],
+    [
+     48.1338118,
+     -122.7955733
+    ],
+    [
+     48.133919,
+     -122.7955329
+    ],
+    [
+     48.1341815,
+     -122.7955361
+    ],
+    [
+     48.1345405,
+     -122.7955643
+    ],
+    [
+     48.1346771,
+     -122.795558
+    ],
+    [
+     48.1347411,
+     -122.7954702
+    ],
+    [
+     48.1347647,
+     -122.7953272
+    ],
+    [
+     48.1347588,
+     -122.7951274
+    ],
+    [
+     48.1347473,
+     -122.794952
+    ],
+    [
+     48.1348056,
+     -122.7947598
+    ],
+    [
+     48.1351565,
+     -122.7942921
+    ],
+    [
+     48.1352568,
+     -122.7941583
+    ],
+    [
+     48.1356098,
+     -122.7935873
+    ],
+    [
+     48.1356556,
+     -122.7935132
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.81579958",
+   "name": "Cappy's trail, OSM way 81579958 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 12 vertices (densified), great-circle segments",
+   "lat": 48.1349094,
+   "lon": -122.7995515,
+   "size": {
+    "length_m_sphere": 489.1,
+    "length_m_src": 490,
+    "vertices": 12
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 81579958,
+   "points": [
+    [
+     48.1377311,
+     -122.7995763
+    ],
+    [
+     48.1368216,
+     -122.7996514
+    ],
+    [
+     48.1364181,
+     -122.7996237
+    ],
+    [
+     48.1355411,
+     -122.7995088
+    ],
+    [
+     48.134971,
+     -122.7995148
+    ],
+    [
+     48.1346329,
+     -122.7994897
+    ],
+    [
+     48.1343322,
+     -122.799479
+    ],
+    [
+     48.1340672,
+     -122.7995004
+    ],
+    [
+     48.1339026,
+     -122.7995326
+    ],
+    [
+     48.1336734,
+     -122.7995648
+    ],
+    [
+     48.1334801,
+     -122.7995755
+    ],
+    [
+     48.1333419,
+     -122.7996007
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.456854675",
+   "name": "Cappy's trail, OSM way 456854675 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 11 vertices (densified), great-circle segments",
+   "lat": 48.1326473,
+   "lon": -122.7950061,
+   "size": {
+    "length_m_sphere": 351.1,
+    "length_m_src": 352,
+    "vertices": 11
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 456854675,
+   "points": [
+    [
+     48.1326408,
+     -122.7976143
+    ],
+    [
+     48.132595,
+     -122.7974533
+    ],
+    [
+     48.1325986,
+     -122.7967827
+    ],
+    [
+     48.1326129,
+     -122.795962
+    ],
+    [
+     48.1326201,
+     -122.7952914
+    ],
+    [
+     48.1326201,
+     -122.7946209
+    ],
+    [
+     48.1326201,
+     -122.7942239
+    ],
+    [
+     48.1326487,
+     -122.793725
+    ],
+    [
+     48.1326666,
+     -122.7934139
+    ],
+    [
+     48.1327454,
+     -122.7930598
+    ],
+    [
+     48.1327524,
+     -122.7929203
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.493747360",
+   "name": "Cappy's trail, OSM way 493747360 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 47 vertices (densified), great-circle segments",
+   "lat": 48.1309591,
+   "lon": -122.7980461,
+   "size": {
+    "length_m_sphere": 975.9,
+    "length_m_src": 977,
+    "vertices": 47
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 493747360,
+   "points": [
+    [
+     48.1307076,
+     -122.8043772
+    ],
+    [
+     48.130782,
+     -122.803712
+    ],
+    [
+     48.130866,
+     -122.803349
+    ],
+    [
+     48.130944,
+     -122.803167
+    ],
+    [
+     48.1309999,
+     -122.8031063
+    ],
+    [
+     48.131107,
+     -122.80299
+    ],
+    [
+     48.131349,
+     -122.802585
+    ],
+    [
+     48.131498,
+     -122.802429
+    ],
+    [
+     48.131545,
+     -122.802294
+    ],
+    [
+     48.131592,
+     -122.802084
+    ],
+    [
+     48.131614,
+     -122.801836
+    ],
+    [
+     48.131541,
+     -122.801159
+    ],
+    [
+     48.131441,
+     -122.800963
+    ],
+    [
+     48.131256,
+     -122.800318
+    ],
+    [
+     48.131104,
+     -122.799893
+    ],
+    [
+     48.131024,
+     -122.799776
+    ],
+    [
+     48.1309666,
+     -122.7995898
+    ],
+    [
+     48.130953,
+     -122.799448
+    ],
+    [
+     48.130948,
+     -122.799158
+    ],
+    [
+     48.130917,
+     -122.798896
+    ],
+    [
+     48.130795,
+     -122.798485
+    ],
+    [
+     48.130654,
+     -122.798188
+    ],
+    [
+     48.130536,
+     -122.797825
+    ],
+    [
+     48.13052,
+     -122.797646
+    ],
+    [
+     48.130539,
+     -122.797518
+    ],
+    [
+     48.1305536,
+     -122.7974686
+    ],
+    [
+     48.130696,
+     -122.796985
+    ],
+    [
+     48.130854,
+     -122.796619
+    ],
+    [
+     48.130908,
+     -122.796459
+    ],
+    [
+     48.130911,
+     -122.79631
+    ],
+    [
+     48.130892,
+     -122.796147
+    ],
+    [
+     48.130861,
+     -122.796046
+    ],
+    [
+     48.130713,
+     -122.795838
+    ],
+    [
+     48.130658,
+     -122.795695
+    ],
+    [
+     48.130574,
+     -122.79494
+    ],
+    [
+     48.13052,
+     -122.794653
+    ],
+    [
+     48.130522,
+     -122.794537
+    ],
+    [
+     48.130547,
+     -122.794345
+    ],
+    [
+     48.130608,
+     -122.79417
+    ],
+    [
+     48.130825,
+     -122.793934
+    ],
+    [
+     48.130923,
+     -122.793775
+    ],
+    [
+     48.131019,
+     -122.793668
+    ],
+    [
+     48.131133,
+     -122.7935
+    ],
+    [
+     48.131181,
+     -122.793381
+    ],
+    [
+     48.131277,
+     -122.793011
+    ],
+    [
+     48.131321,
+     -122.792959
+    ],
+    [
+     48.13138,
+     -122.792933
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.1306467939",
+   "name": "Cappy's trail, OSM way 1306467939 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 13 vertices (densified), great-circle segments",
+   "lat": 48.1294722,
+   "lon": -122.7952285,
+   "size": {
+    "length_m_sphere": 416.0,
+    "length_m_src": 417,
+    "vertices": 13
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 1306467939,
+   "points": [
+    [
+     48.1305536,
+     -122.7974686
+    ],
+    [
+     48.1302539,
+     -122.7972863
+    ],
+    [
+     48.1299466,
+     -122.7969162
+    ],
+    [
+     48.129657,
+     -122.7964278
+    ],
+    [
+     48.1293308,
+     -122.7958256
+    ],
+    [
+     48.1292121,
+     -122.7954911
+    ],
+    [
+     48.1292366,
+     -122.7948724
+    ],
+    [
+     48.1292657,
+     -122.7946043
+    ],
+    [
+     48.1292485,
+     -122.7945148
+    ],
+    [
+     48.1291953,
+     -122.7942385
+    ],
+    [
+     48.1291241,
+     -122.7939096
+    ],
+    [
+     48.1291951,
+     -122.7934402
+    ],
+    [
+     48.128919,
+     -122.7929745
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.cappy.1306467995",
+   "name": "Cappy's trail, OSM way 1306467995 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 9 vertices (densified), great-circle segments",
+   "lat": 48.130282,
+   "lon": -122.801936,
+   "size": {
+    "length_m_sphere": 454.3,
+    "length_m_src": 455,
+    "vertices": 9
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#6dffc0",
+   "osm_way": 1306467995,
+   "points": [
+    [
+     48.1316071,
+     -122.8040687
+    ],
+    [
+     48.1313891,
+     -122.8037208
+    ],
+    [
+     48.1310966,
+     -122.8032997
+    ],
+    [
+     48.1309999,
+     -122.8031063
+    ],
+    [
+     48.1304601,
+     -122.8021051
+    ],
+    [
+     48.1299013,
+     -122.8013082
+    ],
+    [
+     48.1292897,
+     -122.800382
+    ],
+    [
+     48.1289725,
+     -122.7998312
+    ],
+    [
+     48.1288218,
+     -122.7996018
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.ra.203382512",
+   "name": "Ready Athletics trail, OSM way 203382512 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 5 vertices (densified), great-circle segments",
+   "lat": 48.1133626,
+   "lon": -122.8052215,
+   "size": {
+    "length_m_sphere": 489.2,
+    "length_m_src": 490,
+    "vertices": 5
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#ffe070",
+   "osm_way": 203382512,
+   "points": [
+    [
+     48.1145746,
+     -122.8052246
+    ],
+    [
+     48.1145582,
+     -122.8052261
+    ],
+    [
+     48.1144622,
+     -122.8052348
+    ],
+    [
+     48.1130428,
+     -122.8052126
+    ],
+    [
+     48.1101751,
+     -122.8052095
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "trail.ra.203383552",
+   "name": "Ready Athletics trail, OSM way 203383552 (path)",
+   "type": "trail",
+   "shape": "glowing ribbon 1 m + glow 6 m along 4 vertices (densified), great-circle segments",
+   "lat": 48.1101196,
+   "lon": -122.8050789,
+   "size": {
+    "length_m_sphere": 137.3,
+    "length_m_src": 137,
+    "vertices": 4
+   },
+   "anchor": "ground",
+   "source": "trails.json / daynight.js",
+   "color": "#ffe070",
+   "osm_way": 203383552,
+   "points": [
+    [
+     48.1101,
+     -122.805796
+    ],
+    [
+     48.1100974,
+     -122.8053031
+    ],
+    [
+     48.1101751,
+     -122.8052095
+    ],
+    [
+     48.110106,
+     -122.804007
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "parcel.998002802",
+   "name": "Parcel 998002802 outline (Cappy's Trails garden)",
+   "type": "parcel outline",
+   "shape": "closed ribbon .6 m, 11 vertices",
+   "lat": 48.1316469,
+   "lon": -122.7992587,
+   "size": {
+    "area_m2_sphere": 1872.0,
+    "perimeter_m": 183.3
+   },
+   "anchor": "ground",
+   "source": "trails.json cappy_outline (WA Current_Parcels)",
+   "color": "#30ff60",
+   "points": [
+    [
+     48.1313729,
+     -122.7990496
+    ],
+    [
+     48.1313726,
+     -122.799463
+    ],
+    [
+     48.1315097,
+     -122.7994643
+    ],
+    [
+     48.1316468,
+     -122.7994656
+    ],
+    [
+     48.1317838,
+     -122.7994668
+    ],
+    [
+     48.1319209,
+     -122.7994681
+    ],
+    [
+     48.1319211,
+     -122.799054
+    ],
+    [
+     48.1317841,
+     -122.7990529
+    ],
+    [
+     48.131647,
+     -122.7990518
+    ],
+    [
+     48.1315099,
+     -122.7990507
+    ],
+    [
+     48.1313729,
+     -122.7990496
+    ]
+   ]
+  },
+  {
+   "cat": "trails",
+   "id": "parcel.997800502",
+   "name": "Parcel 031-997800502 outline (Ready Athletics) - DATA ONLY, not drawn",
+   "type": "parcel outline (not rendered)",
+   "shape": "16 vertices",
+   "lat": 48.1059194,
+   "lon": -122.8056565,
+   "size": {
+    "area_m2_sphere": 3007.2
+   },
+   "anchor": "n/a",
+   "source": "trails.json ra_parcel_outline",
+   "points": [
+    [
+     48.1062103,
+     -122.8053935
+    ],
+    [
+     48.1053057,
+     -122.8054012
+    ],
+    [
+     48.1053058,
+     -122.8054054
+    ],
+    [
+     48.1053058,
+     -122.8055498
+    ],
+    [
+     48.1053058,
+     -122.8056539
+    ],
+    [
+     48.105661,
+     -122.8058422
+    ],
+    [
+     48.1061005,
+     -122.8058381
+    ],
+    [
+     48.1061005,
+     -122.8058422
+    ],
+    [
+     48.1061185,
+     -122.8058396
+    ],
+    [
+     48.1061358,
+     -122.8058321
+    ],
+    [
+     48.106152,
+     -122.8058201
+    ],
+    [
+     48.1061664,
+     -122.8058038
+    ],
+    [
+     48.1062104,
+     -122.805744
+    ],
+    [
+     48.1062105,
+     -122.8057439
+    ],
+    [
+     48.1062103,
+     -122.8054009
+    ],
+    [
+     48.1062103,
+     -122.8053935
+    ]
+   ]
+  },
+  {
+   "cat": "streets",
+   "id": "street.Hastings Ave",
+   "name": "Road path: Hastings Ave",
+   "type": "road path",
+   "shape": "fat line (7/3/1 px glow-ribbon-core) at floor, 195 vertices, labels every ~1/6",
+   "lat": 48.1163748,
+   "lon": -122.8310571,
+   "size": {
+    "length_m": 7072,
+    "vertices": 195
+   },
+   "anchor": "floor -1.55 m, flat local",
+   "source": "streets.json",
+   "color": "#ff9d00"
+  },
+  {
+   "cat": "streets",
+   "id": "street.Water St",
+   "name": "Road path: Water St",
+   "type": "road path",
+   "shape": "fat line (7/3/1 px glow-ribbon-core) at floor, 63 vertices, labels every ~1/6",
+   "lat": 48.1131616,
+   "lon": -122.7595122,
+   "size": {
+    "length_m": 1507,
+    "vertices": 63
+   },
+   "anchor": "floor -1.55 m, flat local",
+   "source": "streets.json",
+   "color": "#00e5ff"
+  },
+  {
+   "cat": "streets",
+   "id": "street.Downtown \u2192 Fort Word",
+   "name": "Road path: Downtown \u2192 Fort Worden \u2192 North Beach",
+   "type": "road path",
+   "shape": "fat line (7/3/1 px glow-ribbon-core) at floor, 221 vertices, labels every ~1/6",
+   "lat": 48.1290767,
+   "lon": -122.7649002,
+   "size": {
+    "length_m": 5568,
+    "vertices": 221
+   },
+   "anchor": "floor -1.55 m, flat local",
+   "source": "streets.json",
+   "color": "#ffe600"
+  },
+  {
+   "cat": "streets",
+   "id": "street.sheridan",
+   "name": "Sheridan St",
+   "type": "road path",
+   "shape": "5 segments, 98 vertices, magenta fat line + labels",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "length_m": 2740
+   },
+   "anchor": "floor",
+   "source": "sheridan.json",
+   "color": "#ff00cc"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.pt_shore",
+   "name": "Port Townsend shoreline (OSM coastline, full detail)",
+   "type": "shoreline",
+   "shape": "3 coast lines (772 pts) + 112 harbour structures + 3 lagoons + 7 labels, exact ENU at floor",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "floor, exact ENU (curvature drop)",
+   "source": "shore.json -> geometry/pt-shoreline.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.ocean",
+   "name": "Ocean surface + coast (old)",
+   "type": "ocean mesh",
+   "shape": "water mesh masked by coast.json natural=coastline lines in bbox 48.01..48.19, -122.915..-122.645",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "floor",
+   "source": "extras.makeOcean / coast.json"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.grid",
+   "name": "Ground grid",
+   "type": "grid",
+   "shape": "plane 20x20 km, procedural 20 m / 100 m / 1 km lines, fades 3-10 km",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "floor, centred on grid origin (round(lat,3),round(lon,3))",
+   "source": "index.html buildLocal / quest grid-plane"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.satellite",
+   "name": "Satellite imagery layer (optional)",
+   "type": "imagery",
+   "shape": "web-mercator tiles draped on proj(lat,lon,h) (follows curvature); globe texture z2 when high",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "ground",
+   "source": "sat.js (Imagery (c) Esri)"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.africa",
+   "name": "Africa (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "27 polygons, 1083 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": 2.0,
+   "lon": 20.0,
+   "size": {
+    "area_km2_src": 30856334
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "continents.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.north_america",
+   "name": "North America (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "156 polygons, 6073 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": 50.0,
+   "lon": -100.0,
+   "size": {
+    "area_km2_src": 24717521
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "continents.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.south_america",
+   "name": "South America (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "39 polygons, 1430 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": -18.0,
+   "lon": -60.0,
+   "size": {
+    "area_km2_src": 18030583
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "continents.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.asia",
+   "name": "Asia (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "188 polygons, 5414 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": 45.0,
+   "lon": 90.0,
+   "size": {
+    "area_km2_src": 45999549
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "continents.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.europe",
+   "name": "Europe (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "77 polygons, 2709 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": 52.0,
+   "lon": 15.0,
+   "size": {
+    "area_km2_src": 9880840
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "continents.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.antarctica",
+   "name": "Antarctica (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "1 polygons, 1048 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "area_km2_src": null
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "landmass.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.australia",
+   "name": "Australia (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "2 polygons, 559 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "area_km2_src": null
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "landmass.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.antarctic_ice_shelves",
+   "name": "Antarctic ice shelves (true-scale outline + fill)",
+   "type": "continent",
+   "shape": "25 polygons, 1315 vertices, earcut in azimuthal-equidistant plane, tris <= 250 km, vertices on sphere",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "area_km2_src": null
+   },
+   "anchor": "sphere surface (world, ENU km)",
+   "source": "landmass.json -> geometry/continents.geojson"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.rainier",
+   "name": "Mount Rainier (true-scale terrain + 15 km ring)",
+   "type": "mountain",
+   "shape": "USGS 3DEP heightfield mesh + small circle r 15 km + label at summit+400 m",
+   "lat": 46.8528857,
+   "lon": -121.7603744,
+   "size": {
+    "summit_m": 4392,
+    "ring_r_m": 15000
+   },
+   "anchor": "sphere surface + h",
+   "source": "mountains.json / extras.makeTerrain"
+  },
+  {
+   "cat": "geography",
+   "id": "geo.baker",
+   "name": "Mount Baker (true-scale terrain + 15 km ring)",
+   "type": "mountain",
+   "shape": "USGS 3DEP heightfield mesh + small circle r 15 km + label at summit+400 m",
+   "lat": 48.7767,
+   "lon": -121.8144,
+   "size": {
+    "summit_m": 3286,
+    "ring_r_m": 15000
+   },
+   "anchor": "sphere surface + h",
+   "source": "mountains.json / extras.makeTerrain"
+  },
+  {
+   "cat": "far",
+   "id": "far.north_pole",
+   "name": "North Pole",
+   "type": "far marker",
+   "shape": "flag; pillar r 12S h 700S; S = render distance/9010 (size scales with distance)",
+   "lat": 90.0,
+   "lon": 0.0,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.south_pole",
+   "name": "South Pole",
+   "type": "far marker",
+   "shape": "ice island; pillar r 12S h 700S; S = render distance/9010 (size scales with distance)",
+   "lat": -90.0,
+   "lon": 0.0,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.great_pyramid_of_giza",
+   "name": "Great Pyramid of Giza",
+   "type": "far marker",
+   "shape": "pyramid; pillar r 12S h 700S; S = render distance/9010 (size scales with distance); square pyramid r 160S h 220S",
+   "lat": 29.97917,
+   "lon": 31.13417,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.pyramid_of_khafre",
+   "name": "Pyramid of Khafre",
+   "type": "far marker",
+   "shape": "pyramid; pillar r 12S h 700S; S = render distance/9010 (size scales with distance); square pyramid r 160S h 220S",
+   "lat": 29.97611,
+   "lon": 31.13083,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.great_pyramid_of_cholula",
+   "name": "Great Pyramid of Cholula",
+   "type": "far marker",
+   "shape": "pyramid; pillar r 12S h 700S; S = render distance/9010 (size scales with distance); square pyramid r 160S h 220S",
+   "lat": 19.0575,
+   "lon": -98.30194,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.pyramid_of_the_sun",
+   "name": "Pyramid of the Sun, Teotihuacan",
+   "type": "far marker",
+   "shape": "pyramid; pillar r 12S h 700S; S = render distance/9010 (size scales with distance); square pyramid r 160S h 220S",
+   "lat": 19.693,
+   "lon": -98.844,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "far",
+   "id": "far.icecube_neutrino_observatory",
+   "name": "IceCube Neutrino Observatory",
+   "type": "far marker",
+   "shape": "cube; pillar r 12S h 700S; S = render distance/9010 (size scales with distance); cube 220S",
+   "lat": -89.99,
+   "lon": -63.45306,
+   "size": {},
+   "anchor": "sphere surface, local up, through the Earth",
+   "source": "index.html FAR / quest.html PLACES"
+  },
+  {
+   "cat": "edges",
+   "id": "edge.markers",
+   "name": "Edge-of-Earth markers N/E/S/W",
+   "type": "edge marker",
+   "shape": "sphere r 150 (scene km) + line from viewer + label at the point 90 deg of arc (10,007.5 km) from the viewer along bearings 0/90/180/270; appears at elevation -45 deg, chord R*sqrt2 = 9,010 km",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "arc_deg": 90,
+    "bearings": [
+     0,
+     90,
+     180,
+     270
+    ]
+   },
+   "anchor": "viewer-relative generator: destination(viewer, b, pi/2*R)",
+   "source": "index.html build / quest.html PLACES",
+   "colors": {
+    "N": "#ff4040",
+    "E": "#40ff60",
+    "S": "#40a0ff",
+    "W": "#ffd040"
+   }
+  },
+  {
+   "cat": "edges",
+   "id": "edge.horizonRing",
+   "name": "Horizon ring",
+   "type": "ring",
+   "shape": "flat annulus 9,990..10,000 km in the viewer tangent plane",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-centred",
+   "source": "index.html"
+  },
+  {
+   "cat": "edges",
+   "id": "edge.globe",
+   "name": "Wireframe globe",
+   "type": "sphere",
+   "shape": "sphere r 6371 km (48x32 wireframe), centre at the Earth centre in ENU, poles aligned to ECEF Z",
+   "lat": null,
+   "lon": null,
+   "size": {
+    "r_km": 6371
+   },
+   "anchor": "Earth centre",
+   "source": "index.html"
+  },
+  {
+   "cat": "bots",
+   "id": "edge.anchor",
+   "name": "Edge-ring anchor: SR 20 (W Sims Way) / Mill Rd signal",
+   "type": "anchor",
+   "shape": "point (mean of OSM traffic_signals nodes 12630503607-610)",
+   "lat": 48.100386,
+   "lon": -122.81329,
+   "size": {
+    "ring_r_m": 7
+   },
+   "anchor": "ground; GM-editable (persisted on Monster in server/bots.json; code default recorded)",
+   "source": "server.js EDGE_DEF"
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot000",
+   "name": "Edge-0 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style lightblue",
+   "lat": 48.1004489,
+   "lon": -122.81329,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 0 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 0
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot030",
+   "name": "Edge-30 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1004405,
+   "lon": -122.8132429,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 30 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 30
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot060",
+   "name": "Edge-60 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1004174,
+   "lon": -122.8132085,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 60 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 60
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot090",
+   "name": "Edge-90 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style lightblue",
+   "lat": 48.100386,
+   "lon": -122.8131958,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 90 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 90
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot120",
+   "name": "Edge-120 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1003546,
+   "lon": -122.8132085,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 120 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 120
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot150",
+   "name": "Edge-150 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1003315,
+   "lon": -122.8132429,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 150 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 150
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot180",
+   "name": "Edge-180 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style lightblue",
+   "lat": 48.1003231,
+   "lon": -122.81329,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 180 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 180
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot210",
+   "name": "Edge-210 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1003315,
+   "lon": -122.8133371,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 210 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 210
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot240",
+   "name": "Edge-240 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1003546,
+   "lon": -122.8133715,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 240 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 240
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot270",
+   "name": "Edge-270 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style lightblue",
+   "lat": 48.100386,
+   "lon": -122.8133842,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 270 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 270
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot300",
+   "name": "Edge-300 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style plaid",
+   "lat": 48.1004174,
+   "lon": -122.8133715,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 300 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 300
+  },
+  {
+   "cat": "bots",
+   "id": "edge.bot330",
+   "name": "Edge-330 deg (edge marker bot)",
+   "type": "edge marker bot",
+   "shape": "stick-figure bot marker (mp.js avatar), style default",
+   "lat": 48.1004405,
+   "lon": -122.8133371,
+   "size": {},
+   "anchor": "ring r 7 m, bearing 330 deg (one per Ready Athletics wedge ray)",
+   "source": "server.js BOTS edge group",
+   "bearing": 330
+  },
+  {
+   "cat": "bots",
+   "id": "bot.keeper.cappy",
+   "name": "Cappy's Keeper",
+   "type": "keeper bot",
+   "shape": "bot marker (mp.js avatar)",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {},
+   "anchor": "fixed (GM can pause/hide)",
+   "source": "server.js BOTS"
+  },
+  {
+   "cat": "bots",
+   "id": "bot.keeper.ra",
+   "name": "Ready Athletics Keeper",
+   "type": "keeper bot",
+   "shape": "bot marker (mp.js avatar)",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {},
+   "anchor": "fixed",
+   "source": "server.js BOTS"
+  },
+  {
+   "cat": "characters",
+   "id": "ren",
+   "name": "Ren (3dguru) - AI guide robot",
+   "type": "AI character (non-human robot)",
+   "shape": "robot body h 1.85 m hovering .32 m, 12-wedge halo, chest emblem; beam 400 m; talk radius 15 m / leave 20 m; dance wander <= 1.3 m",
+   "lat": 48.13165,
+   "lon": -122.7991562,
+   "size": {
+    "h_m": 1.85,
+    "hover_m": 0.32,
+    "talk_r_m": 15,
+    "leave_r_m": 20,
+    "beam_m": 400
+   },
+   "anchor": "4 m east of Cappy's pillar (flat offset)",
+   "source": "figures-registry REN / ren.js"
+  },
+  {
+   "cat": "test",
+   "id": "test.Ghost-1",
+   "name": "Ghost-1 (server TEST fixture, dummy player marker)",
+   "type": "test fixture",
+   "shape": "bot-style marker; random walk 0.8-3 m/s within 150 m of target",
+   "lat": 48.11035,
+   "lon": -122.80591,
+   "size": {
+    "wander_r_m": 150
+   },
+   "anchor": "target point only (live position not recorded)",
+   "source": "server.js GHOSTS",
+   "place": "Ready Athletics"
+  },
+  {
+   "cat": "test",
+   "id": "test.Ghost-2",
+   "name": "Ghost-2 (server TEST fixture, dummy player marker)",
+   "type": "test fixture",
+   "shape": "bot-style marker; random walk 0.8-3 m/s within 150 m of target",
+   "lat": 48.13165,
+   "lon": -122.79921,
+   "size": {
+    "wander_r_m": 150
+   },
+   "anchor": "target point only (live position not recorded)",
+   "source": "server.js GHOSTS",
+   "place": "Cappy's Trails garden"
+  },
+  {
+   "cat": "vehicles",
+   "id": "quest.ship",
+   "name": "Quest spaceship cockpit",
+   "type": "vehicle",
+   "shape": "see-through cockpit group fixed to the XR rig (viewer); inertial flight",
+   "lat": null,
+   "lon": null,
+   "size": {},
+   "anchor": "viewer-relative (no world position)",
+   "source": "quest.html cockpit()/QSHIP"
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p001",
+   "name": "Point Wilson Lighthouse (at B-6)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1434258,
+   "lon": -122.7550952,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 238.876,
+   "corner_bearings_deg": [
+    301.124,
+    181.124,
+    61.124
+   ],
+   "kind": "trail",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p002",
+   "name": "North Beach County Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1421571,
+   "lon": -122.782457,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 237.4697,
+   "corner_bearings_deg": [
+    302.53,
+    182.53,
+    62.53
+   ],
+   "kind": "park",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p003",
+   "name": "Battery Tolles (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1419383,
+   "lon": -122.7708056,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 236.0634,
+   "corner_bearings_deg": [
+    303.937,
+    183.937,
+    63.937
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p004",
+   "name": "Battery Kinzie",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1418321,
+   "lon": -122.7609448,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 234.6572,
+   "corner_bearings_deg": [
+    305.343,
+    185.343,
+    65.343
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p005",
+   "name": "58th St & Gise St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1417394,
+   "lon": -122.7877213,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 233.2509,
+   "corner_bearings_deg": [
+    306.749,
+    186.749,
+    66.749
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p006",
+   "name": "56th St & Landes St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1403495,
+   "lon": -122.7831286,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 231.8446,
+   "corner_bearings_deg": [
+    308.155,
+    188.155,
+    68.155
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p007",
+   "name": "56th St & Hendricks St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1402738,
+   "lon": -122.7928699,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 230.4383,
+   "corner_bearings_deg": [
+    309.562,
+    189.562,
+    69.562
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p008",
+   "name": "Fort Worden Radar Building",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1402186,
+   "lon": -122.7708938,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 251.5326,
+   "corner_bearings_deg": [
+    288.467,
+    168.467,
+    48.467
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p009",
+   "name": "End of the world",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1391624,
+   "lon": -122.7997137,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 250.1263,
+   "corner_bearings_deg": [
+    289.874,
+    169.874,
+    49.874
+   ],
+   "kind": "landmark",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p010",
+   "name": "Lighting the Way",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1385543,
+   "lon": -122.7615903,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 51.8279,
+   "corner_bearings_deg": [
+    128.172,
+    8.172,
+    248.172
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p011",
+   "name": "Cleveland Street",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1381253,
+   "lon": -122.7897916,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 53.2342,
+   "corner_bearings_deg": [
+    126.766,
+    6.766,
+    246.766
+   ],
+   "kind": "trail",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p012",
+   "name": "Fort Worden Historical State Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1378515,
+   "lon": -122.768597,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 54.6405,
+   "corner_bearings_deg": [
+    125.359,
+    5.359,
+    245.359
+   ],
+   "kind": "park",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p013",
+   "name": "Skoshi's Trail",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1370968,
+   "lon": -122.7983507,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 56.0468,
+   "corner_bearings_deg": [
+    123.953,
+    3.953,
+    243.953
+   ],
+   "kind": "trail",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p014",
+   "name": "Battery Stoddard (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1365562,
+   "lon": -122.7642217,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 46.2028,
+   "corner_bearings_deg": [
+    133.797,
+    13.797,
+    253.797
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p015",
+   "name": "Trail L-5",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1362135,
+   "lon": -122.7743292,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 47.6091,
+   "corner_bearings_deg": [
+    132.391,
+    12.391,
+    252.391
+   ],
+   "kind": "trail",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p016",
+   "name": "50th St & Jackman St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1360092,
+   "lon": -122.7851613,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 49.0154,
+   "corner_bearings_deg": [
+    130.985,
+    10.985,
+    250.985
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p017",
+   "name": "Peary Ave & Steve St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1356501,
+   "lon": -122.8102702,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 50.4217,
+   "corner_bearings_deg": [
+    129.578,
+    9.578,
+    249.578
+   ],
+   "kind": "intersection",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p018",
+   "name": "49th St & Kuhn St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1353436,
+   "lon": -122.7819718,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 63.0782,
+   "corner_bearings_deg": [
+    116.922,
+    356.922,
+    236.922
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p019",
+   "name": "49th St & Sheridan St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1353359,
+   "lon": -122.7908452,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 64.4845,
+   "corner_bearings_deg": [
+    115.516,
+    355.516,
+    235.516
+   ],
+   "kind": "intersection",
+   "area": "North Beach",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p020",
+   "name": "Triangle of Fire Viewpoint",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1343152,
+   "lon": -122.7631655,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 257.1824,
+   "corner_bearings_deg": [
+    282.818,
+    162.818,
+    42.818
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p021",
+   "name": "Coast Artillery Museum (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1342195,
+   "lon": -122.7659165,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 255.7761,
+   "corner_bearings_deg": [
+    284.224,
+    164.224,
+    44.224
+   ],
+   "kind": "landmark",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p022",
+   "name": "Jefferson County Fairgrounds",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1333086,
+   "lon": -122.7830039,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 259.9949,
+   "corner_bearings_deg": [
+    280.005,
+    160.005,
+    40.005
+   ],
+   "kind": "park",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p023",
+   "name": "Cook Ave & Trail Crest Dr",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1328399,
+   "lon": -122.8097098,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 258.5886,
+   "corner_bearings_deg": [
+    281.411,
+    161.411,
+    41.411
+   ],
+   "kind": "intersection",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p024",
+   "name": "Redwood St & W St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1326439,
+   "lon": -122.7710496,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 251.5572,
+   "corner_bearings_deg": [
+    288.443,
+    168.443,
+    48.443
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p025",
+   "name": "San Juan Ave & U St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1317188,
+   "lon": -122.7777583,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 250.1509,
+   "corner_bearings_deg": [
+    289.849,
+    169.849,
+    49.849
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p026",
+   "name": "43rd St & Grant St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1313792,
+   "lon": -122.7918464,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 254.3698,
+   "corner_bearings_deg": [
+    285.63,
+    165.63,
+    45.63
+   ],
+   "kind": "intersection",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p027",
+   "name": "Chestnut St & V St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1310136,
+   "lon": -122.7638761,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 252.9635,
+   "corner_bearings_deg": [
+    287.036,
+    167.036,
+    47.036
+   ],
+   "kind": "intersection",
+   "area": "Fort Worden / Point Wilson",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p028",
+   "name": "Cherry St & T St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1303002,
+   "lon": -122.7695385,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 245.9321,
+   "corner_bearings_deg": [
+    294.068,
+    174.068,
+    54.068
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p029",
+   "name": "Albatross St & Cook Ave",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.130145,
+   "lon": -122.8136846,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 244.5258,
+   "corner_bearings_deg": [
+    295.474,
+    175.474,
+    55.474
+   ],
+   "kind": "intersection",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p030",
+   "name": "Cappy's Trails (path)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.13009,
+   "lon": -122.7996,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 248.7323,
+   "corner_bearings_deg": [
+    291.268,
+    171.268,
+    51.268
+   ],
+   "kind": "trail",
+   "area": "Cappy's trails area / Northwest",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p031",
+   "name": "41st St & Wilson St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1299682,
+   "lon": -122.7886622,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 250.1386,
+   "corner_bearings_deg": [
+    289.861,
+    169.861,
+    49.861
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p032",
+   "name": "Bobby McGarraugh Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1283088,
+   "lon": -122.769549,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 245.9198,
+   "corner_bearings_deg": [
+    294.08,
+    174.08,
+    54.08
+   ],
+   "kind": "park",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p033",
+   "name": "San Juan Ave & Tremont St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1259238,
+   "lon": -122.7777688,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 247.326,
+   "corner_bearings_deg": [
+    292.674,
+    172.674,
+    52.674
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p034",
+   "name": "35th St & Eddy St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1254882,
+   "lon": -122.8037343,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 254.3575,
+   "corner_bearings_deg": [
+    285.643,
+    165.643,
+    45.643
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p035",
+   "name": "Cherry St & M St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1253643,
+   "lon": -122.7709581,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 255.7637,
+   "corner_bearings_deg": [
+    284.236,
+    164.236,
+    44.236
+   ],
+   "kind": "intersection",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p036",
+   "name": "Corona Ave & Greenway Pl",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1250652,
+   "lon": -122.7949279,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 251.5449,
+   "corner_bearings_deg": [
+    288.455,
+    168.455,
+    48.455
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p037",
+   "name": "Clallam St & McKinley St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1250042,
+   "lon": -122.7586533,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 252.9512,
+   "corner_bearings_deg": [
+    287.049,
+    167.049,
+    47.049
+   ],
+   "kind": "intersection",
+   "area": "Morgan Hill / Chetzemoka",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p038",
+   "name": "35th Street Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1247688,
+   "lon": -122.7983402,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 237.4821,
+   "corner_bearings_deg": [
+    302.518,
+    182.518,
+    62.518
+   ],
+   "kind": "park",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p039",
+   "name": "Silver St & Umatilla Ave",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1245726,
+   "lon": -122.7898327,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 238.8883,
+   "corner_bearings_deg": [
+    301.112,
+    181.112,
+    61.112
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p040",
+   "name": "Valley Trail",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1237285,
+   "lon": -122.7754,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 251.4746,
+   "corner_bearings_deg": [
+    288.525,
+    168.525,
+    48.525
+   ],
+   "kind": "trail",
+   "area": "Fairgrounds / San Juan Ave",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p041",
+   "name": "Sather Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1230253,
+   "lon": -122.7639437,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 250.0683,
+   "corner_bearings_deg": [
+    289.932,
+    169.932,
+    49.932
+   ],
+   "kind": "park",
+   "area": "Morgan Hill / Chetzemoka",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p042",
+   "name": "Chetzemoka Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1225607,
+   "lon": -122.7554518,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 248.662,
+   "corner_bearings_deg": [
+    291.338,
+    171.338,
+    51.338
+   ],
+   "kind": "park",
+   "area": "Morgan Hill / Chetzemoka",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p043",
+   "name": "30th St & Sherman St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1218962,
+   "lon": -122.7936093,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 247.2557,
+   "corner_bearings_deg": [
+    292.744,
+    172.744,
+    52.744
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p044",
+   "name": "Hufford Pl & Maple Pl",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1217342,
+   "lon": -122.7662103,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 257.0997,
+   "corner_bearings_deg": [
+    282.9,
+    162.9,
+    42.9
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p045",
+   "name": "Discovery Rd & Haines St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1214382,
+   "lon": -122.7798083,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 255.6935,
+   "corner_bearings_deg": [
+    284.307,
+    164.307,
+    44.307
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p046",
+   "name": "Garfield St & Monroe St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1209105,
+   "lon": -122.7568498,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 254.2872,
+   "corner_bearings_deg": [
+    285.713,
+    165.713,
+    45.713
+   ],
+   "kind": "intersection",
+   "area": "Morgan Hill / Chetzemoka",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p047",
+   "name": "Hastings Ave & Spring St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1201431,
+   "lon": -122.8118816,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 252.8809,
+   "corner_bearings_deg": [
+    287.119,
+    167.119,
+    47.119
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p048",
+   "name": "Hastings Ave & Thomas St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1201326,
+   "lon": -122.7996689,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 240.2243,
+   "corner_bearings_deg": [
+    299.776,
+    179.776,
+    59.776
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p049",
+   "name": "Hastings Ave & Holcomb St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1201059,
+   "lon": -122.7862086,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 238.818,
+   "corner_bearings_deg": [
+    301.182,
+    181.182,
+    61.182
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p050",
+   "name": "Blaine St & Taylor St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1198779,
+   "lon": -122.7615781,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 243.0246,
+   "corner_bearings_deg": [
+    296.975,
+    176.975,
+    56.975
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p051",
+   "name": "27th St & Sherman St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1193012,
+   "lon": -122.7938463,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 244.4309,
+   "corner_bearings_deg": [
+    295.569,
+    175.569,
+    55.569
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p052",
+   "name": "U.S. Coast Guard Memorial",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1181973,
+   "lon": -122.7521523,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 245.8371,
+   "corner_bearings_deg": [
+    294.163,
+    174.163,
+    54.163
+   ],
+   "kind": "landmark",
+   "area": "Point Hudson / east Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p053",
+   "name": "Carolanne St & Cliff St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1179397,
+   "lon": -122.803429,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 247.2434,
+   "corner_bearings_deg": [
+    292.757,
+    172.757,
+    52.757
+   ],
+   "kind": "intersection",
+   "area": "Hastings / Middle Point",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p054",
+   "name": "Lawrence St & Taylor St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1178355,
+   "lon": -122.7596702,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 248.6497,
+   "corner_bearings_deg": [
+    291.35,
+    171.35,
+    51.35
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p055",
+   "name": "24th St & San Juan Ave",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1174539,
+   "lon": -122.7779344,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 250.056,
+   "corner_bearings_deg": [
+    289.944,
+    169.944,
+    49.944
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p056",
+   "name": "Lawrence St & Polk St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1169808,
+   "lon": -122.7616981,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 251.4623,
+   "corner_bearings_deg": [
+    288.538,
+    168.538,
+    48.538
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p057",
+   "name": "Cherry St & Walker St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1169732,
+   "lon": -122.7728113,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 252.8686,
+   "corner_bearings_deg": [
+    287.131,
+    167.131,
+    47.131
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p058",
+   "name": "Memorial Field",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1168699,
+   "lon": -122.7544218,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 231.7743,
+   "corner_bearings_deg": [
+    308.226,
+    188.226,
+    68.226
+   ],
+   "kind": "park",
+   "area": "Point Hudson / east Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p059",
+   "name": "Point Hudson (at Jackson St & Water St)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.116553,
+   "lon": -122.75151,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 233.1806,
+   "corner_bearings_deg": [
+    306.819,
+    186.819,
+    66.819
+   ],
+   "kind": "intersection",
+   "area": "Point Hudson / east Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p060",
+   "name": "Port Townsend Public Library (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1165011,
+   "lon": -122.7641044,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 43.3779,
+   "corner_bearings_deg": [
+    136.622,
+    16.622,
+    256.622
+   ],
+   "kind": "landmark",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p061",
+   "name": "Garfield St & Pierce St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1164772,
+   "lon": -122.7668663,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 41.9716,
+   "corner_bearings_deg": [
+    138.028,
+    18.028,
+    258.028
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p062",
+   "name": "Rothschild House State Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1162645,
+   "lon": -122.7578087,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 46.1905,
+   "corner_bearings_deg": [
+    133.81,
+    13.81,
+    253.81
+   ],
+   "kind": "park",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p063",
+   "name": "City Hall",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1161771,
+   "lon": -122.753612,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 44.7842,
+   "corner_bearings_deg": [
+    135.216,
+    15.216,
+    255.216
+   ],
+   "kind": "landmark",
+   "area": "Point Hudson / east Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p064",
+   "name": "Baker View Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1159974,
+   "lon": -122.7884084,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 49.003,
+   "corner_bearings_deg": [
+    130.997,
+    10.997,
+    250.997
+   ],
+   "kind": "park",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p065",
+   "name": "Crest Ave & Rainier St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1159077,
+   "lon": -122.8058278,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 47.5968,
+   "corner_bearings_deg": [
+    132.403,
+    12.403,
+    252.403
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p066",
+   "name": "Haller Fountain",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1152013,
+   "lon": -122.7572599,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 51.8156,
+   "corner_bearings_deg": [
+    128.184,
+    8.184,
+    248.184
+   ],
+   "kind": "landmark",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p067",
+   "name": "YMCA (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1151747,
+   "lon": -122.7728012,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 50.4093,
+   "corner_bearings_deg": [
+    129.591,
+    9.591,
+    249.591
+   ],
+   "kind": "park",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p068",
+   "name": "Bell Tower (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.115057,
+   "lon": -122.7585368,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 54.6282,
+   "corner_bearings_deg": [
+    125.372,
+    5.372,
+    245.372
+   ],
+   "kind": "landmark",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p069",
+   "name": "City Dock",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1149257,
+   "lon": -122.7527654,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 53.2219,
+   "corner_bearings_deg": [
+    126.778,
+    6.778,
+    246.778
+   ],
+   "kind": "landmark",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p070",
+   "name": "Adams St & Water St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1148622,
+   "lon": -122.755466,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 79.929,
+   "corner_bearings_deg": [
+    100.071,
+    340.071,
+    220.071
+   ],
+   "kind": "intersection",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p071",
+   "name": "20th St & McNeil St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1145182,
+   "lon": -122.7789711,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 81.3352,
+   "corner_bearings_deg": [
+    98.665,
+    338.665,
+    218.665
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p072",
+   "name": "20th St & Jackman St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.11448,
+   "lon": -122.7851019,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 77.1164,
+   "corner_bearings_deg": [
+    102.884,
+    342.884,
+    222.884
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p073",
+   "name": "Taylor St & Water St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1144383,
+   "lon": -122.7564773,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 78.5227,
+   "corner_bearings_deg": [
+    101.477,
+    341.477,
+    221.477
+   ],
+   "kind": "intersection",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p074",
+   "name": "Discovery Rd & Grant St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1137036,
+   "lon": -122.7914868,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 74.3038,
+   "corner_bearings_deg": [
+    105.696,
+    345.696,
+    225.696
+   ],
+   "kind": "intersection",
+   "area": "Castle Hill / Central",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p075",
+   "name": "Lawrence St & Walker St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1135969,
+   "lon": -122.769814,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 75.7101,
+   "corner_bearings_deg": [
+    104.29,
+    344.29,
+    224.29
+   ],
+   "kind": "intersection",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p076",
+   "name": "Union Wharf",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1135273,
+   "lon": -122.7557811,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 71.4913,
+   "corner_bearings_deg": [
+    108.509,
+    348.509,
+    228.509
+   ],
+   "kind": "trail",
+   "area": "Downtown Water St",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p077",
+   "name": "Jefferson County Courthouse (out front)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1124045,
+   "lon": -122.7680123,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 72.8975,
+   "corner_bearings_deg": [
+    107.102,
+    347.102,
+    227.102
+   ],
+   "kind": "landmark",
+   "area": "Uptown (Lawrence St)",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p078",
+   "name": "Ready Athletics trail",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.112,
+   "lon": -122.80521,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 68.6787,
+   "corner_bearings_deg": [
+    111.321,
+    351.321,
+    231.321
+   ],
+   "kind": "trail",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p079",
+   "name": "Madrona Blvd & Morning Star Way",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1119739,
+   "lon": -122.8116587,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 70.085,
+   "corner_bearings_deg": [
+    109.915,
+    349.915,
+    229.915
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p080",
+   "name": "Austin Matthew Ln & Towne Point Ave",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1119658,
+   "lon": -122.7991517,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 82.6712,
+   "corner_bearings_deg": [
+    97.329,
+    337.329,
+    217.329
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p081",
+   "name": "14th St & McPherson St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1100024,
+   "lon": -122.8001405,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 81.2649,
+   "corner_bearings_deg": [
+    98.735,
+    338.735,
+    218.735
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p082",
+   "name": "Gateway Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1097966,
+   "lon": -122.7700739,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 79.8587,
+   "corner_bearings_deg": [
+    100.141,
+    340.141,
+    220.141
+   ],
+   "kind": "park",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p083",
+   "name": "Kah Tai Lagoon Nature Park (at Benedict St & East Sims Way)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1090189,
+   "lon": -122.7754335,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 78.4524,
+   "corner_bearings_deg": [
+    101.548,
+    341.548,
+    221.548
+   ],
+   "kind": "intersection",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p084",
+   "name": "Discovery Rd & Howard St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1088575,
+   "lon": -122.8053226,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 77.0461,
+   "corner_bearings_deg": [
+    102.954,
+    342.954,
+    222.954
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p085",
+   "name": "12th St & Hill St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1086575,
+   "lon": -122.7844025,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 75.6398,
+   "corner_bearings_deg": [
+    104.36,
+    344.36,
+    224.36
+   ],
+   "kind": "intersection",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p086",
+   "name": "Nora's Neighborhood Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1078305,
+   "lon": -122.7942766,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 74.2335,
+   "corner_bearings_deg": [
+    105.766,
+    345.766,
+    225.766
+   ],
+   "kind": "park",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p087",
+   "name": "Port Townsend Boat Haven (at Patrol Boat Pier)",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.107061,
+   "lon": -122.7729139,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 72.8272,
+   "corner_bearings_deg": [
+    107.173,
+    347.173,
+    227.173
+   ],
+   "kind": "landmark",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p088",
+   "name": "Minnie Nakano Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1069291,
+   "lon": -122.7836209,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 71.421,
+   "corner_bearings_deg": [
+    108.579,
+    348.579,
+    228.579
+   ],
+   "kind": "park",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p089",
+   "name": "9th St & Sheridan St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.106407,
+   "lon": -122.7903057,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 70.0147,
+   "corner_bearings_deg": [
+    109.985,
+    349.985,
+    229.985
+   ],
+   "kind": "intersection",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p090",
+   "name": "9th St & Rainier St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1063245,
+   "lon": -122.8059248,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 74.2212,
+   "corner_bearings_deg": [
+    105.779,
+    345.779,
+    225.779
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p091",
+   "name": "Larry Scott Memorial Trail",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1057596,
+   "lon": -122.7798791,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 75.6275,
+   "corner_bearings_deg": [
+    104.373,
+    344.373,
+    224.373
+   ],
+   "kind": "trail",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p092",
+   "name": "5th St & 7th St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1052212,
+   "lon": -122.8106503,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 77.0338,
+   "corner_bearings_deg": [
+    102.966,
+    342.966,
+    222.966
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p093",
+   "name": "Cliff St & South Park Ave",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1043413,
+   "lon": -122.8027995,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 78.44,
+   "corner_bearings_deg": [
+    101.56,
+    341.56,
+    221.56
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p094",
+   "name": "Bishop Play Park",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1041554,
+   "lon": -122.7957129,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 68.5961,
+   "corner_bearings_deg": [
+    111.404,
+    351.404,
+    231.404
+   ],
+   "kind": "park",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p095",
+   "name": "Evans Vista & Rainier St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1016811,
+   "lon": -122.8051792,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 70.0023,
+   "corner_bearings_deg": [
+    109.998,
+    349.998,
+    229.998
+   ],
+   "kind": "intersection",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p096",
+   "name": "1st St & Grant St",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1005447,
+   "lon": -122.7913258,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 71.4086,
+   "corner_bearings_deg": [
+    108.591,
+    348.591,
+    228.591
+   ],
+   "kind": "intersection",
+   "area": "Kah Tai Lagoon / Boat Haven / Sims Way",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  },
+  {
+   "cat": "pillars",
+   "id": "pillar.p097",
+   "name": "Larry Scott Memorial Trail",
+   "type": "Matt Ready prism pillar",
+   "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
+   "lat": 48.1000411,
+   "lon": -122.8132261,
+   "size": {
+    "h_m": 1.8,
+    "side_m": 0.7
+   },
+   "anchor": "floor, flat local map; yaw about up axis",
+   "source": "pillars.json / pillars.js",
+   "yaw_deg": 72.8149,
+   "corner_bearings_deg": [
+    107.185,
+    347.185,
+    227.185
+   ],
+   "kind": "trail",
+   "area": "Westside / Ready Athletics vicinity",
+   "sound": {
+    "track": "disco-jam (64 s loop, 120 BPM, A minor)",
+    "gain": "1 if d<=3 m; 0.5(1+cos(pi(d-3)/52)) if 3<d<55; 0 if d>=55",
+    "voices": "nearest 2 within 55 m, shared loop clock"
+   }
+  }
+ ]
+}
