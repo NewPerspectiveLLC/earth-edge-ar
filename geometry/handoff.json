@@ -799,8 +799,8 @@
     ],
     [
      "p051",
-     48.1193012,
-     -122.7938463,
+     48.1201329,
+     -122.7957831,
      244.4309,
      "intersection"
     ],
@@ -890,10 +890,10 @@
     ],
     [
      "p064",
-     48.1159974,
-     -122.7884084,
+     48.1129662,
+     -122.7882401,
      49.003,
-     "park"
+     "intersection"
     ],
     [
      "p065",
@@ -1228,8 +1228,8 @@
   },
   {
    "file": "pillars.json",
-   "bytes": 14863,
-   "sha256": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
+   "bytes": 14880,
+   "sha256": "9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486",
    "content": "d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon)",
    "source": "OSM-derived public spots, 2026-10-17",
    "license": "ODbL"
@@ -1460,5 +1460,5 @@
   "other singer performer bots: 0 configured now (one per player-named singer, dynamic)",
   "GhostBot (purple Victorian tux, client-side, walks loops around the viewer): 1"
  ],
- "record_sha256": "fdeb11a030cf3d7964d1ad1927263921c0cbb88ad91ebc57b7c5e054d62e70e6"
+ "record_sha256": "0a780149396267d4ee09cd40bed2f6e3d688b6d0861cc8c6ab363c20d2f95758"
 }

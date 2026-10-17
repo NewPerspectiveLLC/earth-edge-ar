@@ -44,7 +44,7 @@ Each outline is an ordered vertex list of (lat, lon), mapped by P = R·v(lat,lon
 | `sheridan.json` | Sheridan St segments [lat,lon] |  | 5687 | `ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119` | OSM; ODbL |
 | `mountains.json` | Mount Rainier, Mount Baker heightfields |  | 187691 | `1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b` | USGS 3DEP via AWS Terrain Tiles; public domain |
 | `coast.json` | wider OSM coastline used for the ocean mask (bbox 48.01..48.19,-122.915..-122.645) |  | 112277 | `1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400` | OSM Overpass 2026-10-14; ODbL |
-| `pillars.json` | d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon) |  | 14863 | `70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146` | OSM-derived public spots, 2026-10-17; ODbL |
+| `pillars.json` | d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon) |  | 14880 | `9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486` | OSM-derived public spots, 2026-10-17; ODbL |
 | `pillar-matt.jpg` | pillar texture (see textures) |  | 39473 | `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e` | project asset; project |
 | `geometry/vortex-table.json` | vortex normals / antipodes / wedge tests |  | 14140 | `0e51823636a787db29e34eeaee3c55b7133c19a5b868169d6f40b1b8ff606ac5` | computed; - |
 
@@ -126,7 +126,7 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 | p048 | 48.1201326 | -122.7996689 | 240.2243 | intersection |
 | p049 | 48.1201059 | -122.7862086 | 238.818 | intersection |
 | p050 | 48.1198779 | -122.7615781 | 243.0246 | intersection |
-| p051 | 48.1193012 | -122.7938463 | 244.4309 | intersection |
+| p051 | 48.1201329 | -122.7957831 | 244.4309 | intersection |
 | p052 | 48.1181973 | -122.7521523 | 245.8371 | landmark |
 | p053 | 48.1179397 | -122.803429 | 247.2434 | intersection |
 | p054 | 48.1178355 | -122.7596702 | 248.6497 | intersection |
@@ -139,7 +139,7 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 | p061 | 48.1164772 | -122.7668663 | 41.9716 | intersection |
 | p062 | 48.1162645 | -122.7578087 | 46.1905 | park |
 | p063 | 48.1161771 | -122.753612 | 44.7842 | landmark |
-| p064 | 48.1159974 | -122.7884084 | 49.003 | park |
+| p064 | 48.1129662 | -122.7882401 | 49.003 | intersection |
 | p065 | 48.1159077 | -122.8058278 | 47.5968 | intersection |
 | p066 | 48.1152989 | -122.7533024 | 51.8156 | park |
 | p067 | 48.1152013 | -122.7572599 | 50.4093 | landmark |
@@ -180,4 +180,4 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 - other singer performer bots: 0 configured now (one per player-named singer, dynamic)
 - GhostBot (purple Victorian tux, client-side, walks loops around the viewer): 1
 
-Record: `geometry/record.json` sha256 `fdeb11a030cf3d7964d1ad1927263921c0cbb88ad91ebc57b7c5e054d62e70e6`, generated 2026-10-17T11:13:57-07:00.
+Record: `geometry/record.json` sha256 `0a780149396267d4ee09cd40bed2f6e3d688b6d0861cc8c6ab363c20d2f95758`, generated 2026-10-17T12:35:46-07:00.

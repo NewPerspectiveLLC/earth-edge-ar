@@ -250,7 +250,7 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 | test | test.Ghost-2 | Ghost-2 (server TEST fixture, dummy player marker) | test fixture | 48.13165 | -122.79921 | wander_r_m 150 | target point only (live position not recorded) | server.js GHOSTS |
 | vehicles | quest.ship | Quest spaceship cockpit | vehicle | - | - |  | viewer-relative (no world position) | quest.html cockpit()/QSHIP |
 
-### Matt Ready prism pillars (96, from pillars.json sha256 `70872740220fea0a…`)
+### Matt Ready prism pillars (96, from pillars.json sha256 `9bb94d3932fe7f36…`)
 Shape: equilateral triangular prism, side 0.7 m, height 1.8 m, texture `pillar-matt.jpg` on all 3 faces; yaw = FNV-1a(id). Full table with yaw in HANDOFF.md §5 / record.json.
 
 | id | name | kind | area | lat | lon | yaw° |
@@ -305,7 +305,7 @@ Shape: equilateral triangular prism, side 0.7 m, height 1.8 m, texture `pillar-m
 | p048 | Hastings Ave & Thomas St | intersection | Hastings / Middle Point | 48.1201326 | -122.7996689 | 240.2243 |
 | p049 | Hastings Ave & Holcomb St | intersection | Castle Hill / Central | 48.1201059 | -122.7862086 | 238.818 |
 | p050 | Blaine St & Taylor St | intersection | Uptown (Lawrence St) | 48.1198779 | -122.7615781 | 243.0246 |
-| p051 | 27th St & Sherman St | intersection | Hastings / Middle Point | 48.1193012 | -122.7938463 | 244.4309 |
+| p051 | Hancock St & Hastings Ave | intersection | Hastings / Middle Point | 48.1201329 | -122.7957831 | 244.4309 |
 | p052 | U.S. Coast Guard Memorial | landmark | Point Hudson / east Water St | 48.1181973 | -122.7521523 | 245.8371 |
 | p053 | Carolanne St & Cliff St | intersection | Hastings / Middle Point | 48.1179397 | -122.803429 | 247.2434 |
 | p054 | Lawrence St & Taylor St | intersection | Uptown (Lawrence St) | 48.1178355 | -122.7596702 | 248.6497 |
@@ -318,7 +318,7 @@ Shape: equilateral triangular prism, side 0.7 m, height 1.8 m, texture `pillar-m
 | p061 | Garfield St & Pierce St | intersection | Uptown (Lawrence St) | 48.1164772 | -122.7668663 | 41.9716 |
 | p062 | Rothschild House State Park | park | Downtown Water St | 48.1162645 | -122.7578087 | 46.1905 |
 | p063 | City Hall | landmark | Point Hudson / east Water St | 48.1161771 | -122.753612 | 44.7842 |
-| p064 | Baker View Park | park | Castle Hill / Central | 48.1159974 | -122.7884084 | 49.003 |
+| p064 | 18th St & Wilson St | intersection | Castle Hill / Central | 48.1129662 | -122.7882401 | 49.003 |
 | p065 | Crest Ave & Rainier St | intersection | Westside / Ready Athletics vicinity | 48.1159077 | -122.8058278 | 47.5968 |
 | p066 | City Dock (at John Pope Marine Park) | park | Downtown Water St | 48.1152989 | -122.7533024 | 51.8156 |
 | p067 | Haller Fountain | landmark | Downtown Water St | 48.1152013 | -122.7572599 | 50.4093 |

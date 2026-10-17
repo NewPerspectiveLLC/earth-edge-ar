@@ -2,7 +2,7 @@
  "spec": "Live Geometry geometry record v1.0",
  "date": "2026-10-17",
  "status": "locked (pillars: as of d44 working tree)",
- "generated": "2026-10-17T11:13:57-07:00",
+ "generated": "2026-10-17T12:35:46-07:00",
  "sphere": {
   "R_m": 6371000.0,
   "frame": "ECEF-like, +Z north pole, +X lat0/lon0; heights spherical"
@@ -47,7 +47,7 @@
  ],
  "pillars_meta": {
   "file": "pillars.json",
-  "sha256": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
+  "sha256": "9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486",
   "count": 96,
   "src": "OpenStreetMap contributors (ODbL) via Overpass, fetched 2026-10-17; public places only (street-corner right-of-way 4 m NE of intersection centre, park/landmark/trail points); stratified 490 m grid, seed 44; keep-out radius around a private area; water (harbor/lagoon polygons) excluded",
   "constants": {
@@ -91,21 +91,21 @@
   }
  ],
  "source_hashes": {
-  "audio.js": "734a215c65d4e0c9c7a6914cebfef5fb7c32fb9a5bb38adc1a7e4081cee83963",
-  "circle.js": "45fb127373c85fd526d700a1924762767d834005b20c22ea375d0c328cc1638e",
+  "audio.js": "4520d8c872e49697ded05cbf3f6c8f19ff1167c783598f2828af0ba7fc1bc9f1",
+  "circle.js": "06e68d1c1fd91486821e2d0c530ade5a8e33cf2cbfe4310f97c7e844f40daaea",
   "coast.json": "1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400",
   "continents.json": "1dc47aca434d0e27ec41cb20a36116ee7099a714fb53ef2a423f00aeb096ba16",
-  "daynight.js": "75902d38e65013070b9568de3304474a25b6a5efd5dfc9ec91d0d00bcc9e5cc5",
-  "extras.js": "5bf7a6a1a8d562da67ca6148137b845ee70117f42e2031d2621cbe1d2ffd9b98",
-  "figures-registry.js": "52a07a4e56d599570304c217e22b45aeafb4ca578a7998c11675eff2dfdbf142",
-  "index.html": "ff13f06f695cb0a6f30f2465d418e62d135ca5167cb4003e6f9cacf15be617b9",
+  "daynight.js": "b2c09412dedb27a5483d088c4451c13d7d75c2a03ef097aba37eef8f9ac213bc",
+  "extras.js": "2e9272cd933221137559fb2395166e72dcce2801288a952353b1ac9d003fe57d",
+  "figures-registry.js": "ff3c742280de8eb0ad8c1959be7921fa859f54c636c18437c7c3a49192a9e84c",
+  "index.html": "2f46fd9ae580bd8e034307ec69cce40aa54ba84b1653327427be0373b8083de4",
   "landmass.json": "5a7c28c9497cd51d17080d909f3fd747386fbc2cc9110257bafd82c21b461292",
   "mountains.json": "1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b",
   "pillar-matt.jpg": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
-  "pillars.js": "35617834ce8cbf9e5b05dfe038b56a9689a984604c5a4c5f0678b8845c7f762c",
-  "pillars.json": "70872740220fea0a8f40adbc3e70b866daaf73280b328fa1534fbf773854f146",
-  "quest.html": "61c265993e11b93e58f9fbc4aa551f0bb77b9cf76dafdc1b68aaf80ec884decb",
-  "ren.js": "0a0877cf01ce53badba8d7fcad776a219445626742a7d87e416624fc5efe9f14",
+  "pillars.js": "8a28975c94e75c53f05e437f10e519ef039bd49eb1fa8ffb22f2a034c5109880",
+  "pillars.json": "9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486",
+  "quest.html": "b8980b81c2f411280728241982c73c334a0def140d082d75578f64d508310119",
+  "ren.js": "453173b14800e2899f2a7f6a7928578fa9745278a72b89257b1b90a4ca589821",
   "server/server.js": "a44e7678f4057f91d7f16fe31bc432c61e355d0fe2a36801a87974e23e14902a",
   "sheridan.json": "ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119",
   "shore.json": "228da1eb820e1051209e72f0a7f8c72cc31bce8a3c954f045321cd10ff73f12b",
@@ -4911,11 +4911,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p051",
-   "name": "27th St & Sherman St",
+   "name": "Hancock St & Hastings Ave",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1193012,
-   "lon": -122.7938463,
+   "lat": 48.1201329,
+   "lon": -122.7957831,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5275,11 +5275,11 @@
   {
    "cat": "pillars",
    "id": "pillar.p064",
-   "name": "Baker View Park",
+   "name": "18th St & Wilson St",
    "type": "Matt Ready prism pillar",
    "shape": "equilateral triangular prism (billboard) side .7 m: plinth (side .826, h .08) + 3 image faces (h 1.67) + cyan cap (side .742, h .05) + ground ring .55-1.1 m; texture tex.pillar-matt on all 3 faces",
-   "lat": 48.1159974,
-   "lon": -122.7884084,
+   "lat": 48.1129662,
+   "lon": -122.7882401,
    "size": {
     "h_m": 1.8,
     "side_m": 0.7
@@ -5292,7 +5292,7 @@
     10.997,
     250.997
    ],
-   "kind": "park",
+   "kind": "intersection",
    "area": "Castle Hill / Central",
    "sound": {
     "track": "disco-jam (64 s loop, 120 BPM, A minor)",
