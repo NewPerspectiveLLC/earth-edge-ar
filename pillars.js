@@ -1,11 +1,13 @@
 // pillars.js (d44): Matt Ready triangular-prism billboard pillars scattered around Port Townsend + proximity music (Master DJ).
 // Data: pillars.json (OSM-derived public spots: street-corner right-of-way, parks, landmarks, trails). Placement/size/audio constants live in figures-registry.js (PILLARS).
-// Rendering: one shared prism geometry, one unlit material per image (default PILLAR_IMAGE; a pillar may set "image" to override), InstancedMesh, per-instance distance cull.
-// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792274910186) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
+// Rendering: one shared prism geometry with 3 face groups, unlit 'contain' materials (whole image fitted unstretched, leftover bands = dark neon-purple gradient);
+// default faces = PILLARS.images; a pillar may set "image" (all 3 faces) or "images" [3] to override. InstancedMesh, per-instance distance cull.
+// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792277924923) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792274910186';
-export const PILLAR_IMAGE = PILLARS.image;               // swap this one constant (or PILLARS.image) for a photo of Matt later
+import { PILLARS } from './figures-registry.js?v=1792277924923';
+export const PILLAR_IMAGE = PILLARS.image;
+export const PILLAR_FACES = PILLARS.images || [PILLAR_IMAGE, PILLAR_IMAGE, PILLAR_IMAGE];   // d46: per-face images (faces 0,1 = Project Driftwood orb-matt.jpg, face 2 = pillar-matt.jpg)               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;
 const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 * Math.cos(a * D); return Math.hypot(x, y) };
 const brgEN = (a, b, c, d) => [(d - b) * 111320 * Math.cos(a * D), (c - a) * 111320];
@@ -16,10 +18,18 @@ function prismGeo(side, h, y0) {
   for (let k = 0; k < 3; k++) { const a0 = k * 120 * D, a1 = (k + 1) * 120 * D, x0 = R * Math.sin(a0), z0 = R * Math.cos(a0), x1 = R * Math.sin(a1), z1 = R * Math.cos(a1);
     const nx = Math.sin(a0 + 60 * D), nz = Math.cos(a0 + 60 * D), b = P.length / 3;   // face normal points out between the two corners
     P.push(x0, y0, z0, x1, y0, z1, x1, y0 + h, z1, x0, y0 + h, z0); U.push(0, 0, 1, 0, 1, 1, 0, 1); for (let i = 0; i < 4; i++) N.push(nx, 0, nz);
-    I.push(b, b + 1, b + 2, b, b + 2, b + 3) }
+    I.push(b, b + 1, b + 2, b, b + 2, b + 3); /* one draw group per face */ }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
-  g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setIndex(I); return g;
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setIndex(I); for (let k = 0; k < 3; k++) g.addGroup(k * 6, 6, k); return g;
 }
+/* unlit 'contain' image material (instancing-aware): fits the whole image on a face of aspect faceA (w/h) without stretching; leftover bands get a dark neon-purple gradient */
+const FIT_V = 'varying vec2 vUv;\nvoid main(){vUv=uv;vec4 p=vec4(position,1.);\n#ifdef USE_INSTANCING\np=instanceMatrix*p;\n#endif\ngl_Position=projectionMatrix*modelViewMatrix*p;}';
+const FIT_F = 'uniform sampler2D map;uniform float faceA,imgA,lum;varying vec2 vUv;\nvoid main(){vec2 u=vUv;vec2 s=imgA>faceA?vec2(1.,faceA/imgA):vec2(imgA/faceA,1.);vec2 q=(u-.5)/s+.5;\n'
+ + 'float inside=step(0.,q.x)*step(q.x,1.)*step(0.,q.y)*step(q.y,1.);float e=max(max(-q.x,q.x-1.),max(-q.y,q.y-1.));\n'
+ + 'vec3 band=mix(vec3(.30,.04,.55),vec3(.035,.005,.07),clamp(e*s.y*6.,0.,1.))+vec3(.55,.1,.9)*exp(-e*s.y*90.);\n'
+ + 'vec4 c=texture2D(map,clamp(q,0.,1.));gl_FragColor=vec4(mix(band,c.rgb,inside)*lum,1.);\n#include <colorspace_fragment>\n}';
+export function fitMaterial(tex, faceA) { const m = new THREE.ShaderMaterial({ uniforms: { map: { value: tex }, faceA: { value: faceA }, imgA: { value: faceA }, lum: { value: 1 } }, vertexShader: FIT_V, fragmentShader: FIT_F, side: THREE.FrontSide });
+  const up = () => { const im = tex.image; if (im && im.width) m.uniforms.imgA.value = im.width / im.height }; if (tex.image) up(); else tex.onUpdate = up; m.userData.up = up; return m }
 function capGeo(side, h, y0) {   // closed triangular slab (plinth / cap), flat-shaded
   const R = side / Math.sqrt(3), c = [0, 1, 2].map(k => [R * Math.sin(k * 120 * D), R * Math.cos(k * 120 * D)]), P = [];
   const tri = (a, b, e) => P.push(...a, ...b, ...e);
@@ -42,12 +52,14 @@ export function initPillars(parent, toLocal, cam, opts = {}) {
   const ver = window.EEAR_V ? '?v=' + window.EEAR_V : '';
   fetch((opts.url || PILLARS.url) + ver).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json() }).then(j => {
     S.list = j.pillars.map(p => ({ ...p, yaw: hash(p.id) * 2 * Math.PI }));
-    const by = {}; for (const p of S.list) (by[p.image || PILLAR_IMAGE] ||= []).push(p);
+    const faces = p => p.images && p.images.length === 3 ? p.images : p.image ? [p.image, p.image, p.image] : PILLAR_FACES;
+    const by = {}; for (const p of S.list) (by[faces(p).join('|')] ||= []).push(p);
+    const faceA = PILLARS.sideM / (PILLARS.heightM - PILLARS.plinthM - PILLARS.capM), texs = {};
+    const texOf = img => texs[img] ||= (() => { const t = tl.load(img + (PILLAR_FACES.includes(img) ? ver : ''), () => { for (const G of S.groups) G.mats.forEach(m => m.userData.up()) }); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t })();
     const mk = (g, m, n) => { const im = new THREE.InstancedMesh(g, m, n); im.frustumCulled = false; im.instanceMatrix.setUsage(THREE.DynamicDrawUsage); root.add(im); return im };
-    for (const [img, ps] of Object.entries(by)) {
-      const tex = tl.load(img + (img === PILLAR_IMAGE ? ver : '')); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
-      const mat = new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff, side: THREE.FrontSide });   // unlit: readable at night, day lighting can't black it out
-      S.groups.push({ ps, face: mk(geo, mat, ps.length), mat });
+    for (const [key, ps] of Object.entries(by)) {   // unlit: readable at night, day lighting can't black it out. One material per distinct image (shared across faces/groups)
+      const mats = key.split('|').map(img => fitMaterial(texOf(img), faceA)), uniq = [...new Set(mats)];
+      S.groups.push({ ps, face: mk(geo, mats, ps.length), mats });
     }
     S.plinth = mk(plG, plM, S.list.length); S.cap = mk(cpG, cpM, S.list.length); S.ring = mk(ringG, ringM, S.list.length); S.ring.renderOrder = 2;
     S.ready = true; place(true); api.setNight(S.night);
@@ -98,7 +110,7 @@ export function initPillars(parent, toLocal, cam, opts = {}) {
   function nearest(L, k) { const out = []; for (const p of S.list) { const d = Math.hypot(dist(L.lat, L.lon, p.lat, p.lon), (L.alt || 0)); if (out.length < k || d < out[out.length - 1].d) { out.push({ p, d }); out.sort((a, b) => a.d - b.d); if (out.length > k) out.pop() } } return out }
   const api = {
     update(dt) { const now = performance.now(); if (now - lastPlace > 250) { lastPlace = now; place(false) } try { audioFrame(now) } catch (e) { if (!S.aerr) { S.aerr = 1; console.warn('pillar audio', e) } } },
-    setNight(n) { S.night = n; ringM.opacity = .1 + .55 * n; cpM.color.setHSL(.48, 1, .45 + .2 * n); for (const G of S.groups) G.mat.color.setScalar(.88 + .12 * n) },
+    setNight(n) { S.night = n; ringM.opacity = .1 + .55 * n; cpM.color.setHSL(.48, 1, .45 + .2 * n); for (const G of S.groups) G.mats.forEach(m => m.uniforms.lum.value = .88 + .12 * n) },
     get list() { return S.list }, get placed() { return S.placed || 0 }, get near() { return S.near }, get nearD() { return S.nearD }, get voices() { return S.voices.map(v => ({ id: v.p.id, gain: +v.g.gain.value.toFixed(3) })) },
     get err() { return S.err }, gain: pillarGain, root, image: PILLAR_IMAGE, state: S,
   };

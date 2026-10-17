@@ -1,1 +1,1 @@
-{"v": "1792274910186", "note": "d45: Master DJ: one global queue (server /api/dj + SSE, GM-key writes), dj.html control page, pillars + in-app music play the current DJ track synced to server time; 25-track freely licensed library"}
+{"v": "1792277924923", "note": "d46: flying sound (Master DJ orbits the player via HRTF; lingers + far swoops; toggle in music panel), neon-purple plasma orb with Project Driftwood billboard, per-player spawn copy (client-only), pillars show Project Driftwood on 2 faces"}
