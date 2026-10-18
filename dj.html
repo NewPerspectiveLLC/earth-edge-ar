@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792356031991><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792356031991></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — Master DJ</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry DJ"><meta name=description content="Live Geometry: Matt's Reality Master DJ: one global playlist for everyone in the world"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792356031991><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792356031991>
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792356720978><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792356720978></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — Master DJ</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry DJ"><meta name=description content="Live Geometry: Matt's Reality Master DJ: one global playlist for everyone in the world"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792356720978><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792356720978>
 <style>
 :root{--p:#a45cff;--c:#2ff5df}
 html,body{margin:0;background:#0b0912;color:#eee;font:14px system-ui,-apple-system,sans-serif}
@@ -39,8 +39,8 @@ a{color:#c9a6ff}.ro .w{display:none}
 </div>
 <script>window.EEAR_DJ_NOUI=1</script>
 <script type=module>
-import './djvoice.js?v=1792356031991';
-import { DJ } from './dj.js?v=1792356031991';
+import './djvoice.js?v=1792356720978';
+import { DJ } from './dj.js?v=1792356720978';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BASE=DJ.base;let KEY=localStorage.eearGM||'',LIB=null,canW=false;
 const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
@@ -82,4 +82,4 @@ fetch('audio/dj/library.json',{cache:'no-cache'}).then(r=>r.json()).then(j=>{LIB
 addEventListener('eear:dj',()=>{lastSig='';render()});
 setInterval(()=>{const st=DJ.state,c=DJ.at();if(st&&c.item){$('npE').textContent=fmt(c.offset);$('npD').textContent=fmt(c.item.duration);$('npB').style.width=Math.min(100,100*c.offset/c.item.duration)+'%'}render()},500);
 if(KEY)checkKey();else render();
-</script><script type=module>document.getElementById('bVoice').onclick=()=>import('./djpanel.js?v=1792356031991').then(M=>M.open())</script></body></html>
+</script><script type=module>document.getElementById('bVoice').onclick=()=>import('./djpanel.js?v=1792356720978').then(M=>M.open())</script></body></html>

@@ -57,3 +57,26 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
 - GM endpoints (header `X-GM-Key`): `GET/POST /api/ren-usage`, `POST /api/ren-usage/test-notify`, `GET /api/stats`.
 - First-contact notifier: `~/.eear-secrets/ren-notify.json` (chmod 600, never committed), off until the file exists. Examples: `{"mode":"imessage","to":"+1..."}` or `{"mode":"webhook","url":"https://...","authorization":"Bearer ..."}`; optional `"alerts":true`, `"maxPerHour":30`, `"enabled":false`.
 - `stats.html`: "Room Stats" dashboard (GM key, refreshes every 10 s).
+
+## d49 (2026-10-18): Ghost & Orb controls, rooms, parcels, DJ help
+- **Ghost & Orb controls** (ghost.html, 👻🛸 button, Quest Layers panel tabs *Ghost* / *Orb*):
+  - Orb modes: Auto / Manual / Go-to / Tour.
+  - Manual on iPhone/desktop: on-screen joystick.
+  - Manual on Quest: the *Steer orb* toggle. Then the left stick steers and the right stick Y sets height; triggers are untouched.
+  - Go-to: Map → 🎯 Send orb, or Quest "Send orb 40 m ahead".
+  - Tours: Ready Athletics / Cappy's / Alternate / Off. Radius min 25 m, linger, speed.
+  - Settings are in localStorage `eearOrbCfg`. The orb path is computed per device.
+  - Matt (GM key) can *Apply to everyone* via `POST /api/orb` (DJ state `.orb`). Clients follow unless "Follow Matt's orb settings" is off. Manual steering stays local.
+- **Live orb** on the minimap radar and on the full Map: purple dot plus a 5 Hz trail. Tap it for distance and status.
+- **Parcels:**
+  - Official Jefferson County polygons in `parcels.json`: 997800502 Ready Athletics LLC and 998002802 Cappy's Trails.
+  - Drawn as a glowing ground ribbon with a label.
+  - 8 ft stone corner columns (instanced, Lite on Quest).
+  - Layers keys: `parcelRA`, `colsRA`, `parcelCappy`, `colsCappy`, `raTrail`.
+- **Rooms** (`rooms.js`): *Matt's Reality* and *Ready Athletics Master Map* (`?room=ra-master-map`).
+  - Switch from the title-card picker, the 🏠 pill, or the Quest panel *Room* tab.
+  - Each room has its own Layers state: `eearLayers` / `eearLayers_ra`, and on Quest `eearQLayers` / `eearQLayers_ra`.
+- **RA vortex centre switch:** `ra-center.json` (`"use": "pin"|"parcel"`) plus `python3 tools/ra_center.py --apply`.
+  - Rewrites every file that holds the RA centre.
+  - Then regenerate the geometry docs (`geometry/build_record.py`, `make_docs.py`) and deploy.
+- **dj-help.html:** "How to talk to everyone (Live DJ voice)", linked from dj.html and gm.html.

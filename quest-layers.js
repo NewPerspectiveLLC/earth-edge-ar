@@ -1,12 +1,12 @@
 // quest.html: one registry for every layer toggle -> 3D in-headset Layers panel (Y button) + 2D HUD + localStorage (QL).
-import{makePanel,xrRays,summon}from'./qpanel.js?v=1792356031991';
+import{makePanel,xrRays,summon}from'./qpanel.js?v=1792356720978';
 const T=AFRAME.THREE;
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.QVXG&&window.QGEO&&window.QGHOST&&window.QGAP&&window.QAPV){clearInterval(iv);r()}},200)});
 await wait();
 const sc=document.querySelector('a-scene'),QLs=()=>QL;const on=k=>QL[k]!==0;
 const tagged=cat=>{const a=[];sc.object3D.traverse(o=>{if(o.userData&&o.userData.qcat===cat)a.push(o)});return a};
 const domCat=cat=>[...document.querySelectorAll(`[data-qcat="${cat}"]`)];
-const CATS=['vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges','moon','sun','sat'];
+const CATS=['parcelRA','colsRA','parcelCappy','colsCappy','raTrail','vxLocal','vxWorld','vxAnti','ocean','coast','roads','saucers','ghost','places','poles','pyramids','edges','moon','sun','sat'];
 const isLabel=el=>el.tagName==='A-TEXT'&&!['msg','bm'].includes(el.id);
 function apply(){QGAP();QAPV();
  for(const c of CATS){const v=on(c);for(const o of tagged(c))o.visible=v;for(const el of domCat(c))el.setAttribute('visible',v&&(on('labels')||!isLabel(el)))}
@@ -14,7 +14,7 @@ function apply(){QGAP();QAPV();
  const gr=document.getElementById('grid');gr&&gr.setAttribute('visible',on('grid'));
  /* labels hidden by the master / per-label switches are marked so they come back exactly (not left hidden) */
  for(const el of qLabels()){const off=!on('labels')||QLOFF.has(qlk(el));if(off){if(el.getAttribute('visible')!==false||el.dataset.qlh){el.dataset.qlh=1;el.setAttribute('visible',false)}}else if(el.dataset.qlh){delete el.dataset.qlh;if(!(el.dataset.qcat&&!on(el.dataset.qcat)))el.setAttribute('visible',true)}}
- localStorage.eearQLayers=JSON.stringify(QL);hud();P&&P.refresh()}
+ localStorage[window.QLKEY||'eearQLayers']=JSON.stringify(QL);hud();P&&P.refresh()}
 const panelEl=el=>false;
 /* universal labels: per-label off set (first line of the a-text = key), persisted */
 const QLOFF=window.QLOFF=new Set(JSON.parse(localStorage.eearQLabelsOff||'[]'));const qlk=el=>String(el.getAttribute('value')||'').split('\n')[0].trim();
@@ -58,14 +58,43 @@ const QPW=()=>window.QPOW;R.push({section:'Powers',key:'powOn',label:'Powers (A 
  {section:'Powers',key:'nM5',label:'Nudge north −5°',kind:'action',run:()=>window.qNorthNudge&&qNorthNudge(-5)},{section:'Powers',key:'nReset',label:'Reset north',kind:'action',run:()=>window.qNorthReset&&qNorthReset()});
 R.push({section:'View',key:'lite',label:'Lite mode (reloads)',kind:'toggle',get:()=>!!window.EEAR_LITE,set:v=>{localStorage.eearLite=v?'1':'0';location.reload()}});
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
-const SECTIONS=['Vortex','Earth','Local','Places','Sky','Labels','View','Powers'];
-for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera'&&it.key!=='satOpaque')QL[it.key]=1;
+/* d49: official parcels + stone corner columns + RA trail (parcels.js?v=1792356720978) */
+add('Places','parcelRA','RA parcel 997800502',()=>tagged('parcelRA'));add('Places','colsRA','RA corner columns',()=>tagged('colsRA'));add('Places','parcelCappy',"Cappy's parcel 998002802",()=>tagged('parcelCappy'));add('Places','colsCappy',"Cappy's corner columns",()=>tagged('colsCappy'));add('Places','raTrail','RA trail',()=>tagged('raTrail'));
+/* d49: ROOM (same as the title-card picker on iPhone/desktop). Each room keeps its own Layers state; switching is live (no reload, music/DJ + presence keep going). */
+const ROOMN={'matts-reality':"Matt's Reality",'ra-master-map':'Ready Athletics Master Map'};let RM=null;import('./rooms.js?v=1792356720978').then(M=>RM=M).catch(()=>{});
+function setRoom(r){if(r===window.QROOM)return;localStorage[window.QLKEY]=JSON.stringify(QL);window.QROOM=localStorage.eearRoom=r;window.QLKEY=r==='ra-master-map'?'eearQLayers_ra':'eearQLayers';let st={};try{st=JSON.parse(localStorage[window.QLKEY]||'{}')}catch(e){}
+ const pre=r==='ra-master-map'?(RM?RM.QRA_PRESET:{}):(RM?RM.QMR_DEFAULTS:{raTrail:0});for(const k of Object.keys(QL))QL[k]=1;Object.assign(QL,{satOpaque:0},pre,st);apply();nL=-1;build();try{history.replaceState(null,'','?room='+r)}catch(e){}window.qSay&&qSay(ROOMN[r])}
+for(const r in ROOMN)R.push({section:'Room',key:'room:'+r,label:ROOMN[r],kind:'toggle',get:()=>window.QROOM===r,set:()=>setRoom(r)});
+R.push({section:'Room',key:'roomRA',label:'Go to RA parcel (Master Map)',kind:'action',run:()=>{setRoom('ra-master-map')}});
+/* d49: Ghost (ghostctl.js?v=1792356720978 settings, same as the 2D 'Ghost & Orb controls' screen, localStorage.eearGhostCfg) */
+const GC=()=>window.EEAR_GHOSTCTL,GMODES=['classic','orbit','follow','wander','mirror'],GMN={classic:'Classic',orbit:'Orbit me',follow:'Follow me',wander:'Wander',mirror:'Mirror'};
+const gv=k=>GC()?GC().get()[k]:0,gs=p=>GC()&&GC().set(p),fx=v=>(Math.round(v*100)/100).toString();
+R.push({section:'Ghost',key:'gMode',label:'Mode',lbl:()=>'Mode: '+(GMN[gv('mode')]||'…'),kind:'action',run:()=>{const i=GMODES.indexOf(gv('mode'));gs({mode:GMODES[(i+1)%GMODES.length]})}});
+R.push({section:'Ghost',key:'gPreset',label:'Preset',lbl:()=>'Preset: '+(window._gp||'tap to cycle'),kind:'action',run:()=>{const P=['Calm','Playful','Shadowing','Wild'];const i=(P.indexOf(window._gp)+1)%P.length;window._gp=P[i];GC()&&GC().preset(P[i])}});
+const gstep=(k,lab,d,mn,mx,pair)=>{for(const sg of[-1,1])R.push({section:'Ghost',key:'g'+k+sg,label:lab,lbl:()=>`${lab} ${sg>0?'+':'−'}  (${fx(gv(k))}${pair?'–'+fx(gv(pair)):''})`,kind:'action',run:()=>{const p={};p[k]=Math.min(mx,Math.max(mn,gv(k)+sg*d));if(pair)p[pair]=Math.min(mx,Math.max(mn,gv(pair)+sg*d));gs(p)}})};
+gstep('speedMin','Speed',.2,.05,15,'speedMax');gstep('distMin','Distance',1,.5,200,'distMax');gstep('height','Height',.5,-1,20);gstep('jitter','Random',.1,0,1);gstep('pauseEvery','Linger every',5,0,120);gstep('approach','Shy↔Bold',.25,-1,1);
+R.push({section:'Ghost',key:'gShow',label:'Show ghost',kind:'toggle',get:()=>on('ghost'),set:v=>set('ghost',v)},{section:'Ghost',key:'gReset',label:'Reset ghost',kind:'action',run:()=>GC()&&GC().reset()});
+/* d49: Orb (orbit.js?v=1792356720978 settings, same as the 2D screen; Matt's GM 'Apply to everyone' settings are followed unless 'Follow Matt' is off) */
+const OA=()=>window.EEAR_ORBAPI,oc=()=>OA()?OA().orbCfg():{},ol=p=>OA()&&OA().setOrbCfg(p);let OC=null;import('./orbctl.js?v=1792356720978').then(M=>OC=M).catch(()=>{});
+const TOURS=['ra','cappy','alt','off'],TN={ra:'Ready Athletics',cappy:"Cappy's trails",alt:'Alternate',off:'Off'},MN={auto:'Auto',manual:'Manual (steer)',goto:'Go-to',tour:'Tour'};
+const steer=v=>{window.QORBSTEER=!!v;window.EEAR_ORBSTEER={x:0,y:0,h:0};ol({mode:v?'manual':'auto'})};
+R.push({section:'Orb',key:'oMode',label:'Orb',lbl:()=>'Orb: '+(MN[oc().mode]||'…')+(window.EEAR_AUDIO&&!EEAR_AUDIO.flyOn?' (Flying sound off)':''),kind:'action',run:()=>{steer(false);ol({mode:'auto',goto:null})}});
+R.push({section:'Orb',key:'oSteer',label:'Steer orb (left stick; R-stick Y = height)',kind:'toggle',get:()=>!!window.QORBSTEER,set:v=>steer(v)});
+R.push({section:'Orb',key:'oAhead',label:'Send orb 40 m ahead',kind:'action',run:()=>{const c=sc.camera,f=window.QF;if(!f||!OC)return;const p=new T.Vector3(),d=new T.Vector3();c.getWorldPosition(p);c.getWorldDirection(d);d.y=0;d.normalize();p.addScaledVector(d,40);f.worldToLocal(p);steer(false);OC.sendGoto(HOME[0]-p.z/111320,HOME[1]+p.x/window.QMPQ)}});
+R.push({section:'Orb',key:'oTour',label:'Tour now',kind:'action',run:()=>{steer(false);OC&&OC.tourNow()}});
+R.push({section:'Orb',key:'oTours',label:'Tours',lbl:()=>'Tours: '+(TN[oc().tour]||'…'),kind:'action',run:()=>{const i=TOURS.indexOf(oc().tour);ol({tour:TOURS[(i+1)%TOURS.length]})}});
+const ostep=(k,lab,d,u)=>{for(const sg of[-1,1])R.push({section:'Orb',key:'o'+k+sg,label:lab,lbl:()=>`${lab} ${sg>0?'+':'−'}  (${fx(oc()[k]||0)}${u})`,kind:'action',run:()=>ol({[k]:(oc()[k]||0)+sg*d})})};
+ostep('radius','Radius',5,' m, min 25');ostep('speed','Speed',.2,'×');ostep('lingerF','Linger',.25,'×');
+R.push({section:'Orb',key:'oHold',label:'Hold at go-to spot',kind:'toggle',get:()=>!!oc().hold,set:v=>ol({hold:!!v})});
+R.push({section:'Orb',key:'oFollow',label:"Follow Matt's orb settings",kind:'toggle',get:()=>OA()?OA().orbCfgLocal().follow!==false:true,set:v=>ol({follow:!!v})});
+const SECTIONS=['Room','Vortex','Earth','Local','Places','Sky','Labels','View','Powers','Ghost','Orb'];
+for(const it of R)if(it.kind==='toggle'&&!it.key.includes(':')&&!['gShow','oSteer','oHold','oFollow'].includes(it.key)&&QL[it.key]===undefined&&it.key!=='camera'&&it.key!=='satOpaque')QL[it.key]=1;
 let P=null,nL=-1;const base=R.slice();
 function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;
  const items=base.slice();const at=items.findIndex(x=>x.key==='labelsAllOff')+1;
  items.splice(at,0,...T0.map(t=>({section:'Labels',key:'lab:'+t,label:t,kind:'toggle',get:()=>!QLOFF.has(t),set:v=>qLabelSet(t,v),objs:()=>qLabels().filter(el=>qlk(el)===t).map(obj3)})));
  const vis=P&&P.root.visible,pos=P&&P.root.position.clone(),q=P&&P.root.quaternion.clone(),par=P&&P.root.parent||sc.object3D;if(P&&P.root.parent)P.root.parent.remove(P.root);
- P=makePanel(T,{items,sections:SECTIONS,title:"Matt's Reality Layers"});par.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
+ P=makePanel(T,{items,sections:SECTIONS,title:(window.QROOM==='ra-master-map'?'RA Master Map':"Matt's Reality")+' · Layers'});par.add(P.root);P.root.traverse(o=>{if(o.material)o.material.userData.pf=1});
  if(vis){P.root.position.copy(pos);P.root.quaternion.copy(q);P.root.visible=true}window.QPANEL=P;window.QREG=items}
 build();
 const rig=document.getElementById('rig').object3D;

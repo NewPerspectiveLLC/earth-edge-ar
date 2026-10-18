@@ -7,11 +7,11 @@ export function makePanel(T,{items,sections,title='Layers'}){
  const root=new T.Group();root.visible=false;root.name='qpanel';const btns=[];const P={root,btns,tab:0,items};
  const mkBtn=(kind,label,item,section)=>{const{c,g,t}=canvasTex(T,256,170);const m=new T.Mesh(new T.PlaneGeometry(BW,BH),new T.MeshBasicMaterial({map:t,transparent:true,opacity:1,depthTest:false,depthWrite:false,toneMapped:false}));m.renderOrder=10000;m.frustumCulled=false;
   const b={kind,label,item,section,key:item?item.key:'tab:'+label,mesh:m,hover:false,_s:''};m.userData.btn=b;
-  b.draw=()=>{const sel=kind==='tab'&&sections[P.tab]===label,st=kind==='toggle'?!!item.get():null;const s=[st,b.hover,sel,label].join();if(s===b._s)return;b._s=s;
+  b.draw=()=>{const sel=kind==='tab'&&sections[P.tab]===label,st=kind==='toggle'?!!item.get():null;const lab=item&&item.lbl?item.lbl():label;/* d49: live value labels */const s=[st,b.hover,sel,lab].join();if(s===b._s)return;b._s=s;
    const bg=kind==='tab'?(sel?'#ffd23f':'#2b3445'):kind==='action'?'#1f6fd1':(st?'#18a957':'#4a4f58');g.fillStyle=bg;g.fillRect(0,0,256,170);
    g.lineWidth=b.hover?16:4;g.strokeStyle=b.hover?'#ffffff':'#0b0e14';g.strokeRect(b.hover?8:2,b.hover?8:2,b.hover?240:252,b.hover?154:166);
    g.fillStyle=kind==='tab'&&sel?'#111':'#fff';g.textAlign='center';g.textBaseline='middle';g.font='bold 30px system-ui,sans-serif';
-   const L=wrap(g,label,220).slice(0,3);const y0=kind==='toggle'?62:85;L.forEach((l,i)=>g.fillText(l,128,y0+(i-(L.length-1)/2)*34));
+   const L=wrap(g,lab,220).slice(0,3);const y0=kind==='toggle'?62:85;L.forEach((l,i)=>g.fillText(l,128,y0+(i-(L.length-1)/2)*34));
    if(kind==='toggle'){g.font='bold 34px system-ui,sans-serif';g.fillText(st?'● ON':'○ OFF',128,138)}t.needsUpdate=true};
   btns.push(b);return b};
  // backing board + title
