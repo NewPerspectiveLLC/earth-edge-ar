@@ -1,7 +1,7 @@
 // ghostctl.js (d47): Ghost controls. Per-device settings for the Ghost bot (the tuxedo 'shadow' that walks near you in Live Geometry).
 // Client-side only: the ghost bot is drawn on this device and never sent to the server (nothing about it, or you, is shared). Settings: localStorage.eearGhostCfg,
 // applied live (also from ghost.html in another tab via the 'storage' event). Mode 'classic' = the original loop/wander behaviour; the others are driven here.
-import { DANCES, resetPose, walkPose } from './extras.js?v=1792350751479';
+import { DANCES, resetPose, walkPose } from './extras.js?v=1792352854476';
 export const DEFAULTS = { mode: 'classic', speedMin: .3, speedMax: .9, distMin: 2, distMax: 8, dir: 'ccw', loopR: 3, height: 0, jitter: .2, pauseEvery: 20, pauseLen: 4, lag: 1.5, opacity: 1, size: 1, glow: 1, approach: 0, trail: false };
 export const PRESETS = {
   Calm: { mode: 'orbit', speedMin: .15, speedMax: .4, distMin: 3, distMax: 6, dir: 'ccw', height: 0, jitter: .05, pauseEvery: 15, pauseLen: 8, lag: 4, opacity: .9, size: 1, glow: .8, approach: 0, trail: false },

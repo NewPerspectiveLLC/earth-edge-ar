@@ -1,5 +1,5 @@
 // quest.html: one registry for every layer toggle -> 3D in-headset Layers panel (Y button) + 2D HUD + localStorage (QL).
-import{makePanel,xrRays,summon}from'./qpanel.js?v=1792350751479';
+import{makePanel,xrRays,summon}from'./qpanel.js?v=1792352854476';
 const T=AFRAME.THREE;
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.QVXG&&window.QGEO&&window.QGHOST&&window.QGAP&&window.QAPV){clearInterval(iv);r()}},200)});
 await wait();
@@ -48,8 +48,17 @@ R.push({section:'View',key:'floorUp',label:'Floor +10 cm',kind:'action',run:()=>
 const LVo=()=>window.EEAR_LIVE;R.push({section:'View',key:'live',label:'Live tracking',kind:'toggle',get:()=>!!(LVo()&&LVo().active),set:v=>{const L=LVo();if(!L)return;const S=L.S;if(v){if(S&&S.live&&S.paused)document.getElementById('tmP').click();else{const b=document.getElementById('joinB');b&&b.click()}}else if(S&&S.live&&!S.paused)document.getElementById('tmP').click();setTimeout(()=>P.refresh(),1500);setTimeout(()=>P.refresh(),4000)},objs:()=>[]});
 R.push({section:'View',key:'board',label:'Board spaceship',kind:'action',run:()=>qBoard()},{section:'View',key:'exitShip',label:'Exit ship (to ground)',kind:'action',run:()=>qExit()});
 R.push({section:'View',key:'vignette',label:'Comfort vignette (ship)',kind:'toggle',get:()=>!!QSHIP.vignette,set:v=>{QSHIP.vignette=!!v;localStorage.eearVignette=v?'1':'0'},objs:()=>[]});
+const QPW=()=>window.QPOW;R.push({section:'Powers',key:'powOn',label:'Powers (A = fire)',kind:'toggle',get:()=>!!(QPW()&&QPW().enabled),set:v=>QPW()&&QPW().setEnabled(v)},
+ {section:'Powers',key:'powW0',label:'Weapon: Freeze (water)',kind:'toggle',get:()=>!!(QPW()&&QPW().weapon===0),set:()=>QPW()&&QPW().setWeapon(0)},
+ {section:'Powers',key:'powW1',label:'Weapon: Web lock',kind:'toggle',get:()=>!!(QPW()&&QPW().weapon===1),set:()=>QPW()&&QPW().setWeapon(1)},
+ {section:'Powers',key:'powW2',label:'Weapon: Tow line',kind:'toggle',get:()=>!!(QPW()&&QPW().weapon===2),set:()=>QPW()&&QPW().setWeapon(2)},
+ {section:'Powers',key:'thawAll',label:'Thaw all',kind:'action',run:()=>QPW()&&QPW().thawAll()},{section:'Powers',key:'clearWebs',label:'Clear all webs',kind:'action',run:()=>QPW()&&QPW().clearWebs()},
+ {section:'Powers',key:'relTow',label:'Release tow',kind:'action',run:()=>QPW()&&QPW().release()},
+ {section:'Powers',key:'nSet',label:"Set north = where I'm facing",kind:'action',run:()=>window.qNorthSet&&qNorthSet()},{section:'Powers',key:'nP5',label:'Nudge north +5°',kind:'action',run:()=>window.qNorthNudge&&qNorthNudge(5)},
+ {section:'Powers',key:'nM5',label:'Nudge north −5°',kind:'action',run:()=>window.qNorthNudge&&qNorthNudge(-5)},{section:'Powers',key:'nReset',label:'Reset north',kind:'action',run:()=>window.qNorthReset&&qNorthReset()});
+R.push({section:'View',key:'lite',label:'Lite mode (reloads)',kind:'toggle',get:()=>!!window.EEAR_LITE,set:v=>{localStorage.eearLite=v?'1':'0';location.reload()}});
 R.push({section:'View',key:'close',label:'Close panel',kind:'action',run:()=>{P.root.visible=false}});
-const SECTIONS=['Vortex','Earth','Local','Places','Sky','Labels','View'];
+const SECTIONS=['Vortex','Earth','Local','Places','Sky','Labels','View','Powers'];
 for(const it of R)if(it.kind==='toggle'&&QL[it.key]===undefined&&it.key!=='camera'&&it.key!=='satOpaque')QL[it.key]=1;
 let P=null,nL=-1;const base=R.slice();
 function build(){const T0=[...new Set(qLabels().map(qlk).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).slice(0,25);if(P&&T0.length===nL)return;nL=T0.length;

@@ -1,12 +1,13 @@
 // orbball.js (d46): the visible Master DJ "flying sound" orb. Follows orbit.js (the same offsets that drive the HRTF panner in audio.js), so what you see is what you hear.
 // Neon purple plasma/fire ball, 10 m across: fbm value-noise fire surface with scrolling flames + fresnel rim (opaque, 1 draw), animated flame corona billboard (1),
 // two additive glow halos (2), ember/spark particles shed into the world as a trail (1 draw, Points), Matt Ready "Project Driftwood" billboard hanging below it (1) with a
-// purple underglow (1). Everything pulses to the beat (beat.js?v=1792350751479). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
+// purple underglow (1). Everything pulses to the beat (beat.js?v=1792352854476). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
 // Master DJ with Flying sound on and the DJ playing. Also plants ONE copy of the same image on the ground 6-10 m from the player at their first fix: client-side only, never sent.
 import * as THREE from 'three';
-import { ORB, frame as orbFrame } from './orbit.js?v=1792350751479';
-import * as BEAT from './beat.js?v=1792350751479';
+import { ORB, frame as orbFrame } from './orbit.js?v=1792352854476';
+import * as BEAT from './beat.js?v=1792352854476';
 const MOBILE = /iPhone|iPad|iPod|Android|OculusBrowser|Quest|Mobile/i.test(navigator.userAgent);
+const LITE = () => !!window.EEAR_LITE;   // d48 Quest Lite mode: 2-octave surface, 1-octave corona, 40 embers
 const NOISE = `float hh(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}
 uniform float oct,t,pulse,lin;
@@ -40,7 +41,7 @@ export function initOrb(parent, toLocal, cam, opts = {}) {
   const halo1 = new THREE.Sprite(additive(new THREE.SpriteMaterial({ map: hT1, color: 0xffffff }), false)), halo2 = new THREE.Sprite(additive(new THREE.SpriteMaterial({ map: hT2, color: 0xffffff }), false));
   halo1.scale.set(19, 19, 1); halo2.scale.set(34, 34, 1); halo1.renderOrder = 4; halo2.renderOrder = 3; root.add(halo1, halo2);
   // embers: world-space trail (child of parent, not of root)
-  const NE = MOBILE ? 180 : 420, eP = new Float32Array(NE * 3), eV = new Float32Array(NE * 3), eL = new Float32Array(NE).fill(1), eS = new Float32Array(NE), eLt = new Float32Array(NE);
+  const NE = LITE() ? 40 : MOBILE ? 180 : 420, eP = new Float32Array(NE * 3), eV = new Float32Array(NE * 3), eL = new Float32Array(NE).fill(1), eS = new Float32Array(NE), eLt = new Float32Array(NE);
   const eg = new THREE.BufferGeometry(); eg.setAttribute('position', new THREE.BufferAttribute(eP, 3).setUsage(THREE.DynamicDrawUsage)); eg.setAttribute('life', new THREE.BufferAttribute(eL, 1).setUsage(THREE.DynamicDrawUsage)); eg.setAttribute('seed', new THREE.BufferAttribute(eS, 1));
   const embers = new THREE.Points(eg, additive(new THREE.ShaderMaterial({ uniforms: { sz: { value: MOBILE ? 1.1 : .9 } }, vertexShader: EMB_V, fragmentShader: EMB_F }))); embers.frustumCulled = false; embers.renderOrder = 6; parent.add(embers);
   // Project Driftwood billboard under the orb + underglow
@@ -60,22 +61,23 @@ export function initOrb(parent, toLocal, cam, opts = {}) {
     if (!S.spawn && L && isFinite(L.lat)) { const b = Math.random() * 360, d = ORB.spawnM[0] + Math.random() * (ORB.spawnM[1] - ORB.spawnM[0]);
       S.spawn = { lat: L.lat + d * Math.cos(b * D) / 111320, lon: L.lon + d * Math.sin(b * D) / (111320 * Math.cos(L.lat * D)), d, b } }
     cam.getWorldPosition(cp); parent.worldToLocal(cp);
-    if (S.spawn) { const w = toLocal(S.spawn.lat, S.spawn.lon); if (w) { spawn.position.copy(w); ring.position.copy(w); ring.position.y += .03; spawn.rotation.y = Math.atan2(cp.x - w.x, cp.z - w.z); spawn.visible = ring.visible = true; ring.material.opacity = .35 + .25 * Math.sin(t * 2) } }
+    if (S.spawn) { const w = toLocal(S.spawn.lat, S.spawn.lon); if (w) { spawn.position.copy(w); ring.position.copy(w); ring.position.y += .03; spawn.rotation.y = Math.atan2(cp.x - w.x, cp.z - w.z); spawn.visible = ring.visible = Math.hypot(cp.x - w.x, cp.z - w.z) > 2.5 || Math.abs(cp.y - w.y) > 3;   /* d48: hidden when the camera is inside/at the 1.8 m spawn poster */ ring.material.opacity = .35 + .25 * Math.sin(t * 2) } }
     const O = orbFrame(now), show = !!(AU && AU.flyOn && DJ && DJ.at().playing); S.visible = root.visible = show;
     // beat pulse
     let pulse = 0; try { const st = BEAT.tick(); if (st && st.on && st.beat >= 0) pulse = Math.exp(-5 * (st.beat - Math.floor(st.beat))) * .8 + Math.min(.4, (st.energy || 0) * .4) } catch (e) { }
     U.pulse.value += (pulse - U.pulse.value) * Math.min(1, dt * 20); U.t.value = t; U.lin.value = O.linger || 0;
     if (show) {
       const bob = Math.sin(t * 1.3) * .35; root.position.set(cp.x + O.e, cp.y + O.u + bob, cp.z - O.n);
-      const d = root.position.distanceTo(cp); S.dist = d; const far = d > 35, vfar = d > 300; S.lod = vfar ? 'tour' : far ? 'far' : 'near';
-      U.oct.value = (MOBILE ? 3 : 5) - (far ? 1 : 0) - (vfar ? 1 : 0); UC.oct.value = (MOBILE ? 2 : 3) - (far && !MOBILE ? 1 : 0);
+      { const m = ORB.min3dM || 25, dd = root.position.distanceTo(cp); if (dd < m) root.position.sub(cp).setLength(m).add(cp) }   // d48 hard 25 m keep-out from the actual camera (incl. bob, fast flight)
+      const d = root.position.distanceTo(cp); S.dist = d; const cf = Math.min(1, Math.max(0, (d - 7) / 13)); S.closeFade = cf;   /* backstop: glow/poster fade if anything ever gets the camera within 20 m */ const far = d > 35, vfar = d > 300; S.lod = vfar ? 'tour' : far ? 'far' : 'near';
+      U.oct.value = LITE() ? (far ? 1 : 2) : (MOBILE ? 3 : 5) - (far ? 1 : 0) - (vfar ? 1 : 0); UC.oct.value = LITE() ? 1 : (MOBILE ? 2 : 3) - (far && !MOBILE ? 1 : 0);
       const s = 1 + .06 * U.pulse.value; core.scale.setScalar(s); corona.quaternion.copy(cam.getWorldQuaternion(qa)).premultiply(parent.getWorldQuaternion(qb).invert());   // camera-facing billboard in the parent frame
       /* d46d: halos are capped in SCREEN size relative to the ball (they used to be a fixed 19/34 m, i.e. 1.9x/3.4x the ball radius, so at 15-45 m the outer one
          filled most of the view and washed the map/lines pale blue-lavender, esp. on iOS over the satellite imagery). Halo radius <= ball's angular radius x1.25 (+1.5 deg) / x1.5 (+2.5 deg); wide halos also dim. */
       const cA = Math.asin(Math.min(.99, R / Math.max(d, R + .01))), hs = (nom, k, add) => 2 * d * Math.tan(Math.min(Math.atan(nom / 2 / d), cA * k + add * D));
       const h1 = hs(19 * (1 + .1 * U.pulse.value), 1.25, 1.5), h2 = hs(34, 1.5, 2.5), dim = Math.min(1, 9 * D / Math.max(1e-3, Math.atan(h2 / 2 / d) - cA));
-      halo1.material.opacity = (.45 + .3 * U.pulse.value + .15 * U.lin.value) * (.6 + .4 * dim); halo2.material.opacity = (.25 + .2 * U.pulse.value) * dim; halo1.scale.set(h1, h1, 1); halo2.scale.set(h2, h2, 1); S.halo = [h1, h2];
-      mattG.position.set(0, -R - .4 - ORB.imageH, 0); mattG.rotation.y = Math.atan2(cp.x - root.position.x, cp.z - root.position.z); under.position.set(0, -R - .6, 0); under.material.opacity = .45 + .3 * U.pulse.value;
+      halo1.material.opacity = (.45 + .3 * U.pulse.value + .15 * U.lin.value) * (.6 + .4 * dim) * cf; halo2.material.opacity = (.25 + .2 * U.pulse.value) * dim * cf; corona.visible = halo1.visible = halo2.visible = under.visible = cf > .02; mattG.visible = d > 12; halo1.scale.set(h1, h1, 1); halo2.scale.set(h2, h2, 1); S.halo = [h1, h2];
+      mattG.position.set(0, -R - .4 - ORB.imageH, 0); mattG.rotation.y = Math.atan2(cp.x - root.position.x, cp.z - root.position.z); under.position.set(0, -R - .6, 0); under.material.opacity = (.45 + .3 * U.pulse.value) * cf;
       // embers: emit from the surface, live 1.4-3 s, drift up + outward with curl-ish wobble; stay in the world as the orb moves (trail)
       const rate = (NE / 2.2) * (far ? .45 : 1) * (1 + U.pulse.value); acc += rate * dt;
       while (acc >= 1) { acc--; const i = ei; ei = (ei + 1) % NE; const u = Math.random() * 2 - 1, a = Math.random() * 6.283, sr = Math.sqrt(1 - u * u), nx = sr * Math.cos(a), ny = u, nz = sr * Math.sin(a);

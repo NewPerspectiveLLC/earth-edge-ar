@@ -12,7 +12,8 @@ addEventListener('pointerdown', () => { try { const c = ctx(); if (c.state === '
 const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s) };
 const unb64 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u };
 // ---- listener: live chunks
-function onPcm(j) { V.rx++; if (V.me && j.id === V.id) return;   // never play my own mic back (feedback)
+const SEEN = new Set();
+function onPcm(j) { const k = j.id + ':' + j.seq; if (SEEN.has(k)) return; SEEN.add(k); if (SEEN.size > 400) SEEN.delete(SEEN.values().next().value); V.rx++; if (V.me && j.id === V.id) return;   // never play my own mic back (feedback)
   const c = ctx(); if (c.state !== 'running') { try { c.resume() } catch (e) { } if (c.state !== 'running') return }
   const u = unb64(j.pcm), i16 = new Int16Array(u.buffer, u.byteOffset, u.length >> 1), n = i16.length, sr = j.sr || SR, buf = c.createBuffer(1, n, sr), d = buf.getChannelData(0);
   for (let i = 0; i < n; i++) d[i] = i16[i] / 32768;
@@ -33,6 +34,17 @@ async function annTick() { const st = DJ() && DJ().state, A = st && st.ann, c = 
 function duckTick() { const st = DJ() && DJ().state, speaking = !!(st && st.live) || (V.liveUntil > performance.now()) || !!V.ann || V.live, g = speaking ? .2 : 1;
   const n = DJ() && DJ().node; if (n && n.context && Math.abs(V.duck - g) > .01) { n.gain.setTargetAtTime(g, n.context.currentTime, speaking ? .08 : .5); V.duck = g } else if (n && n.context && n.gain.value !== g && Math.abs(n.gain.value - g) > .05 && !speaking) n.gain.setTargetAtTime(g, n.context.currentTime, .5) }
 setInterval(() => { hook(); annTick(); duckTick() }, 150);
+// d47b: long-poll fallback (the trycloudflare tunnel - also used by the Pages copy - buffers SSE, so 'pcm' and 'dj' events never arrive through it).
+// GET /api/dj/pull?after=<gs>&rev=<rev> returns new voice chunks at once (or state-rev changes -> refetch DJ state); otherwise held up to 12 s.
+let pullGs = -1, pullOn = false, pullRev = -1;
+async function pullLoop() { if (pullOn) return; pullOn = true;
+  for (;;) { const D = DJ(); if (!D || D.source !== 'live' || document.hidden) { await new Promise(r => setTimeout(r, 1500)); continue }
+    try { const rev = pullRev >= 0 ? pullRev : (D.state && D.state.rev != null ? D.state.rev : -1), r = await fetch(D.base + '/api/dj/pull?after=' + pullGs + '&rev=' + rev, { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json();
+      if (pullGs >= 0) for (const c of j.pcm || []) onPcm(c);
+      pullGs = j.gs; pullRev = j.rev; if (j.rev !== rev && D.fetchState) await D.fetchState() }
+    catch (e) { await new Promise(r => setTimeout(r, 3000)) } } }
+setTimeout(pullLoop, 800);
 // ---- broadcaster (GM)
 export async function startLive() { if (V.live) return; if (!localStorage.eearGM) throw new Error('GM key needed'); V.err = '';
   const ms = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });

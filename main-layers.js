@@ -1,5 +1,5 @@
 // index.html WebXR (Quest browser AR): the same 3D Layers panel as quest.html, driven by LAY/applyLayers so it stays in sync with the 2D Layers sheet + localStorage.eearLayers.
-import*as T from'three';import{makePanel,xrRays,summon}from'./qpanel.js?v=1792350751479';
+import*as T from'three';import{makePanel,xrRays,summon}from'./qpanel.js?v=1792352854476';
 const wait=()=>new Promise(r=>{const iv=setInterval(()=>{if(window.EEAR&&window.applyLayers&&window.layRefresh){clearInterval(iv);r()}},200)});
 await wait();
 const{ren,scene,LAY}=EEAR;const L=window.LAYERS;

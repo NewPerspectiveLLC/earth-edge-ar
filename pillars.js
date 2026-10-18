@@ -2,10 +2,10 @@
 // Data: pillars.json (OSM-derived public spots: street-corner right-of-way, parks, landmarks, trails). Placement/size/audio constants live in figures-registry.js (PILLARS).
 // Rendering: one shared prism geometry with 3 face groups, unlit 'contain' materials (whole image fitted unstretched, leftover bands = dark neon-purple gradient);
 // default faces = PILLARS.images; a pillar may set "image" (all 3 faces) or "images" [3] to override. InstancedMesh, per-instance distance cull.
-// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792350751479) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
+// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792352854476) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792350751479';
+import { PILLARS } from './figures-registry.js?v=1792352854476';
 export const PILLAR_IMAGE = PILLARS.image;
 export const PILLAR_FACES = PILLARS.images || [PILLAR_IMAGE, PILLAR_IMAGE, PILLAR_IMAGE];   // d46: per-face images (faces 0,1 = Project Driftwood orb-matt.jpg, face 2 = pillar-matt.jpg)               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;
@@ -23,8 +23,9 @@ function prismGeo(side, h, y0) {
   g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setIndex(I); for (let k = 0; k < 3; k++) g.addGroup(k * 6, 6, k); return g;
 }
 /* unlit 'contain' image material (instancing-aware): fits the whole image on a face of aspect faceA (w/h) without stretching; leftover bands get a dark neon-purple gradient */
-const FIT_V = 'varying vec2 vUv;\nvoid main(){vUv=uv;vec4 p=vec4(position,1.);\n#ifdef USE_INSTANCING\np=instanceMatrix*p;\n#endif\ngl_Position=projectionMatrix*modelViewMatrix*p;}';
-const FIT_F = 'uniform sampler2D map;uniform float faceA,imgA,lum;varying vec2 vUv;\nvoid main(){vec2 u=vUv;vec2 s=imgA>faceA?vec2(1.,faceA/imgA):vec2(imgA/faceA,1.);vec2 q=(u-.5)/s+.5;\n'
+/* d48: near cut - fragments within 1.2 m of the eye are discarded, so flying into / standing inside a pillar never fills the view purple+poster (Quest fast flight) */
+const FIT_V = 'varying vec2 vUv;varying float vNC;\nvoid main(){vUv=uv;vec4 p=vec4(position,1.);\n#ifdef USE_INSTANCING\np=instanceMatrix*p;\n#endif\nvec4 mv=modelViewMatrix*p;vNC=-mv.z/max(1e-6,length(modelMatrix[0].xyz));gl_Position=projectionMatrix*mv;}';
+const FIT_F = 'uniform sampler2D map;uniform float faceA,imgA,lum;varying vec2 vUv;varying float vNC;\nvoid main(){if(vNC<1.2)discard;vec2 u=vUv;vec2 s=imgA>faceA?vec2(1.,faceA/imgA):vec2(imgA/faceA,1.);vec2 q=(u-.5)/s+.5;\n'
  + 'float inside=step(0.,q.x)*step(q.x,1.)*step(0.,q.y)*step(q.y,1.);float e=max(0.,max(max(-q.x,q.x-1.),max(-q.y,q.y-1.)));/* >=0: exp() below must not overflow inside the image */\n'
  + 'vec3 band=mix(vec3(.30,.04,.55),vec3(.035,.005,.07),clamp(e*s.y*6.,0.,1.))+vec3(.55,.1,.9)*exp(-min(e*s.y*90.,30.));\n'
  + 'vec3 c=inside>.5?texture2D(map,clamp(q,0.,1.)).rgb:band;gl_FragColor=vec4(c*lum,1.);\n#include <colorspace_fragment>\n}';
@@ -46,6 +47,8 @@ export function initPillars(parent, toLocal, cam, opts = {}) {
   const ringG = new THREE.RingGeometry(.55, 1.1, 24).rotateX(-Math.PI / 2).translate(0, .02, 0);
   const plM = new THREE.MeshLambertMaterial({ color: 0x2a1446, emissive: 0x1a0830 });
   const cpM = new THREE.MeshBasicMaterial({ color: 0x2ff5df });
+  for (const m of [plM, cpM]) m.onBeforeCompile = sh => { sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vNC;').replace('#include <project_vertex>', '#include <project_vertex>\nvNC=-mvPosition.z/max(1e-6,length(modelMatrix[0].xyz));');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vNC;').replace('void main() {', 'void main() {\nif(vNC<1.2)discard;') };   // d48 near cut (see FIT_V)
   const ringM = new THREE.MeshBasicMaterial({ color: 0xa45cff, transparent: true, opacity: .15, depthWrite: false, blending: THREE.AdditiveBlending });
   const tl = new THREE.TextureLoader(), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), zero = new THREE.Vector3(0, 0, 0), Y = new THREE.Vector3(0, 1, 0);
   const root = new THREE.Group(); root.name = 'pillars'; parent.add(root);

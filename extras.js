@@ -8,8 +8,8 @@ const toL=(o,a,l)=>{const[my,mx]=mPer(o[0]);return[(l-o[1])*mx,-(a-o[0])*my]};
 export function passMat(T,m,add=true){m.blending=T.CustomBlending;m.blendEquation=T.AddEquation;m.blendSrc=T.SrcAlphaFactor;m.blendDst=add?T.OneFactor:T.OneMinusSrcAlphaFactor;m.blendSrcAlpha=T.ZeroFactor;m.blendDstAlpha=T.OneFactor;m.transparent=true;m.depthWrite=false;m.userData.pf=1;m.userData.add=add;return m}
 export const U={t:{value:0}};
 // ---------- OCEAN: masked water from OSM coastline, cheap animated shader, fades out past 8 km from viewer
-export async function makeOcean(T,origin,groundY){const J=await (await fetch('coast.json?v=1792350751479')).json();const[S,W,N,E]=J.bbox;
- const[x0,z0]=toL(origin,N,W),[x1,z1]=toL(origin,S,E);const tex=await new T.TextureLoader().loadAsync('ocean-mask.png?v=1792350751479');tex.flipY=false;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;
+export async function makeOcean(T,origin,groundY){const J=await (await fetch('coast.json?v=1792352854476')).json();const[S,W,N,E]=J.bbox;
+ const[x0,z0]=toL(origin,N,W),[x1,z1]=toL(origin,S,E);const tex=await new T.TextureLoader().loadAsync('ocean-mask.png?v=1792352854476');tex.flipY=false;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;
  const m=new T.ShaderMaterial({depthTest:false,extensions:{derivatives:true},uniforms:{t:U.t,mask:{value:tex},b0:{value:new T.Vector2(x0,z0)},b1:{value:new T.Vector2(x1,z1)},me:{value:new T.Vector2()}},
   vertexShader:'varying vec2 vP;void main(){vec4 w=modelMatrix*vec4(position,1.);vP=position.xz;gl_Position=projectionMatrix*viewMatrix*w;}',
   fragmentShader:`uniform float t;uniform sampler2D mask;uniform vec2 b0,b1,me;varying vec2 vP;
@@ -38,10 +38,12 @@ export function makeSaucer(T,col,hero){const g=new T.Group();g.userData.layer='s
  // landing pad: ring + H + corner lights
  const pad=new T.Group();pad.add(new T.Mesh(new T.RingGeometry(9*S,10*S,48).rotateX(-Math.PI/2),mat(c,.8)));pad.add(new T.Mesh(new T.CircleGeometry(9*S,48).rotateX(-Math.PI/2),mat(c,.10)));
  for(const[x,z,w,d]of[[-2.5,0,1,8],[2.5,0,1,8],[0,0,5,1]]){const b=new T.Mesh(new T.PlaneGeometry(w*S,d*S).rotateX(-Math.PI/2),mat(0xffffff,.8));b.position.set(x*S,.02,z*S);pad.add(b)}
- const lights=[];for(let i=0;i<8;i++){const L=new T.Mesh(new T.SphereGeometry(.45*S,8,6),mat(0xffffff,1));const a=i/8*Math.PI*2;L.position.set(Math.cos(a)*10.8*S,.4,Math.sin(a)*10.8*S);pad.add(L);lights.push(L)}g.add(pad);
+ const LITE=!!window.EEAR_LITE;/* d48 Lite (Quest): pad lights + portholes as ONE InstancedMesh each (2 draws instead of 16-24), no blinking */
+ const inst=(geo,mm,P)=>{const im=new T.InstancedMesh(geo,mm,P.length),m4=new T.Matrix4();P.forEach((p,i)=>im.setMatrixAt(i,m4.makeTranslation(p[0],p[1],p[2])));im.frustumCulled=false;return im};
+ const lights=[];if(LITE)pad.add(inst(new T.SphereGeometry(.45*S,6,4),mat(0xffffff,1),Array.from({length:8},(_,i)=>[Math.cos(i/8*Math.PI*2)*10.8*S,.4,Math.sin(i/8*Math.PI*2)*10.8*S])));else for(let i=0;i<8;i++){const L=new T.Mesh(new T.SphereGeometry(.45*S,8,6),mat(0xffffff,1));const a=i/8*Math.PI*2;L.position.set(Math.cos(a)*10.8*S,.4,Math.sin(a)*10.8*S);pad.add(L);lights.push(L)}g.add(pad);
  // saucer hovering above the pad
  const sc=new T.Group();const body=new T.Mesh(new T.SphereGeometry(6*S,32,12).scale(1,.22,1),mat(0xc8d8ff,.55));const dome=new T.Mesh(new T.SphereGeometry(2.4*S,24,12,0,Math.PI*2,0,Math.PI/2),mat(c,.6));dome.position.y=.9*S;
- const rim=new T.Mesh(new T.TorusGeometry(6*S,.25*S,6,48).rotateX(Math.PI/2),mat(c,.95));sc.add(body,dome,rim);const port=[];for(let i=0;i<(hero?16:8);i++){const p=new T.Mesh(new T.SphereGeometry(.35*S,6,4),mat(0xffffff,1));const a=i/(hero?16:8)*Math.PI*2;p.position.set(Math.cos(a)*5.3*S,-.3*S,Math.sin(a)*5.3*S);sc.add(p);port.push(p)}
+ const rim=new T.Mesh(new T.TorusGeometry(6*S,.25*S,6,48).rotateX(Math.PI/2),mat(c,.95));sc.add(body,dome,rim);const port=[];const NP=hero?16:8;if(LITE)sc.add(inst(new T.SphereGeometry(.35*S,6,4),mat(0xffffff,1),Array.from({length:NP},(_,i)=>[Math.cos(i/NP*Math.PI*2)*5.3*S,-.3*S,Math.sin(i/NP*Math.PI*2)*5.3*S])));else for(let i=0;i<(hero?16:8);i++){const p=new T.Mesh(new T.SphereGeometry(.35*S,6,4),mat(0xffffff,1));const a=i/(hero?16:8)*Math.PI*2;p.position.set(Math.cos(a)*5.3*S,-.3*S,Math.sin(a)*5.3*S);sc.add(p);port.push(p)}
  sc.position.y=(hero?34:22);g.add(sc);let beam=null;if(hero){beam=new T.Mesh(new T.CylinderGeometry(2.5*S,9*S,sc.position.y,24,1,true),mat(c,.12));beam.position.y=sc.position.y/2;g.add(beam)}
  g.traverse(o=>{o.renderOrder=7;o.frustumCulled=false});SAUCERS.push({g,sc,lights,port,beam,hero,ph:Math.random()*6});return g}
 // ---------- VORTEX (local): spiral funnel; (world): great circles from the vortex to its antipode
@@ -144,7 +146,7 @@ export function enuProj(T,la0,lo0){const R=6371e3,e=(a,l)=>{a*=D;l*=D;return[R*M
 // Drawn as tubes so they are thick on Quest (WebGL lines are 1 px there).
 export function makeVortexWorldTubes(T,la,lo,col,proj,shell=3000,rad=7){const g=new T.Group();g.userData.layer='vortexW';
  const m=passMat(T,new T.MeshBasicMaterial({color:col,transparent:true,opacity:.9,depthTest:false,side:T.DoubleSide}));const core=passMat(T,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9,depthTest:false}));
- for(const C of vortexWorldCircles(la,lo,proj)){let run=[];const flush=()=>{if(run.length>3){const cv=new T.CatmullRomCurve3(run);for(const[mm,r]of[[m,rad],[core,rad*.35]]){const t=new T.Mesh(new T.TubeGeometry(cv,run.length*2,r,5,false),mm);t.frustumCulled=false;t.renderOrder=9;g.add(t)}}run=[]};
+ for(const C of vortexWorldCircles(la,lo,proj)){let run=[];const flush=()=>{if(run.length>3){const cv=new T.CatmullRomCurve3(run);const LITE=!!window.EEAR_LITE;for(const[mm,r]of LITE?[[m,rad]]:[[m,rad],[core,rad*.35]]){const t=new T.Mesh(new T.TubeGeometry(cv,LITE?Math.max(8,run.length>>1):run.length*2,r,LITE?3:5,false),mm);/* d48 Lite: 1 tube (no white core), 1/4 segments, 3 sides */t.frustumCulled=false;t.renderOrder=9;g.add(t)}}run=[]};
   for(let i=0;i<C.length;i+=3){const v=new T.Vector3(C[i],C[i+1],C[i+2]);if(v.length()<60000){flush();continue}/* near part: floor-level ground lines take over */run.push(v.setLength(shell))}flush()}
  return g}
 

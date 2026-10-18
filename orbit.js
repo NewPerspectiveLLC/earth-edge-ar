@@ -2,20 +2,22 @@
 // Frame: ENU offset from the LISTENER (metres): e = east, n = north, u = up from eye level. World-anchored around the player, so turning your head
 // moves the sound in your ears like a real object. Smooth value-noise wander (varying speed + direction), ~10-16 m out and 11-14 m up;
 // every few minutes a TOUR (fly out, loop Ready Athletics or Cappy's trails, fly back); random LINGER phases (3-15 s: parks in one direction, eases closer, +5 dB) and EXCURSIONS (swoops out to 30-60 m, holds, swoops back).
-// Loudness: distance law (12/r)^0.8 clamped to [0.22, 1] (never silent) x linger boost; all values eased (no jumps, no clicks).
-export const ORB = { image: 'orb-matt.jpg' /* Project Driftwood poster (unmodified JPEG): under the orb + each player's spawn copy */, imageH: 7, spawnH: 1.8, spawnM: [6, 10], diameterM: 10, minR: 10, wanderR: [10, 16], heightM: [11, 14], excursionR: [30, 60],
-  linger: { everyS: [14, 40], lastS: [3, 15], boostDb: 5 }, excursion: { everyS: [35, 80], outS: [4, 6], holdS: [2, 4], backS: [3, 5] }, gainRef: 12, gainExp: .8, gainFloor: .22,
+// Loudness: distance law (25/r)^0.8 clamped to [0.22, 1] (never silent) x linger boost; all values eased (no jumps, no clicks).
+// d48 HARD RULE: the orb centre is never closer than ORB.min3dM = 25 m (3D) to the listener/camera, in every phase (wander 25-34 m out + 14-20 m up, lingers stop at 25 m and
+// get louder instead (+5 dB, gainRef 25 m so 25 m = full level), swoops, tour fly-out/back/overhead passes). Final step: radial push-out onto the 25 m sphere (continuous, no jumps).
+export const ORB = { image: 'orb-matt.jpg' /* Project Driftwood poster (unmodified JPEG): under the orb + each player's spawn copy */, imageH: 7, spawnH: 1.8, spawnM: [6, 10], diameterM: 10, min3dM: 25, minR: 22, wanderR: [25, 34], heightM: [14, 20], excursionR: [30, 60],
+  linger: { everyS: [14, 40], lastS: [3, 15], boostDb: 5 }, excursion: { everyS: [35, 80], outS: [4, 6], holdS: [2, 4], backS: [3, 5] }, gainRef: 25, gainExp: .8, gainFloor: .22,
   // TOUR (d46c): every few minutes the source flies out from the player, loops a real trail (trails.json: OSM paths), then flies back. Alternates Ready Athletics / Cappy's trails.
   tour: { everyS: [150, 240], firstS: [75, 120], sites: [['ra', "Ready Athletics trail"], ['cappy', "Cappy's trails"]], maxKm: 6, flySpd: 90, flyS: [6, 28], loopSpd: 28, loopS: [14, 45], hAbove: 18, arc: .18, arcMax: 160 } };
 const rnd = (a, b) => a + Math.random() * (b - a), ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
 function noise1() { const K = 64, v = Array.from({ length: K }, () => Math.random() * 2 - 1); return x => { const i = Math.floor(x), f = x - i, a = v[((i % K) + K) % K], b = v[(((i + 1) % K) + K) % K]; return a + (b - a) * ease(f) } }
 const fbm = (n, x) => .65 * n(x) + .35 * n(x * 2.3 + 17);
 const nSpd = noise1(), nDir = noise1(), nEl = noise1(), nR = noise1();
-const S = { t: 0, az: Math.random() * 6.283, azv: 0, r: 13, u: 12, mode: 'wander', mt: 0, mdur: 0, nextL: rnd(8, 20), nextX: rnd(30, 60), xr: 45, linger: 0, boost: 1, gain: .8, e: 0, n: 13, lingers: 0, excursions: 0, tours: 0, tourSkips: 0, tourSite: '', tourW: 0, nextT: rnd(...ORB.tour.firstS), flying: true };
+const S = { t: 0, az: Math.random() * 6.283, azv: 0, r: 28, u: 16, mode: 'wander', mt: 0, mdur: 0, nextL: rnd(8, 20), nextX: rnd(30, 60), xr: 45, linger: 0, boost: 1, gain: .8, e: 0, n: 13, lingers: 0, excursions: 0, tours: 0, tourSkips: 0, tourSite: '', tourW: 0, nextT: rnd(...ORB.tour.firstS), flying: true };
 export const state = S;
 const tau = (cur, tgt, dt, k) => cur + (tgt - cur) * (1 - Math.exp(-dt / k));
 // ---- tour paths (lat/lon polylines, chained nearest-neighbour, closed back to the start)
-let TRAILS = null; fetch('trails.json?v=1792350751479').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
+let TRAILS = null; fetch('trails.json?v=1792352854476').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
 const M = 111320, enu = (la0, lo0, la, lo) => [(lo - lo0) * M * Math.cos(la0 * Math.PI / 180), (la - la0) * M];
 function sitePath(key) { const W = (TRAILS && TRAILS[key] || []).map(w => w.pts.slice()); if (!W.length) return null; const out = W.shift();
   while (W.length) { const [la, lo] = out[out.length - 1]; let bi = 0, bd = 1e18, rev = false;
@@ -67,11 +69,12 @@ export function step(dt) {
     S.tw = tau(S.tw || 0, w, dt, .15); w = S.tw; S.e = S.e + (te - S.e) * w; S.n = S.n + (tn - S.n) * w; ue = S.uo + (tu - S.uo) * w + arc }
   else S.tw = 0;
   S.tourW = w; S.u = ue;
+  { const d0 = Math.hypot(S.e, S.n, S.u), m = ORB.min3dM; S.pushed = d0 < m; if (d0 < m) { if (d0 < 1e-3) { S.e = 0; S.n = 0; S.u = m } else { const k = m / d0; S.e *= k; S.n *= k; S.u *= k } } ue = S.u }   // d48: 25 m keep-out (3D)
   const d = Math.hypot(S.e, S.n, ue), g = Math.max(ORB.gainFloor, Math.min(1, Math.pow(ORB.gainRef / Math.max(d, 1), ORB.gainExp)));
   S.boost = tau(S.boost, Math.pow(10, ORB.linger.boostDb * lt / 20), dt, .25); S.gain = g * S.boost; S.dist = d; return S;
 }
 let lastT = 0;
-/** step once per animation frame no matter how many callers (audio.js?v=1792350751479 + orbball.js) */
+/** step once per animation frame no matter how many callers (audio.js?v=1792352854476 + orbball.js) */
 export function frame(nowMs = performance.now()) { if (nowMs - lastT < 4) return S; let dt = lastT ? Math.min(2, (nowMs - lastT) / 1000) : 0; lastT = nowMs;   /* wall-clock: sub-step slow frames so the orbit never slows down */
   while (dt > .1) { step(.05); dt -= .05 } return step(dt) }
 window.EEAR_ORB = S;
