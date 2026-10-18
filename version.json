@@ -1,1 +1,1 @@
-{"v": "1792362251041", "note": "d49e: Matt's own song 'Meet Me on the Dance Floor' (Matt Ready) added to the Master DJ library (128 kbps MP3); new DJ 'repeat one' mode (POST /api/dj {op:'repeat',mode:'one'|'off'}, state.repeat) with \ud83d\udd02 buttons on dj.html and the in-app DJ panel"}
+{"v": "1792367785670", "note": "d49f: iPhone/desktop 'hide all buttons' eye toggle (top-right, safe-area aware) hides every button, panel, HUD line and the minimap; remembered on the device; quick two-finger tap also toggles"}
