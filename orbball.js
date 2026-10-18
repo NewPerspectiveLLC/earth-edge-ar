@@ -1,11 +1,11 @@
 // orbball.js (d46): the visible Master DJ "flying sound" orb. Follows orbit.js (the same offsets that drive the HRTF panner in audio.js), so what you see is what you hear.
 // Neon purple plasma/fire ball, 10 m across: fbm value-noise fire surface with scrolling flames + fresnel rim (opaque, 1 draw), animated flame corona billboard (1),
 // two additive glow halos (2), ember/spark particles shed into the world as a trail (1 draw, Points), Matt Ready "Project Driftwood" billboard hanging below it (1) with a
-// purple underglow (1). Everything pulses to the beat (beat.js?v=1792279923523). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
+// purple underglow (1). Everything pulses to the beat (beat.js?v=1792350103534). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
 // Master DJ with Flying sound on and the DJ playing. Also plants ONE copy of the same image on the ground 6-10 m from the player at their first fix: client-side only, never sent.
 import * as THREE from 'three';
-import { ORB, frame as orbFrame } from './orbit.js?v=1792279923523';
-import * as BEAT from './beat.js?v=1792279923523';
+import { ORB, frame as orbFrame } from './orbit.js?v=1792350103534';
+import * as BEAT from './beat.js?v=1792350103534';
 const MOBILE = /iPhone|iPad|iPod|Android|OculusBrowser|Quest|Mobile/i.test(navigator.userAgent);
 const NOISE = `float hh(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}
@@ -23,11 +23,11 @@ const COR_V = `varying vec2 vU;void main(){vU=uv-.5;gl_Position=projectionMatrix
 const COR_F = NOISE + `uniform float rb;varying vec2 vU;void main(){float r=length(vU)*2.,a=atan(vU.y,vU.x);
 float fl=fbm(vec3(cos(a)*2.2,sin(a)*2.2,r*4.-t*2.2))+.5*fbm(vec3(cos(a)*5.,sin(a)*5.,-t*3.1));
 float out_=1.-smoothstep(rb,rb+.16+.42*fl*(1.+.6*pulse),r),inn=smoothstep(rb-.06,rb+.01,r),v=out_*inn;
-vec3 c=mix(VIO,MAG,smoothstep(.45,.95,fl));c=mix(c,HOT,smoothstep(.8,1.,v)*.5);gl_FragColor=vec4(c*v*(1.2+.8*pulse),v);}`;
-const EMB_V = `attribute float life,seed;uniform float sz;varying float vL;void main(){vL=life;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=sz*(1.-life*.6)*(300./max(1.,-mv.z));gl_Position=projectionMatrix*mv;}`;
+vec3 c=mix(VIO,MAG,smoothstep(.45,.95,fl));c=mix(c,HOT,smoothstep(.8,1.,v)*.5);vec3 o=c*v*(1.2+.8*pulse);gl_FragColor=vec4(o,max(v,max(o.r,max(o.g,o.b))));/* d46d: alpha>=rgb (valid premultiplied) */}`;
+const EMB_V = `attribute float life,seed;uniform float sz;varying float vL;void main(){vL=life;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(40.,sz*(1.-life*.6)*(300./max(1.,-mv.z)));gl_Position=projectionMatrix*mv;}`;
 const EMB_F = `varying float vL;void main(){vec2 d=gl_PointCoord-.5;float m=smoothstep(.5,.0,length(d));if(vL>=1.)discard;
 vec3 c=mix(vec3(1.,.9,1.),vec3(1.,.16,.82),smoothstep(.0,.3,vL));c=mix(c,vec3(.55,.08,1.),smoothstep(.3,.8,vL));float a=m*(1.-vL);gl_FragColor=vec4(c*a,a);}`;
-const additive = (m, pre = true) => { m.transparent = true; m.depthWrite = false; m.blending = THREE.CustomBlending; m.blendSrc = pre ? THREE.OneFactor : THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.ZeroFactor; m.blendDstAlpha = THREE.OneFactor; return m };  /* additive, leaves canvas alpha alone (AR camera feed) */
+const additive = (m, pre = true) => { m.transparent = true; m.depthWrite = false; m.blending = THREE.CustomBlending; m.blendSrc = pre ? THREE.OneFactor : THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.OneFactor; m.blendDstAlpha = THREE.OneFactor; return m };  /* additive; d46d: also ADDS its alpha so the canvas stays valid premultiplied (rgb<=a). Leaving alpha at 0 made glow pixels rgb>a, which iOS WebKit composites as a wash over the page background */
 function glowTex(stops) { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64); stops.forEach(([o, col]) => g.addColorStop(o, col)); x.fillStyle = g; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t }
 const D = Math.PI / 180;
 export function initOrb(parent, toLocal, cam, opts = {}) {
@@ -70,7 +70,11 @@ export function initOrb(parent, toLocal, cam, opts = {}) {
       const d = root.position.distanceTo(cp); S.dist = d; const far = d > 35, vfar = d > 300; S.lod = vfar ? 'tour' : far ? 'far' : 'near';
       U.oct.value = (MOBILE ? 3 : 5) - (far ? 1 : 0) - (vfar ? 1 : 0); UC.oct.value = (MOBILE ? 2 : 3) - (far && !MOBILE ? 1 : 0);
       const s = 1 + .06 * U.pulse.value; core.scale.setScalar(s); corona.quaternion.copy(cam.getWorldQuaternion(qa)).premultiply(parent.getWorldQuaternion(qb).invert());   // camera-facing billboard in the parent frame
-      halo1.material.opacity = .45 + .3 * U.pulse.value + .15 * U.lin.value; halo2.material.opacity = .25 + .2 * U.pulse.value; halo1.scale.setScalar(19 * (1 + .1 * U.pulse.value)).setZ(1);
+      /* d46d: halos are capped in SCREEN size relative to the ball (they used to be a fixed 19/34 m, i.e. 1.9x/3.4x the ball radius, so at 15-45 m the outer one
+         filled most of the view and washed the map/lines pale blue-lavender, esp. on iOS over the satellite imagery). Halo radius <= ball's angular radius x1.25 (+1.5 deg) / x1.5 (+2.5 deg); wide halos also dim. */
+      const cA = Math.asin(Math.min(.99, R / Math.max(d, R + .01))), hs = (nom, k, add) => 2 * d * Math.tan(Math.min(Math.atan(nom / 2 / d), cA * k + add * D));
+      const h1 = hs(19 * (1 + .1 * U.pulse.value), 1.25, 1.5), h2 = hs(34, 1.5, 2.5), dim = Math.min(1, 9 * D / Math.max(1e-3, Math.atan(h2 / 2 / d) - cA));
+      halo1.material.opacity = (.45 + .3 * U.pulse.value + .15 * U.lin.value) * (.6 + .4 * dim); halo2.material.opacity = (.25 + .2 * U.pulse.value) * dim; halo1.scale.set(h1, h1, 1); halo2.scale.set(h2, h2, 1); S.halo = [h1, h2];
       mattG.position.set(0, -R - .4 - ORB.imageH, 0); mattG.rotation.y = Math.atan2(cp.x - root.position.x, cp.z - root.position.z); under.position.set(0, -R - .6, 0); under.material.opacity = .45 + .3 * U.pulse.value;
       // embers: emit from the surface, live 1.4-3 s, drift up + outward with curl-ish wobble; stay in the world as the orb moves (trail)
       const rate = (NE / 2.2) * (far ? .45 : 1) * (1 + U.pulse.value); acc += rate * dt;

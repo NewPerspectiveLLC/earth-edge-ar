@@ -1,1 +1,1 @@
-{"v": "1792279923523", "note": "d46c: flying sound trail tours (Ready Athletics / Cappy's trails) + orb never culled"}
+{"v": "1792350103534", "note": "d46d: blue-blur fix: orb glow writes valid alpha, halos capped in screen size, ember size clamp, player/bot beams fade within 3-20 m"}
