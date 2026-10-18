@@ -192,7 +192,7 @@ function djNorm(now){const Q=DJ.queue;let ch=false;if(!Q.length){if(DJ.index){DJ
  const tot=Q.reduce((a,x)=>a+(+x.duration||0),0)*1000;if(!(tot>0))return ch;let el=now-DJ.startedAt;if(el<0){DJ.startedAt=now;return true}
  if(el>=tot){const k=Math.floor(el/tot);DJ.startedAt+=k*tot;el-=k*tot;ch=true}
  for(let i=0;i<=Q.length&&el>=(+Q[DJ.index].duration||0)*1000;i++){const d=(+Q[DJ.index].duration||0)*1000;DJ.startedAt+=d;el-=d;DJ.index=(DJ.index+1)%Q.length;ch=true}return ch}
-const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json'}};
+const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null}};
 const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
 setInterval(()=>{try{if(djNorm(Date.now())){DJ.rev++;djSave();djPush()}}catch(e){console.error('dj',e.message)}},1000);
 function djOp(j,now){djNorm(now);const Q=DJ.queue,op=String(j.op||''),at=qid=>Q.findIndex(x=>x.qid===qid),cur=Q[DJ.index]&&Q[DJ.index].qid,restart=i=>{DJ.index=i;DJ.startedAt=now;DJ.pausedOffset=0};
@@ -210,6 +210,31 @@ function djOp(j,now){djNorm(now);const Q=DJ.queue,op=String(j.op||''),at=qid=>Q.
  case'clear':DJ.queue=[];DJ.index=0;DJ.pausedOffset=0;break;
  case'reset':{const r=DJ.rev;DJ=djSeed();DJ.rev=r;break}
  default:return'op must be add, remove, move, order, play, next, prev, pause, resume, shuffle, clear or reset'}
+ DJ.rev++;DJ.updated=now;djSave();djPush();return null}
+/* ---- d47 DJ voice: LIVE talk-over + saved broadcasts. GM-only writes. Mic audio arrives as 16-bit PCM mono chunks (~400 ms, base64, JSON) on POST /api/dj/live;
+   each chunk is pushed at once to every listener on the existing SSE /api/dj/stream (event 'pcm'), and appended to the session. On stop the session is saved as
+   server/broadcasts/<id>.wav (NOT data.json, not statically served; public read via GET /api/dj/bc?id=). Announcements {id,url,dur,startsAt,repeats,gap} live in
+   DJ.ann (server time) so every client plays the saved clip in sync; 'cancel' stops repeats + live for everyone. Caps: live 10 min, saved clip 10 min, 40 saved files. */
+const BCD=path.join(root,'server','broadcasts');try{fs.mkdirSync(BCD,{recursive:true})}catch(e){}
+let LIVE=null;const LIVE_MAX_S=600,BC_KEEP=40;
+const wavHdr=(n,sr)=>{const b=Buffer.alloc(44);b.write('RIFF',0);b.writeUInt32LE(36+n,4);b.write('WAVE',8);b.write('fmt ',12);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(sr,24);b.writeUInt32LE(sr*2,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(n,40);return b};
+const bcList=()=>{try{return fs.readdirSync(BCD).filter(x=>/^[a-z0-9]+\.wav$/.test(x)).map(x=>({id:x.slice(0,-4),m:fs.statSync(path.join(BCD,x)).mtimeMs,size:fs.statSync(path.join(BCD,x)).size})).sort((a,b)=>b.m-a.m)}catch(e){return[]}};
+function liveSave(){const L=LIVE;LIVE=null;if(!L||!L.bytes)return null;const pcm=Buffer.concat(L.chunks),dur=pcm.length/2/L.sr;fs.writeFileSync(path.join(BCD,L.id+'.wav'),Buffer.concat([wavHdr(pcm.length,L.sr),pcm]));
+ for(const x of bcList().slice(BC_KEEP))try{fs.unlinkSync(path.join(BCD,x.id+'.wav'))}catch(e){}
+ DJ.lastBc={id:L.id,url:'/api/dj/bc?id='+L.id,dur:Math.round(dur*100)/100,at:Date.now()};return DJ.lastBc}
+const djPushEv=(ev,o)=>{const m='event: '+ev+'\ndata: '+JSON.stringify(o)+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
+function liveOp(j,now){const op=String(j.op||'');
+ switch(op){
+ case'start':{if(LIVE)liveSave();const sr=Math.round(+j.sr||16000);if(!(sr>=8000&&sr<=48000))return'sr 8000-48000';LIVE={id:Date.now().toString(36)+rid(3).toLowerCase().replace(/[^a-z0-9]/g,''),sr,t0:now,chunks:[],bytes:0,seq:-1};DJ.live={id:LIVE.id,sr,since:now};DJ.ann=null;break}
+ case'chunk':{if(!LIVE||j.id!==LIVE.id)return'no live session (start first)';const b=Buffer.from(String(j.pcm||''),'base64');if(!b.length||b.length%2||b.length>LIVE.sr*2*2)return'bad pcm chunk';
+  if(LIVE.bytes+b.length>LIVE.sr*2*LIVE_MAX_S){liveSave();DJ.live=null;DJ.rev++;djSave();djPush();return'live cap 10 min reached (saved)'}
+  LIVE.chunks.push(b);LIVE.bytes+=b.length;LIVE.seq=+j.seq||0;djPushEv('pcm',{id:LIVE.id,seq:LIVE.seq,sr:LIVE.sr,t:now,tc:+j.tc||null,pcm:j.pcm});return null}
+ case'stop':{const L=liveSave();DJ.live=null;if(L&&j.repeats>0){const R=Math.max(1,Math.min(10,Math.round(+j.repeats)));DJ.ann={...L,startsAt:now+1500,repeats:R,gap:Math.max(0,Math.min(120,+j.gap||3))}}break}
+ case'announce':{const id=String(j.id||(DJ.lastBc&&DJ.lastBc.id)||'');if(!/^[a-z0-9]+$/.test(id)||!fs.existsSync(path.join(BCD,id+'.wav')))return'no such broadcast';
+  const sz=fs.statSync(path.join(BCD,id+'.wav')).size,sr=fs.readFileSync(path.join(BCD,id+'.wav')).readUInt32LE(24),dur=Math.round((sz-44)/2/sr*100)/100;
+  DJ.ann={id,url:'/api/dj/bc?id='+id,dur,startsAt:now+1500,repeats:Math.max(1,Math.min(10,Math.round(+j.repeats||1))),gap:Math.max(0,Math.min(120,+j.gap||3))};break}
+ case'cancel':{if(LIVE)liveSave();DJ.live=null;DJ.ann=null;break}
+ default:return'op must be start, chunk, stop, announce or cancel'}
  DJ.rev++;DJ.updated=now;djSave();djPush();return null}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
@@ -230,7 +255,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -306,6 +331,12 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   if(q.method!=='POST')return send(r,{error:'GET or POST'},405);if(limited('djw:'+ip,120,60000))return send(r,{error:'rate limited'},429);
   if(!isKeyGM(U)){audit(ip,'dj-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
   const e=djOp(j,now);if(e)return send(r,{error:e,state:djView(now)},400);audit(ip,'dj-'+j.op,{id:j.id,qid:j.qid,to:j.to});return send(r,djView(now))}
+ case'/api/dj/live':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(limited('djl:'+ip,600,60000))return send(r,{error:'rate limited'},429);
+  if(!isKeyGM(U)){audit(ip,'djlive-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
+  const e=liveOp(j,now);if(e)return send(r,{error:e},400);if(j.op!=='chunk')audit(ip,'djlive-'+j.op,{id:j.id||null,repeats:j.repeats||null});return send(r,j.op==='chunk'?{ok:1,t:now}:djView(now))}
+ case'/api/dj/bc':{const id=String(u.searchParams.get('id')||'');if(id==='list')return send(r,{list:bcList().slice(0,20).map(x=>({id:x.id,at:x.m,dur:Math.round((x.size-44)/32000*10)/10}))});
+  if(!/^[a-z0-9]+$/.test(id))return send(r,{error:'id'},400);const fp=path.join(BCD,id+'.wav');if(!fs.existsSync(fp))return send(r,{error:'not found'},404);
+  const d=fs.readFileSync(fp);r.writeHead(200,{'content-type':'audio/wav','content-length':d.length,'cache-control':'public, max-age=86400'});return r.end(d)}
  case'/api/dj/stream':{if(limited('djs:'+ip,30,60000)||DJC.size>=500)return send(r,{error:'rate limited'},429);
   r.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache, no-transform','x-accel-buffering':'no'});r.flushHeaders&&r.flushHeaders();r.write(': '+' '.repeat(2048)+'\n\n');
   r.write('event: dj\ndata: '+JSON.stringify(djView(now))+'\n\n');DJC.add(r);const ka=setInterval(()=>{try{r.write('event: t\ndata: '+Date.now()+'\n\n')}catch(e){}},20000),stop=setTimeout(()=>r.end(),30*60000);

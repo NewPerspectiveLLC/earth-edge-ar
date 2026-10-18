@@ -22,3 +22,11 @@ Repo, Pages path and server folder keep the historical id `earth-edge-ar` (URLs,
 ### d46c — flying-sound trail tours
 Every 2.5–4 min (first one 75–120 s after load) the Master DJ source leaves its orbit, flies out (90 m/s cap, 6–28 s, arcing up mid-flight), loops a real trail from `trails.json` (OSM paths; alternates **Ready Athletics trail** and **Cappy's trails**, 14–45 s at ≥28 m/s, 18 m above eye level), then flies back into the orbit. Skipped when the site is > 6 km away. Gain follows the same distance law (floor 0.22, never silent). Constants: `ORB.tour` in `orbit.js`. The orb is never frustum-culled (pure perspective shrink); LOD drops one more fbm octave beyond 300 m.
 Also d46b: place light beams write alpha = brightness, so in camera mode (normal blending) a beam you stand inside no longer paints opaque black over the sky/orb.
+
+### d46d — blue-blur fix
+Orb glow materials add alpha (valid premultiplied canvas on iOS), halos capped to the ball's on-screen size, ember point size ≤ 40 px; player/bot beams fade out within 3–20 m.
+
+### d47 — Ghost controls, Pick song for everyone, live DJ voice
+- **Ghost controls** (`ghostctl.js`, `ghost.html`, in-app "👻 Ghost controls" under the Ghost bot buttons): mode classic/orbit/follow/wander/mirror, speed min/max, distance min/max, direction, loop radius, float height, jitter, pause frequency/length, follow lag, shy↔bold, opacity, size, glow, trail; presets Calm/Playful/Shadowing/Wild + Reset. localStorage `eearGhostCfg`; client-only (the ghost is never sent to the server).
+- **Pick song for everyone** (`djpanel.js`): ⋯ music panel "🎧 Pick song for everyone" or tap the Now-playing pill. Library ▶ Now / + Next, queue ▶ Now, Prev / Pause / Next via the GM-key `/api/dj` (key asked once, `localStorage.eearGM`).
+- **Live DJ voice** (`djvoice.js`, server `/api/dj/live`, `/api/dj/bc`): Go live streams 16 kHz PCM in 400 ms chunks over the existing SSE `/api/dj/stream` (event `pcm`), played gap-free with a 0.35 s jitter buffer; music ducks to 20 %; voice comes from the orb when Flying sound is on. Each session is saved as `server/broadcasts/<id>.wav` (not data.json; last 40 kept); repeat 1–10× with a gap, Replay last, Stop broadcast now (cancels for everyone).

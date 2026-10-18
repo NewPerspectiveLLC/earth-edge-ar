@@ -15,7 +15,7 @@ const S = { t: 0, az: Math.random() * 6.283, azv: 0, r: 13, u: 12, mode: 'wander
 export const state = S;
 const tau = (cur, tgt, dt, k) => cur + (tgt - cur) * (1 - Math.exp(-dt / k));
 // ---- tour paths (lat/lon polylines, chained nearest-neighbour, closed back to the start)
-let TRAILS = null; fetch('trails.json?v=1792350103534').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
+let TRAILS = null; fetch('trails.json?v=1792350751479').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
 const M = 111320, enu = (la0, lo0, la, lo) => [(lo - lo0) * M * Math.cos(la0 * Math.PI / 180), (la - la0) * M];
 function sitePath(key) { const W = (TRAILS && TRAILS[key] || []).map(w => w.pts.slice()); if (!W.length) return null; const out = W.shift();
   while (W.length) { const [la, lo] = out[out.length - 1]; let bi = 0, bd = 1e18, rev = false;
@@ -71,7 +71,7 @@ export function step(dt) {
   S.boost = tau(S.boost, Math.pow(10, ORB.linger.boostDb * lt / 20), dt, .25); S.gain = g * S.boost; S.dist = d; return S;
 }
 let lastT = 0;
-/** step once per animation frame no matter how many callers (audio.js?v=1792350103534 + orbball.js) */
+/** step once per animation frame no matter how many callers (audio.js?v=1792350751479 + orbball.js) */
 export function frame(nowMs = performance.now()) { if (nowMs - lastT < 4) return S; let dt = lastT ? Math.min(2, (nowMs - lastT) / 1000) : 0; lastT = nowMs;   /* wall-clock: sub-step slow frames so the orbit never slows down */
   while (dt > .1) { step(.05); dt -= .05 } return step(dt) }
 window.EEAR_ORB = S;

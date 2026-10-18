@@ -1,11 +1,11 @@
 // orbball.js (d46): the visible Master DJ "flying sound" orb. Follows orbit.js (the same offsets that drive the HRTF panner in audio.js), so what you see is what you hear.
 // Neon purple plasma/fire ball, 10 m across: fbm value-noise fire surface with scrolling flames + fresnel rim (opaque, 1 draw), animated flame corona billboard (1),
 // two additive glow halos (2), ember/spark particles shed into the world as a trail (1 draw, Points), Matt Ready "Project Driftwood" billboard hanging below it (1) with a
-// purple underglow (1). Everything pulses to the beat (beat.js?v=1792350103534). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
+// purple underglow (1). Everything pulses to the beat (beat.js?v=1792350751479). LOD: fewer shader octaves + embers on phones/Quest and when far. Visible while the music player is on
 // Master DJ with Flying sound on and the DJ playing. Also plants ONE copy of the same image on the ground 6-10 m from the player at their first fix: client-side only, never sent.
 import * as THREE from 'three';
-import { ORB, frame as orbFrame } from './orbit.js?v=1792350103534';
-import * as BEAT from './beat.js?v=1792350103534';
+import { ORB, frame as orbFrame } from './orbit.js?v=1792350751479';
+import * as BEAT from './beat.js?v=1792350751479';
 const MOBILE = /iPhone|iPad|iPod|Android|OculusBrowser|Quest|Mobile/i.test(navigator.userAgent);
 const NOISE = `float hh(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}

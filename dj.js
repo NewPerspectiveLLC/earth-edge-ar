@@ -21,7 +21,13 @@ function stream() { if (!window.EventSource) return; try { S.es && S.es.close() 
   const es = S.es = new EventSource(BASE + '/api/dj/stream');
   es.addEventListener('dj', ev => { try { const j = JSON.parse(ev.data); if (!S.st || j.rev !== S.st.rev || S.src !== 'live') { S.st = j; S.src = 'live'; changed() } } catch (e) { } });
   es.onerror = () => { /* browser retries; poll keeps us going */ };
+  for (const k in EV) es.addEventListener(k, ev => { let j; try { j = JSON.parse(ev.data) } catch (e) { return } EV[k].forEach(fn => { try { fn(j) } catch (e) { } }) });
 }
+const EV = {};   // d47: extra SSE event listeners (voice 'pcm' chunks) on the same /api/dj/stream connection
+export function on(ev, fn) { const first = !EV[ev]; (EV[ev] = EV[ev] || []).push(fn); if (first && S.es) S.es.addEventListener(ev, e => { let j; try { j = JSON.parse(e.data) } catch (x) { return } EV[ev].forEach(f => { try { f(j) } catch (x) { } }) }) }
+/** GM write helper (X-GM-Key from localStorage.eearGM): POST /api/dj or /api/dj/live */
+export async function gm(body, path = '/api/dj') { const k = localStorage.eearGM || ''; const r = await fetch(BASE + path, { method: 'POST', headers: { 'content-type': 'application/json', 'x-gm-key': k }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({ error: 'HTTP ' + r.status })); if (!r.ok) { const e = new Error(j.error || ('HTTP ' + r.status)); e.status = r.status; throw e } if (j && j.queue) setState(j); return j }
 export const now = () => Date.now() + S.off;
 /** current {item, offset s, index} at server time t (same normalisation as the server) */
 export function at(t = now()) {
@@ -38,8 +44,8 @@ function changed() { const c = at(), k = (c.item ? c.item.qid + c.item.id : '') 
 function label(c = at()) { const st = S.st; if (!st) return '🎧 Master DJ: connecting…'; if (!st.queue || !st.queue.length) return '🎧 Master DJ: queue empty';
   const n = c.item ? c.item.title + ' — ' + c.item.artist : ''; return (c.playing ? '🎧 Now playing: ' : '🎧 DJ paused: ') + n + (S.src === 'offline' ? ' (offline order)' : '') }
 function ui(c) { if (window.EEAR_DJ_NOUI) return; let d = document.getElementById('djNow');
-  if (!d && document.body) { const s = document.createElement('style'); s.textContent = '#djNow{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 358px);z-index:21;max-width:min(260px,calc(100vw - 16px));font:600 11px system-ui,sans-serif;color:#fff;background:#2a1446d9;border:1px solid #a45cff88;border-radius:8px;padding:4px 8px;line-height:1.3;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'; document.head.appendChild(s);
-    d = document.createElement('div'); d.id = 'djNow'; document.body.appendChild(d) }
+  if (!d && document.body) { const s = document.createElement('style'); s.textContent = '#djNow{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 358px);z-index:21;max-width:min(260px,calc(100vw - 16px));font:600 11px system-ui,sans-serif;color:#fff;background:#2a1446d9;border:1px solid #a45cff88;border-radius:8px;padding:4px 8px;line-height:1.3;pointer-events:auto;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'; document.head.appendChild(s);
+    d = document.createElement('div'); d.id = 'djNow'; d.title = 'Tap: pick the song for everyone'; d.onclick = () => { if (window.EEAR_DJPANEL) EEAR_DJPANEL.open(); else import('./djpanel.js?v=1792350751479').then(M => M.open()) }; document.body.appendChild(d) }
   if (d) d.textContent = label(c) }
 // ---- audio element
 function el() { if (S.el) return S.el; const a = S.el = new Audio(); a.preload = 'auto'; a.playsInline = true; a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
@@ -61,5 +67,5 @@ setInterval(tick, 500); setInterval(changed, 1000);
 let polls = 0; setInterval(() => { polls++; if (S.src !== 'live' || polls % 2 === 0) fetchState(); if (S.src === 'live' && (!S.es || S.es.readyState === 2)) stream() }, 30000);
 fetchState().then(ok => { if (ok) stream() });
 addEventListener('visibilitychange', () => { if (!document.hidden) fetchState() });
-export const DJ = { at, now, attach, unlock, want, label: () => label(), get node() { return S.node }, get el() { return S.el }, get state() { return S.st }, get source() { return S.src }, get err() { return S.err }, get offsetMs() { return S.off }, get current() { return at().item }, base: BASE, fetchState };
+export const DJ = { at, now, attach, unlock, want, label: () => label(), get node() { return S.node }, get el() { return S.el }, get state() { return S.st }, get source() { return S.src }, get err() { return S.err }, get offsetMs() { return S.off }, get current() { return at().item }, base: BASE, fetchState, on, gm };
 window.EEAR_DJ = DJ;
