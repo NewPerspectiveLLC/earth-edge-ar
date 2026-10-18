@@ -2,10 +2,10 @@
 // Data: pillars.json (OSM-derived public spots: street-corner right-of-way, parks, landmarks, trails). Placement/size/audio constants live in figures-registry.js (PILLARS).
 // Rendering: one shared prism geometry with 3 face groups, unlit 'contain' materials (whole image fitted unstretched, leftover bands = dark neon-purple gradient);
 // default faces = PILLARS.images; a pillar may set "image" (all 3 faces) or "images" [3] to override. InstancedMesh, per-instance distance cull.
-// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792353079683) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
+// Audio (d45): every pillar plays the CURRENT Master DJ track (dj.js?v=1792356031991) from its own spot; was the fixed Disco Jam loop. Only the nearest PILLARS.audio.voices (2) pillars inside silentM get a looping
 // AudioBufferSourceNode -> gain -> HRTF PannerNode; all share ONE decoded buffer and a common loop clock, so switching pillars never restarts the song.
 import * as THREE from 'three';
-import { PILLARS } from './figures-registry.js?v=1792353079683';
+import { PILLARS } from './figures-registry.js?v=1792356031991';
 export const PILLAR_IMAGE = PILLARS.image;
 export const PILLAR_FACES = PILLARS.images || [PILLAR_IMAGE, PILLAR_IMAGE, PILLAR_IMAGE];   // d46: per-face images (faces 0,1 = Project Driftwood orb-matt.jpg, face 2 = pillar-matt.jpg)               // swap this one constant (or PILLARS.image) for a photo of Matt later
 const D = Math.PI / 180, A = PILLARS.audio;

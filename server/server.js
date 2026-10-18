@@ -193,7 +193,7 @@ function djNorm(now){const Q=DJ.queue;let ch=false;if(!Q.length){if(DJ.index){DJ
  const tot=Q.reduce((a,x)=>a+(+x.duration||0),0)*1000;if(!(tot>0))return ch;let el=now-DJ.startedAt;if(el<0){DJ.startedAt=now;return true}
  if(el>=tot){const k=Math.floor(el/tot);DJ.startedAt+=k*tot;el-=k*tot;ch=true}
  for(let i=0;i<=Q.length&&el>=(+Q[DJ.index].duration||0)*1000;i++){const d=(+Q[DJ.index].duration||0)*1000;DJ.startedAt+=d;el-=d;DJ.index=(DJ.index+1)%Q.length;ch=true}return ch}
-const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null}};
+const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null,orb:DJ.orb||null}};
 const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){};djWake()};
 /* d47b long-poll fallback: trycloudflare quick tunnels do not stream SSE, so clients also pull voice chunks + state-rev changes via GET /api/dj/pull?after=<gs> (held up to 12 s). */
 const PULLW=new Set(),PCMR=[];let PGS=0;function djWake(){const w=[...PULLW];PULLW.clear();for(const f of w)try{f()}catch(e){}}
@@ -347,6 +347,11 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  case'/api/dj/live':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(limited('djl:'+ip,600,60000))return send(r,{error:'rate limited'},429);
   if(!isKeyGM(U)){audit(ip,'djlive-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
   const e=liveOp(j,now);if(e)return send(r,{error:e},400);if(j.op!=='chunk')audit(ip,'djlive-'+j.op,{id:j.id||null,repeats:j.repeats||null});return send(r,j.op==='chunk'?{ok:1,t:now}:djView(now))}
+ case'/api/orb':{/* d49: Matt's shared orb flight settings (GM) -> DJ state .orb; every client follows unless it opts out. Manual steering never comes here. */
+  if(q.method!=='POST')return send(r,{orb:DJ.orb||null});if(limited('orb:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  const c=j&&j.cfg;let o=null;if(c&&typeof c==='object'){const n=(v,a,b,d)=>{v=+v;return isFinite(v)?Math.max(a,Math.min(b,v)):d};o={mode:['auto','goto','tour'].includes(c.mode)?c.mode:'auto',tour:['alt','ra','cappy','off'].includes(c.tour)?c.tour:'alt',radius:n(c.radius,25,150,30),lingerF:n(c.lingerF,0,3,1),speed:n(c.speed,.2,3,1),hold:!!c.hold,tourReq:n(c.tourReq,0,1e15,0)};
+   if(c.goto&&isFinite(+c.goto.lat)&&isFinite(+c.goto.lon)&&Math.abs(c.goto.lat)<=90&&Math.abs(c.goto.lon)<=180)o.goto={lat:+(+c.goto.lat).toFixed(6),lon:+(+c.goto.lon).toFixed(6),id:n(c.goto.id,0,1e15,now)};else o.goto=null}
+  DJ.orb=o?{cfg:o,t:now}:null;DJ.rev++;DJ.updated=now;djSave();djPush();audit(ip,'orb-share',{mode:o&&o.mode,on:!!o});return send(r,{ok:1,orb:DJ.orb})}
  case'/api/dj/pull':{if(limited('djp:'+ip,1200,60000))return send(r,{error:'rate limited'},429);PULLC.set(crypto.createHash('sha1').update(ip+'|'+(q.headers['user-agent']||'')).digest('hex').slice(0,12),Date.now());const after=Math.floor(+u.searchParams.get('after')),rev0=Math.floor(+u.searchParams.get('rev'));
   const reply=()=>{const n=Date.now();return send(r,{gs:PGS,rev:DJ.rev,t:n,live:DJ.live?DJ.live.id:null,pcm:after>=0?PCMR.filter(x=>x.gs>after):[]})};
   if(!(after>=0)||PCMR.some(x=>x.gs>after)||(rev0>=0&&rev0!==DJ.rev)||PULLW.size>=500)return reply();

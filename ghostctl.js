@@ -1,7 +1,7 @@
-// ghostctl.js (d47): Ghost controls. Per-device settings for the Ghost bot (the tuxedo 'shadow' that walks near you in Live Geometry).
+// ghostctl.js (d47; d49: + Orb flight section from orbctl.js -> 'Ghost & Orb controls'): Ghost controls. Per-device settings for the Ghost bot (the tuxedo 'shadow' that walks near you in Live Geometry).
 // Client-side only: the ghost bot is drawn on this device and never sent to the server (nothing about it, or you, is shared). Settings: localStorage.eearGhostCfg,
 // applied live (also from ghost.html in another tab via the 'storage' event). Mode 'classic' = the original loop/wander behaviour; the others are driven here.
-import { DANCES, resetPose, walkPose } from './extras.js?v=1792353079683';
+import { DANCES, resetPose, walkPose } from './extras.js?v=1792356031991';
 export const DEFAULTS = { mode: 'classic', speedMin: .3, speedMax: .9, distMin: 2, distMax: 8, dir: 'ccw', loopR: 3, height: 0, jitter: .2, pauseEvery: 20, pauseLen: 4, lag: 1.5, opacity: 1, size: 1, glow: 1, approach: 0, trail: false };
 export const PRESETS = {
   Calm: { mode: 'orbit', speedMin: .15, speedMax: .4, distMin: 3, distMax: 6, dir: 'ccw', height: 0, jitter: .05, pauseEvery: 15, pauseLen: 8, lag: 4, opacity: .9, size: 1, glow: .8, approach: 0, trail: false },
@@ -76,17 +76,18 @@ let panel = null;
 const MODES = [['classic', 'Classic (original loop + wander)'], ['orbit', 'Orbit around me'], ['follow', 'Follow behind me'], ['wander', 'Wander near me'], ['mirror', 'Mirror (faces me, in front)']];
 function css() { if (document.getElementById('gcCss')) return; const s = document.createElement('style'); s.id = 'gcCss'; s.textContent = `#gc{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 50px);bottom:calc(env(safe-area-inset-bottom,0px) + 70px);max-width:520px;margin:0 auto;z-index:70;background:#160a28f2;color:#fff;border:1px solid #a45cff;border-radius:12px;font:14px system-ui,sans-serif;display:flex;flex-direction:column}
 #gc header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #a45cff55}#gc header b{flex:1}#gc .sc{overflow:auto;flex:1;padding:6px 10px}#gc button{font:600 14px system-ui;padding:7px 10px;border-radius:8px;border:0;background:#ffc800;color:#000;margin:2px}#gc button.g{background:#444;color:#fff}
-#gc label{display:block;margin:7px 0 0}#gc label span{display:flex;justify-content:space-between}#gc input[type=range]{width:100%}#gc small{color:#bba3dd;display:block;font-size:11.5px}#gc select{font-size:15px;padding:5px;border-radius:6px;background:#0d0618;color:#fff;border:1px solid #a45cff}`; document.head.appendChild(s) }
+#gc label{display:block;margin:7px 0 0}#gc label span{display:flex;justify-content:space-between}#gc input[type=range]{width:100%}#gc small{color:#bba3dd;display:block;font-size:11.5px}#gc h3{font-size:16px}#gc select{font-size:15px;padding:5px;border-radius:6px;background:#0d0618;color:#fff;border:1px solid #a45cff}`; document.head.appendChild(s) }
 export function open(standalone) { css(); if (!panel) { panel = document.createElement('div'); panel.id = 'gc'; document.body.appendChild(panel) } panel.style.display = 'flex'; panel.dataset.sa = standalone ? 1 : ''; render() }
 export function close() { if (panel) panel.style.display = 'none' }
 function render() { const c = S, fx = (k, v) => { const st = CONTROLS.find(x => x[0] === k)[4]; return st < .1 ? (+v).toFixed(2) : st < 1 ? (+v).toFixed(1) : String(v) };
-  panel.innerHTML = `<header><b>👻 Ghost controls</b>${panel.dataset.sa ? '' : '<button class=g id=gcX>Close</button>'}</header><div class=sc>
+  panel.innerHTML = `<header><b>👻🛸 Ghost & Orb controls</b>${panel.dataset.sa ? '' : '<button class=g id=gcX>Close</button>'}</header><div class=sc>
   <div>${Object.keys(PRESETS).map(n => `<button data-p="${n}">${n}</button>`).join('')}<button class=g id=gcR>Reset to defaults</button></div>
   <label>Mode <select id=gcM>${MODES.map(([k, l]) => `<option value=${k}${c.mode === k ? ' selected' : ''}>${l}</option>`).join('')}</select><small>how the ghost moves relative to you</small></label>
   <label>Direction <select id=gcD>${['ccw', 'cw', 'random'].map(k => `<option value=${k}${c.dir === k ? ' selected' : ''}>${{ ccw: 'counter-clockwise', cw: 'clockwise', random: 'random (switches)' }[k]}</option>`).join('')}</select><small>which way it circles in Orbit mode</small></label>
   <label><input type=checkbox id=gcT${c.trail ? ' checked' : ''}> Trail <small>leaves a glowing purple trail behind it</small></label>
   ${CONTROLS.map(([k, l, mn, mx, stp, h]) => `<label><span>${l}<b id=gcv_${k}>${fx(k, c[k])}</b></span><input type=range data-k=${k} min=${mn} max=${mx} step=${stp} value=${c[k]}><small>${h}</small></label>`).join('')}
-  <small style="margin-top:10px">Settings are saved on this device and apply instantly. The ghost exists only on your screen; nothing about it is sent to the server.</small></div>`;
+  <small style="margin-top:10px">Settings are saved on this device and apply instantly. The ghost exists only on your screen; nothing about it is sent to the server.</small><div id=gcOrb></div></div>`;
+  import('./orbctl.js?v=1792356031991').then(M => M.render(panel.querySelector('#gcOrb'))).catch(e => { const o = panel.querySelector('#gcOrb'); if (o) o.textContent = 'Orb controls failed: ' + e.message });
   const q = s => panel.querySelector(s); if (q('#gcX')) q('#gcX').onclick = close;
   panel.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { preset(b.dataset.p); render() }); q('#gcR').onclick = () => { reset(); render() };
   q('#gcM').onchange = e => set({ mode: e.target.value }); q('#gcD').onchange = e => set({ dir: e.target.value }); q('#gcT').onchange = e => set({ trail: e.target.checked });

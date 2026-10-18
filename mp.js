@@ -1,5 +1,5 @@
 // Opt-in multiplayer + glowing x-ray stick figures. Nothing leaves the device until the user consents and joins.
-import*as T from'three';import{liveUI}from'./liveui.js?v=1792353079683';
+import*as T from'three';import{liveUI}from'./liveui.js?v=1792356031991';
 export function initMP({scene,cam,getPos,toLocal}){
 const API=(window.EEAR_API||'')+'/api';let timer=null,others={};window.MP_OTHERS=others;
 const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#radar{position:fixed;left:8px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 134px);z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;
@@ -39,8 +39,15 @@ const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;con
  if(!others[o.id]){const nm=o.name+(o.device==='quest'?' (Quest)':'')+(o.bot?' · BOT':o.dummy?' · TEST':'')+(st?' · STEALTH':'');const BSY=window.EEAR_BOTSTYLE;others[o.id]={g:stick(nm,st?'#9a9a9a':BSY?BSY.col(o,colorOf(o.id)):colorOf(o.id),st,o.bot&&o.style),o,sg,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}
 const tmp=new T.Vector3();
-function frame(t){const me=getPos();const rc=$('radar').getContext('2d');rc.clearRect(0,0,240,240);rc.strokeStyle='#fff6';rc.beginPath();rc.arc(120,120,118,0,7);rc.stroke();rc.fillStyle='#fff';rc.fillRect(117,117,6,6);
-for(const k in others){const{g,o,born}=others[k];const target=toLocal(o.last.lat,o.last.lon);g.userData.pos=g.userData.pos?g.userData.pos.lerp(target,.1):target.clone();
+/* d49: live flying-sound orb on the round minimap: purple glow dot + 3 s fading trail (orbit.js?v=1792356031991 trail, 5 Hz), hidden when Flying sound is off */
+function orbVis(){const A=window.EEAR_AUDIO,D=window.EEAR_DJ;return !!(A&&A.flyOn&&D&&D.at&&D.at().playing&&window.EEAR_ORBAPI)}
+function orbRadar(rc){if(!orbVis())return;const O=EEAR_ORBAPI,L=EEAR_AUDIO.listener;if(!L||!isFinite(L.lat))return;const M=111320,k=Math.cos(L.lat*Math.PI/180);
+ const px=(la,lo)=>{const e=(lo-L.lon)*M*k,n=(la-L.lat)*M,d=Math.hypot(e,n),rr=Math.min(110,d/10),a=Math.atan2(e,n);return[120+rr*Math.sin(a),120-rr*Math.cos(a)]};
+ const tr=O.state.trail||[];for(let i=1;i<tr.length;i++){const[a,b]=px(...tr[i-1]),[c,d]=px(...tr[i]);rc.strokeStyle='rgba(190,90,255,'+(i/tr.length*.8)+')';rc.lineWidth=1+3*i/tr.length;rc.beginPath();rc.moveTo(a,b);rc.lineTo(c,d);rc.stroke()}
+ const p=O.orbLatLon();if(!p)return;const[x,y]=px(p.lat,p.lon),g=rc.createRadialGradient(x,y,0,x,y,14);g.addColorStop(0,'#fff');g.addColorStop(.25,'#d27bff');g.addColorStop(1,'rgba(160,60,255,0)');rc.fillStyle=g;rc.beginPath();rc.arc(x,y,14,0,7);rc.fill()}
+window.EEAR_ORBVIS=orbVis;
+function frame(t){const me=getPos();const rc=$('radar').getContext('2d');rc.clearRect(0,0,240,240);rc.strokeStyle='#fff6';rc.beginPath();rc.arc(120,120,118,0,7);rc.stroke();rc.fillStyle='#fff';rc.fillRect(117,117,6,6);orbRadar(rc);
+const LAYm=window.EEAR&&EEAR.LAY,hideB=LAYm&&LAYm.bots===0;for(const k in others){const{g,o,born}=others[k];g.visible=!(hideB&&(o.bot||o.dummy));if(!g.visible)continue;const target=toLocal(o.last.lat,o.last.lon);g.userData.pos=g.userData.pos?g.userData.pos.lerp(target,.1):target.clone();
 anim(g,o.entrance,(t-born)/1000,t);g.position.add(g.userData.pos);
 tmp.copy(cam.position).sub(g.position);g.rotation.y=Math.atan2(tmp.x,tmp.z);// billboard around vertical
 const d=Math.max(1,tmp.length()),s=Math.max(1,d/60);g.scale.setScalar(s);// min on-screen size

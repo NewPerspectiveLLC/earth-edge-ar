@@ -3,9 +3,9 @@
 // floor 0.15 so it is audible anywhere in the world (200 m 0.50, 500 m 0.32, 1 km 0.22, 1.7 km 0.17, >=2.2 km 0.15). Listener = app ENU position + true heading + pitch, updated every frame.
 // Song: built-in ORIGINAL procedural loop "Happy's Trails Vortex" (12-step arpeggio motif = 12 wedges, kick, bass, hats; generated live, no samples),
 // or the user's own file (saved in IndexedDB) / URL. Audio starts only from a tap (iOS unlock). navigator.audioSession='playback' where supported.
-import * as ORBIT from './orbit.js?v=1792353079683';
-import './djvoice.js?v=1792353079683';/* d47: Master DJ live voice + broadcasts (listener side runs for everyone) */
-import * as DJM from './dj.js?v=1792353079683';
+import * as ORBIT from './orbit.js?v=1792356031991';
+import './djvoice.js?v=1792356031991';/* d47: Master DJ live voice + broadcasts (listener side runs for everyone) */
+import * as DJM from './dj.js?v=1792356031991';
 /* d45: track 'dj' = the Master DJ queue (dj.js, server /api/dj): the current DJ track, synced to server time, auto-advancing; paused/empty = silence. Default track; one-time migration moves saved built-in/Disco Jam choices to it. */
 export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden"};
 export const SONG="Happy's Trails Vortex";
@@ -88,7 +88,7 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
   if(on){graph();await ctx.resume().catch(()=>{});setTimeout(()=>emit(true),0);if(ctx.state!=='running')$('musE').textContent='Audio is blocked until you tap. Tap Music again.';startTrack();
    if(!setOn.n){setOn.n=1;toast("🎵 "+curName()+" from "+SRC.name+". No sound? The ringer/silent switch may mute web audio.",5000)}}
   else{stopBuiltIn();stopUser();ctx&&ctx.suspend().catch(()=>{});emit(false)}}
- function flyUI(){const b=$('musFly');if(b){b.textContent='🌀 Flying sound: '+(fly?'on':'off');b.style.background=fly?'#b026ff':'#555'}}flyUI();{const op=()=>import('./djpanel.js?v=1792353079683').then(M=>M.open());$('musPick').onclick=op;$('musLive').onclick=op}$('musFly').onclick=()=>{fly=!fly;localStorage.eearFly=fly?'1':'0';flyUI();toast(fly?'🌀 Flying sound on: the Master DJ orbits around you.':'Flying sound off: plain playback.',2500)};
+ function flyUI(){const b=$('musFly');if(b){b.textContent='🌀 Flying sound: '+(fly?'on':'off');b.style.background=fly?'#b026ff':'#555'}}flyUI();{const op=()=>import('./djpanel.js?v=1792356031991').then(M=>M.open());$('musPick').onclick=op;$('musLive').onclick=op}$('musFly').onclick=()=>{fly=!fly;localStorage.eearFly=fly?'1':'0';flyUI();toast(fly?'🌀 Flying sound on: the Master DJ orbits around you.':'Flying sound off: plain playback.',2500)};
  $('musB').onclick=()=>setOn(!on);$('musS').onclick=()=>{$('musP').style.display=$('musP').style.display==='block'?'none':'block'};$('musX').onclick=()=>$('musP').style.display='none';
  $('musV').oninput=()=>{localStorage.eearMusV=$('musV').value;$('musVv').textContent=$('musV').value+'%';if(vol)vol.gain.value=V()};
  $('musF').onclick=()=>$('musFi').click();
@@ -115,6 +115,6 @@ export function initAudio({getListener,toast=(t)=>console.log(t)}){
   if(pan.positionX){pan.positionX.setTargetAtTime(dE,t,.05);pan.positionY.setTargetAtTime(dU,t,.05);pan.positionZ.setTargetAtTime(-dN,t,.05)}else pan.setPosition(dE,dU,-dN)}
  addEventListener('eear:dj',e=>{if(track!=='dj')return;$('musNm').textContent=curName();lastR=0;const it=e.detail&&e.detail.item;renTempo(it&&it.bpm||120);emit(on)});
  window.EEAR_AUDIO={get ctx(){return ctx},voiceIn(){return vIn},TRACKS,DJ:DJM.DJ,get startedAt(){if(track==='dj'){const a=DJM.DJ.el;return a&&ctx&&!a.paused?ctx.currentTime-a.currentTime:null}return stAt},get bpm(){const m=curMeta();return m.tempo||null},get loop(){return userSrc?{dur:userSrc.buffer.duration,loopEnd:userSrc.loopEnd,loop:userSrc.loop,sr:userSrc.buffer.sampleRate}:null},get meta(){return{...curMeta(),playing:on}},get track(){return track},setTrack(t){track=t;localStorage.eearMusT=t;trackUI();if(on)startTrack()},DGAIN,get dist(){return curD},get dgain(){return dg&&dg.gain.value},get ctx(){return ctx},get on(){return on},get pan(){return tap||pan},get flying(){return fly},get flyOn(){return fly&&track==='dj'},get orbit(){return ORBIT.state},get orbPan(){return oPan&&{x:oPan.positionX?oPan.positionX.value:null,y:oPan.positionY?oPan.positionY.value:null,z:oPan.positionZ?oPan.positionZ.value:null,gain:oG.gain.value}},setFlying(v){fly=!!v;localStorage.eearFly=fly?'1':'0';flyUI()},SRC,frame,
- /* d44 pillar proximity music (pillars.js?v=1792353079683): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
+ /* d44 pillar proximity music (pillars.js?v=1792356031991): listener fix, master volume node, shared decoded buffers, beacon ducking 0..1 */
  get listener(){return lastL},get out(){return vol},async buffer(id){graph();const T=TRACKS.find(t=>t.id===id);return T&&T.urls?fileBuf(T):null},setDuck(v){duck=Math.max(0,Math.min(1,+v||0))},get duck(){return duck}};
  return{frame,SRC}}
