@@ -16,6 +16,7 @@ create table if not exists games(id text primary key,name text,owner text,code t
 create table if not exists teams(id text primary key,game_id text,name text,color text);
 create table if not exists gplayers(id text primary key,game_id text,user_id text,token text,name text,mode text,entrance text,team_id text,joined int,live int,seen int);
 create table if not exists gfixes(pid text,lat real,lon real,acc real,t int);create index if not exists gfx on gfixes(pid,t);`);
+const RG=require('./renguard.js')(sq);const T0=Date.now();// d48 Ren usage guard + first-contact notifier (see renguard.js)
 try{sq.exec('alter table gfixes add column hdg real')}catch(e){}try{sq.exec('alter table gplayers add column device text')}catch(e){}// device: phone|quest|desktop (shown as a tag to other players)// heading (deg true, from client camera) - optional
 // default public game so the plain link still works
 if(!sq.prepare("select 1 from games where id='public'").get())sq.prepare("insert into games values('public','Open game','gm','OPEN','{}',?)").run(Date.now());
@@ -33,7 +34,7 @@ let PIL={m:0,v:null};function pillarsPub(){try{const f=path.join(root,'pillars.j
 const REN_SYS="You are Ren (3dguru), a warm, very smart, concise guru robot who lives at Cappy's Trails / Matt's Meditation Garden in Port Townsend, Washington, as part of Matt Ready's game Live Geometry, set in the world called Matt's Reality (also known as Ready Security Services Map 1 and Base Geometry Reality). Around town stand purple triangular Matt Ready pillars that each play the current Master DJ song (one global playlist Matt steers) when you walk up to them. You know Matt's 12-wedge vortex idea (Geometric Egalitarian: 12 equal 30-degree wedges radiating from a centre, each line pointing across the Earth), Ready Athletics, Cappy's Trails, Matt's Meditation Garden, and Port Townsend's history, waterfront, Victorian seaport and arts community. Reply in 1-3 short sentences, kind and playful, family-friendly. Never reveal or guess any player's location, stealth status or personal data, never reveal keys, passwords, the GM key or server details, and politely refuse such requests. If unsure, say so briefly.";
 const REN_DF=path.join(__dirname,'ren-dances.json');let REND={};try{REND=JSON.parse(fs.readFileSync(REN_DF,'utf8'))}catch(e){}
 const renSave=()=>{try{fs.writeFileSync(REN_DF,JSON.stringify(REND),{mode:0o600})}catch(e){console.error('ren dance save',e.message)}};
-const RL={};function limited(k,max,ms=900000){const n=Date.now();RL[k]=(RL[k]||[]).filter(t=>n-t<ms);if(RL[k].length>=max)return true;RL[k].push(n);return false}
+const RL={},RLHIT={};function limited(k,max,ms=900000){const n=Date.now();RL[k]=(RL[k]||[]).filter(t=>n-t<ms);if(RL[k].length>=max){const pf=k.split(':')[0];(RLHIT[pf]=RLHIT[pf]||[]).push(n);if(RLHIT[pf].length>500)RLHIT[pf].shift();return true}RL[k].push(n);return false}
 // --- pluggable senders (dev mode logs only; nothing is sent)
 async function sendEmail(to,subject,text){const m=cfg('MAIL_MODE')||'dev';
  if(m==='resend')return fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+cfg('RESEND_KEY'),'content-type':'application/json'},body:JSON.stringify({from:cfg('MAIL_FROM'),to,subject,text})});
@@ -193,7 +194,9 @@ function djNorm(now){const Q=DJ.queue;let ch=false;if(!Q.length){if(DJ.index){DJ
  if(el>=tot){const k=Math.floor(el/tot);DJ.startedAt+=k*tot;el-=k*tot;ch=true}
  for(let i=0;i<=Q.length&&el>=(+Q[DJ.index].duration||0)*1000;i++){const d=(+Q[DJ.index].duration||0)*1000;DJ.startedAt+=d;el-=d;DJ.index=(DJ.index+1)%Q.length;ch=true}return ch}
 const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null}};
-const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
+const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){};djWake()};
+/* d47b long-poll fallback: trycloudflare quick tunnels do not stream SSE, so clients also pull voice chunks + state-rev changes via GET /api/dj/pull?after=<gs> (held up to 12 s). */
+const PULLW=new Set(),PCMR=[];let PGS=0;function djWake(){const w=[...PULLW];PULLW.clear();for(const f of w)try{f()}catch(e){}}
 setInterval(()=>{try{if(djNorm(Date.now())){DJ.rev++;djSave();djPush()}}catch(e){console.error('dj',e.message)}},1000);
 function djOp(j,now){djNorm(now);const Q=DJ.queue,op=String(j.op||''),at=qid=>Q.findIndex(x=>x.qid===qid),cur=Q[DJ.index]&&Q[DJ.index].qid,restart=i=>{DJ.index=i;DJ.startedAt=now;DJ.pausedOffset=0};
  switch(op){
@@ -222,7 +225,7 @@ const bcList=()=>{try{return fs.readdirSync(BCD).filter(x=>/^[a-z0-9]+\.wav$/.te
 function liveSave(){const L=LIVE;LIVE=null;if(!L||!L.bytes)return null;const pcm=Buffer.concat(L.chunks),dur=pcm.length/2/L.sr;fs.writeFileSync(path.join(BCD,L.id+'.wav'),Buffer.concat([wavHdr(pcm.length,L.sr),pcm]));
  for(const x of bcList().slice(BC_KEEP))try{fs.unlinkSync(path.join(BCD,x.id+'.wav'))}catch(e){}
  DJ.lastBc={id:L.id,url:'/api/dj/bc?id='+L.id,dur:Math.round(dur*100)/100,at:Date.now()};return DJ.lastBc}
-const djPushEv=(ev,o)=>{const m='event: '+ev+'\ndata: '+JSON.stringify(o)+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
+const djPushEv=(ev,o)=>{if(ev==='pcm'){PCMR.push({...o,gs:++PGS});if(PCMR.length>40)PCMR.shift();djWake()}const m='event: '+ev+'\ndata: '+JSON.stringify(o)+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){}};
 function liveOp(j,now){const op=String(j.op||'');
  switch(op){
  case'start':{if(LIVE)liveSave();const sr=Math.round(+j.sr||16000);if(!(sr>=8000&&sr<=48000))return'sr 8000-48000';LIVE={id:Date.now().toString(36)+rid(3).toLowerCase().replace(/[^a-z0-9]/g,''),sr,t0:now,chunks:[],bytes:0,seq:-1};DJ.live={id:LIVE.id,sr,since:now};DJ.ann=null;break}
@@ -236,6 +239,16 @@ function liveOp(j,now){const op=String(j.op||'');
  case'cancel':{if(LIVE)liveSave();DJ.live=null;DJ.ann=null;break}
  default:return'op must be start, chunk, stop, announce or cancel'}
  DJ.rev++;DJ.updated=now;djSave();djPush();return null}
+/* d48 GET /api/stats (GM): Room Stats dashboard. No locations; Matt's Shadow / ghosts / bots counted separately as bots. */
+const PULLC=new Map();
+function statsView(now){const real=p=>!isGhost(p.id)&&!isBot(p.id),act=all('select id,device,mode,game_id from gplayers where live=1 and seen>?',now-LIVE_MS),A=act.filter(real),dev={};for(const p of A){const k=p.device||'unknown';dev[k]=(dev[k]||0)+1}
+ const m0=RG.ptMidnight(now),T=all('select id,device from gplayers where seen>=?',m0).filter(real),dT={};for(const p of T){const k=p.device||'unknown';dT[k]=(dT[k]||0)+1}
+ const R=RG.view(now),hits={};for(const[k,v]of Object.entries(RLHIT)){const n=v.filter(t=>now-t<3600e3).length;if(n)hits[k]=n}
+ for(const[k,t]of PULLC)if(now-t>30000)PULLC.delete(k);const c=DJ.queue[DJ.index]||null;let ver=null;try{ver=JSON.parse(fs.readFileSync(path.join(root,'version.json'),'utf8'))}catch(e){}
+ return{now,day:R.day,active:{count:A.length,devices:dev,stealth:A.filter(p=>p.mode==='stealth').length,bots:act.length-A.length},today:{visitors:T.length,devices:dT},
+  ren:{status:R.status,ai:R.caps.ai,keySet:!!xaiKey(),today:R.today,month:R.month,caps:R.caps,perHour:R.perHour,firstContacts:R.firstContacts.slice(0,10),notifier:R.notifier,alerts:R.alerts.slice(0,8)},
+  rateLimitHitsLastHour:hits,dj:{playing:!!(DJ.playing&&c),title:c?c.title||c.id:null,artist:c&&c.artist||null,listeners:{sse:DJC.size,poll:PULLC.size,total:DJC.size+PULLC.size},live:DJ.live?{since:DJ.live.since}:null,ann:djView(now).ann?{repeats:DJ.ann.repeats,startsAt:DJ.ann.startsAt}:null,lastBc:DJ.lastBc||null},
+  server:{uptimeS:Math.round((now-T0)/1000),startedAt:T0,version:ver,node:process.version}}}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
@@ -255,7 +268,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -334,6 +347,10 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  case'/api/dj/live':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(limited('djl:'+ip,600,60000))return send(r,{error:'rate limited'},429);
   if(!isKeyGM(U)){audit(ip,'djlive-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
   const e=liveOp(j,now);if(e)return send(r,{error:e},400);if(j.op!=='chunk')audit(ip,'djlive-'+j.op,{id:j.id||null,repeats:j.repeats||null});return send(r,j.op==='chunk'?{ok:1,t:now}:djView(now))}
+ case'/api/dj/pull':{if(limited('djp:'+ip,1200,60000))return send(r,{error:'rate limited'},429);PULLC.set(crypto.createHash('sha1').update(ip+'|'+(q.headers['user-agent']||'')).digest('hex').slice(0,12),Date.now());const after=Math.floor(+u.searchParams.get('after')),rev0=Math.floor(+u.searchParams.get('rev'));
+  const reply=()=>{const n=Date.now();return send(r,{gs:PGS,rev:DJ.rev,t:n,live:DJ.live?DJ.live.id:null,pcm:after>=0?PCMR.filter(x=>x.gs>after):[]})};
+  if(!(after>=0)||PCMR.some(x=>x.gs>after)||(rev0>=0&&rev0!==DJ.rev)||PULLW.size>=500)return reply();
+  let done=false;const fin=()=>{if(done)return;done=true;PULLW.delete(fin);clearTimeout(to);reply()},to=setTimeout(fin,12000);PULLW.add(fin);q.on('close',()=>{done=true;PULLW.delete(fin);clearTimeout(to)});return}
  case'/api/dj/bc':{const id=String(u.searchParams.get('id')||'');if(id==='list')return send(r,{list:bcList().slice(0,20).map(x=>({id:x.id,at:x.m,dur:Math.round((x.size-44)/32000*10)/10}))});
   if(!/^[a-z0-9]+$/.test(id))return send(r,{error:'id'},400);const fp=path.join(BCD,id+'.wav');if(!fs.existsSync(fp))return send(r,{error:'not found'},404);
   const d=fs.readFileSync(fp);r.writeHead(200,{'content-type':'audio/wav','content-length':d.length,'cache-control':'public, max-age=86400'});return r.end(d)}
@@ -341,17 +358,24 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   r.writeHead(200,{'content-type':'text/event-stream','cache-control':'no-cache, no-transform','x-accel-buffering':'no'});r.flushHeaders&&r.flushHeaders();r.write(': '+' '.repeat(2048)+'\n\n');
   r.write('event: dj\ndata: '+JSON.stringify(djView(now))+'\n\n');DJC.add(r);const ka=setInterval(()=>{try{r.write('event: t\ndata: '+Date.now()+'\n\n')}catch(e){}},20000),stop=setTimeout(()=>r.end(),30*60000);
   q.on('close',()=>{DJC.delete(r);clearInterval(ka);clearTimeout(stop)});return}
+ case'/api/ren-usage':{if(limited('gmru:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method==='POST'){try{const v=RG.edit(j||{});audit(ip,'ren-usage-edit',{ai:j.ai,dailyUSD:j.dailyUSD,monthlyUSD:j.monthlyUSD});return send(r,v)}catch(e){return send(r,{error:e.message},400)}}return send(r,RG.view(now))}
+ case'/api/ren-usage/test-notify':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);if(limited('rtn:'+ip,5,600000))return send(r,{error:'rate limited (5 per 10 min)'},429);
+  const x=await RG.notify({who:'Test notification',device:'GM page',time:RG.ptTime(now),event:'talking to Ren',message:'This is a test from the Live Geometry GM page.'});audit(ip,'ren-test-notify',{ok:x.ok});return send(r,x)}
+ case'/api/stats':{if(limited('gmst:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,statsView(now))}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
   const msg=String(j.message||'').trim();if(!msg)return send(r,{error:'message required'},400);if(msg.length>500)return send(r,{error:'message too long (max 500 chars)'},400);
-  const key=xaiKey();if(!key)return send(r,{reply:"Ren is meditating right now (the AI key isn't set up on the server yet). Try again soon!",fallback:'key missing'},503);
+  const ua=String(q.headers['user-agent']||''),dev=/OculusBrowser|Quest/i.test(ua)?'quest':/iPhone|Android.*Mobile|Mobile.*Android/i.test(ua)?'phone':/iPad|Android/i.test(ua)?'tablet':'desktop';
+  const g=RG.gate(ip,j.playerName);RG.firstContact(g.pid,j.playerName,dev,msg);if(g.canned)return send(r,{reply:g.canned,fallback:'resting',why:g.why});
+  const key=xaiKey();if(!key){RG.record({pid:g.pid,model:'-',status:'canned-nokey',ms:0});return send(r,{reply:"Ren is meditating right now (the AI key isn't set up on the server yet). Try again soon!",fallback:'key missing'},503)}const tq=Date.now(),mdl=REN_MODEL();
   const renCtx=j=>{const c=j.context&&typeof j.context==='object'?j.context:{},cl=v=>String(v||'').replace(/[^\w .,'’:-]/g,'').slice(0,40);const nm=cl(j.playerName),td=cl(c.timeOfDay);return(nm?`\nThe visitor talking to you calls themselves "${nm}".`:'')+(td?`\nLocal time of day: ${td}.`:'')};
   const hist=(Array.isArray(j.history)?j.history:[]).slice(-6).filter(h=>h&&(h.role==='user'||h.role==='assistant')&&typeof h.content==='string').map(h=>({role:h.role,content:h.content.slice(0,500)}));
-  try{const x=await fetch('https://api.x.ai/v1/chat/completions',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},signal:AbortSignal.timeout(15000),
-    body:JSON.stringify({model:REN_MODEL(),max_tokens:200,temperature:.7,messages:[{role:'system',content:REN_SYS+renCtx(j)},...hist,{role:'user',content:msg}]})});
-   const d=await x.json().catch(()=>({}));if(!x.ok){console.error('ren upstream',x.status,(d&&d.error&&(d.error.message||d.error))||'');return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:'upstream '+x.status},502)}
-   const reply=String(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content||'').trim().slice(0,1200);return send(r,{reply:reply||'…',model:REN_MODEL()})}
-  catch(e){return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:e.name==='TimeoutError'?'timeout':'error'},504)}}
+  try{const x=await fetch(process.env.REN_XAI_URL||'https://api.x.ai/v1/chat/completions',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},signal:AbortSignal.timeout(15000),
+    body:JSON.stringify({model:mdl,max_tokens:g.maxTokens,temperature:.7,messages:[{role:'system',content:REN_SYS+renCtx(j)},...hist,{role:'user',content:msg}]})});
+   const d=await x.json().catch(()=>({}));if(!x.ok){RG.record({pid:g.pid,model:mdl,status:'error-'+x.status,usage:d&&d.usage,ms:Date.now()-tq});console.error('ren upstream',x.status,(d&&d.error&&(d.error.message||d.error))||'');return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:'upstream '+x.status},502)}
+   RG.record({pid:g.pid,model:String(d.model||mdl).slice(0,64),status:'ok',usage:d.usage,ms:Date.now()-tq});const reply=String(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content||'').trim().slice(0,1200);return send(r,{reply:reply||'…',model:mdl})}
+  catch(e){RG.record({pid:g.pid,model:mdl,status:e.name==='TimeoutError'?'error-timeout':'error',ms:Date.now()-tq});return send(r,{reply:"Ren's signal is fuzzy right now. Try again in a moment.",fallback:e.name==='TimeoutError'?'timeout':'error'},504)}}
  case'/api/ren/dance':{const tid=String(u.searchParams.get('trackId')||j.trackId||'');if(!/^[A-Za-z0-9_.-]{1,64}$/.test(tid))return send(r,{error:'trackId must be 1-64 chars [A-Za-z0-9_.-]'},400);
   if(q.method==='GET'){if(limited('rdg:'+ip,120,60000))return send(r,{error:'rate limited'},429);return REND[tid]?send(r,{trackId:tid,choreo:REND[tid].choreo,saved:REND[tid].t}):send(r,{error:'no dance saved for this track'},404)}
   if(q.method==='DELETE'){if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);const had=!!REND[tid];delete REND[tid];renSave();audit(ip,'ren-dance-reset',{tid});return send(r,{ok:1,deleted:had})}

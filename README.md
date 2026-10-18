@@ -31,3 +31,29 @@ Orb glow materials add alpha (valid premultiplied canvas on iOS), halos capped t
 - **Pick song for everyone** (`djpanel.js`): ⋯ music panel "🎧 Pick song for everyone" or tap the Now-playing pill. Library ▶ Now / + Next, queue ▶ Now, Prev / Pause / Next via the GM-key `/api/dj` (key asked once, `localStorage.eearGM`).
 - **Live DJ voice** (`djvoice.js`, server `/api/dj/live`, `/api/dj/bc`): Go live streams 16 kHz PCM in 400 ms chunks over the existing SSE `/api/dj/stream` (event `pcm`), played gap-free with a 0.35 s jitter buffer; music ducks to 20 %; voice comes from the orb when Flying sound is on. Each session is saved as `server/broadcasts/<id>.wav` (not data.json; last 40 kept); repeat 1–10× with a gap, Replay last, Stop broadcast now (cancels for everyone).
 - **d47b long-poll fallback**: the trycloudflare quick tunnel (and so the Pages copy) buffers SSE, so voice chunks and DJ state changes never arrived through it. Clients now also hold `GET /api/dj/pull?after=<gs>&rev=<rev>` (answered at once on a new chunk / state change, else after 12 s); chunks are de-duplicated by id:seq when SSE also delivers them (LAN).
+
+## d48: Quest pass, orb 25 m rule, Ren usage guard, Room Stats
+
+### Quest controls (`quest.html`)
+- **Trigger = fast flight** (hold to fly at high speed where you point; intentionally fast, do not slow it down).
+- **🔒 Padlock** (A / trigger at start) = position + north lock; **B** unlocks.
+- **Powers** (in-VR panel → Powers; local to this headset only, never affect real players): **right thumbstick click** cycles weapon Freeze (water gun) → Web lock → Tow line; **A** (or right grip) fires; **long-press A** = Freeze: thaw all · Web: clear the aimed web · Tow: release. With Powers on and north locked, A fires instead of boarding the ship (board from the panel).
+  - **Freeze**: water jet (≤30 droplets, gravity arc, splash); the hit being freezes in an icy faceted shell for 60 s (shoot again to thaw; thaw = crack + shatter).
+  - **Web lock**: sticky catenary strand; the being is wrapped in a pearly cocoon and held at that spot until cleared (persists across reloads in this headset's localStorage).
+  - **Tow line**: taut glowing strand; the being keeps moving and you are smoothly dragged 3-5 m behind it (one tow at a time; fire again or long-press to release; auto-release if it disappears; overrides the padlock while active).
+  - Targets: the 12 edge bots, Ren, ghosts / Matt's Shadow, performers.
+- **North tools** (panel → Powers): *Set north = where I'm facing* (persisted), *Nudge north ±5°*, *Reset north*.
+- **Lite mode** (default on for Quest; panel → View, or `?lite=0/1`): 0.8x XR framebuffer, max foveation, 72 Hz, merged static lines/tubes, lighter vortex tubes, instanced saucer lights, 2-octave orb, 40 embers. Draw calls ~1960 → ~850 headless.
+- Music auto-starts on Enter VR (unless turned off), resumes on the first select/squeeze; an in-VR "Now playing" line sits under your view.
+- The 12 edge bots roam toward Ready Athletics on Quest: players farther than 150 m are drawn 150 m away on their true bearing, so the bot ring (about 1.2 km away) walks along with you. This is kept on purpose.
+
+### Orb hard rule (all pages)
+The orb's center never comes closer than **25 m (3D) to the camera** in any phase (orbit 25-34 m, lingers, swoops, trail returns, overhead passes, fast flight). A final push-out runs every frame; the close-fade stays as a backstop. Linger loudness comes from gain (reference distance 25 m), not from getting closer.
+
+### Ren AI usage guard (server)
+- Every Ren call is logged to sqlite `server/eear.sqlite` (table `ren_usage`; also `ren_alerts`, `ren_first`) and to `logs/ren-usage.jsonl` (rotates at 5 MB, keeps 3). Players are anonymous ids (salted hash).
+- Caps live in `~/.eear-secrets/ren-limits.json` (chmod 600; re-read on change; GM-editable on gm.html → Ren usage). Defaults: $1/day, $10/month, warning at 80 %, 30 requests/player/hour, 200/player/day, 60/min globally, max_tokens 300, plus an AI on/off switch. When a cap is hit, Ren gives canned replies until the next PT day or month.
+- Prices (per 1M tokens) are in the same file, taken from docs.x.ai/docs/models (2026-10-18).
+- GM endpoints (header `X-GM-Key`): `GET/POST /api/ren-usage`, `POST /api/ren-usage/test-notify`, `GET /api/stats`.
+- First-contact notifier: `~/.eear-secrets/ren-notify.json` (chmod 600, never committed), off until the file exists. Examples: `{"mode":"imessage","to":"+1..."}` or `{"mode":"webhook","url":"https://...","authorization":"Bearer ..."}`; optional `"alerts":true`, `"maxPerHour":30`, `"enabled":false`.
+- `stats.html`: "Room Stats" dashboard (GM key, refreshes every 10 s).

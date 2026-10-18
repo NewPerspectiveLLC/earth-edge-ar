@@ -41,7 +41,7 @@ const dropMat = new T.MeshBasicMaterial({ color: 0xbff0ff, transparent: true, op
 const sparkMat = new T.PointsMaterial({ color: 0xffffff, size: .06, transparent: true, opacity: .9, depthWrite: false, blending: T.AdditiveBlending });
 const shardMat = new T.MeshBasicMaterial({ color: 0xd8f6ff, transparent: true, opacity: .8, depthWrite: false });
 const mistMat = new T.SpriteMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(230,248,255,.8)'); r.addColorStop(1, 'rgba(230,248,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c) })(), transparent: true, depthWrite: false });
-const icoG = new T.IcosahedronGeometry(1, 1).toNonIndexed(), shardG = new T.TetrahedronGeometry(.12), dropG = new T.SphereGeometry(.035, 6, 4), shellG = new T.SphereGeometry(1, 12, 8);
+const icoG = new T.IcosahedronGeometry(1, 1), shardG = new T.TetrahedronGeometry(.12), dropG = new T.SphereGeometry(.035, 6, 4), shellG = new T.SphereGeometry(1, 12, 8);
 for (const m of [iceMat, pearlMat, shellMat, silkM, glowM, towM, towG, dropMat, sparkMat, shardMat, mistMat]) m.userData.pf = 1;
 // ---------- ribbon (CPU, camera-facing) along a catenary-ish curve a->b with sag
 function ribbon(mat, n = 24) { const g = new T.BufferGeometry(), p = new Float32Array((n + 1) * 2 * 3), uv = new Float32Array((n + 1) * 2 * 2), ix = [];
