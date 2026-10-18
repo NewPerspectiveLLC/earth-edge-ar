@@ -350,7 +350,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
  case'/api/dj/pull':{if(limited('djp:'+ip,1200,60000))return send(r,{error:'rate limited'},429);PULLC.set(crypto.createHash('sha1').update(ip+'|'+(q.headers['user-agent']||'')).digest('hex').slice(0,12),Date.now());const after=Math.floor(+u.searchParams.get('after')),rev0=Math.floor(+u.searchParams.get('rev'));
   const reply=()=>{const n=Date.now();return send(r,{gs:PGS,rev:DJ.rev,t:n,live:DJ.live?DJ.live.id:null,pcm:after>=0?PCMR.filter(x=>x.gs>after):[]})};
   if(!(after>=0)||PCMR.some(x=>x.gs>after)||(rev0>=0&&rev0!==DJ.rev)||PULLW.size>=500)return reply();
-  let done=false;const fin=()=>{if(done)return;done=true;PULLW.delete(fin);clearTimeout(to);reply()},to=setTimeout(fin,12000);PULLW.add(fin);q.on('close',()=>{done=true;PULLW.delete(fin);clearTimeout(to)});return}
+  let done=false;const fin=()=>{if(done)return;done=true;PULLW.delete(fin);clearTimeout(to);reply()},to=setTimeout(fin,12000);PULLW.add(fin);/* r (response) 'close' = client went away; q's 'close' fires as soon as the GET body is read, which would drop the reply */r.on('close',()=>{if(done)return;done=true;PULLW.delete(fin);clearTimeout(to)});return}
  case'/api/dj/bc':{const id=String(u.searchParams.get('id')||'');if(id==='list')return send(r,{list:bcList().slice(0,20).map(x=>({id:x.id,at:x.m,dur:Math.round((x.size-44)/32000*10)/10}))});
   if(!/^[a-z0-9]+$/.test(id))return send(r,{error:'id'},400);const fp=path.join(BCD,id+'.wav');if(!fs.existsSync(fp))return send(r,{error:'not found'},404);
   const d=fs.readFileSync(fp);r.writeHead(200,{'content-type':'audio/wav','content-length':d.length,'cache-control':'public, max-age=86400'});return r.end(d)}
