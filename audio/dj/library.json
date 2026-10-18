@@ -3,6 +3,19 @@
  "note": "Freely licensed music only. Kevin MacLeod tracks: CC BY 4.0, credit required (shown on dj.html).",
  "tracks": [
   {
+   "id": "meet-me-on-the-dance-floor",
+   "title": "Meet Me on the Dance Floor",
+   "artist": "Matt Ready",
+   "genre": "Disco gospel / hip-hop",
+   "bpm": null,
+   "url": "audio/dj/meet-me-on-the-dance-floor.mp3",
+   "duration": 209.216,
+   "license": "Original",
+   "licenseUrl": null,
+   "source": "Matt Ready (@meditationmatt) on Suno, https://suno.com/s/3sOn9K2x2mHEiaOR (clip 113de164-10ac-4f93-a199-49bbbf865df9); AAC from the public clip video, transcoded to 128 kbps MP3 44.1 kHz (already -14.4 LUFS, no gain change)",
+   "attribution": "Meet Me on the Dance Floor, an original song by Matt Ready (@meditationmatt)"
+  },
+  {
    "id": "disco-jam",
    "title": "Disco Jam (instrumental)",
    "artist": "Live Geometry",

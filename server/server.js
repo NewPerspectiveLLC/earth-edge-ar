@@ -190,10 +190,11 @@ const djSeed=()=>({queue:(djLib().seed||[]).map(djTrack).filter(Boolean).map(djI
 let DJ=null;const djSave=()=>run("insert into kv values('djState',?) on conflict(k) do update set v=excluded.v",JSON.stringify(DJ));
 try{const v=one("select v from kv where k='djState'");DJ=v?JSON.parse(v.v):null}catch(e){DJ=null}if(!DJ||!Array.isArray(DJ.queue)){DJ=djSeed();djSave()}
 function djNorm(now){const Q=DJ.queue;let ch=false;if(!Q.length){if(DJ.index){DJ.index=0;ch=true}return ch}if(!(DJ.index>=0&&DJ.index<Q.length)){DJ.index=0;ch=true}if(!DJ.playing)return ch;
+ if(DJ.repeat==='one'){const d=(+Q[DJ.index].duration||0)*1000;if(!(d>0))return ch;const el1=now-DJ.startedAt;if(el1<0){DJ.startedAt=now;return true}if(el1>=d){DJ.startedAt+=Math.floor(el1/d)*d;ch=true}return ch}/* d49e repeat one: the current track loops in place */
  const tot=Q.reduce((a,x)=>a+(+x.duration||0),0)*1000;if(!(tot>0))return ch;let el=now-DJ.startedAt;if(el<0){DJ.startedAt=now;return true}
  if(el>=tot){const k=Math.floor(el/tot);DJ.startedAt+=k*tot;el-=k*tot;ch=true}
  for(let i=0;i<=Q.length&&el>=(+Q[DJ.index].duration||0)*1000;i++){const d=(+Q[DJ.index].duration||0)*1000;DJ.startedAt+=d;el-=d;DJ.index=(DJ.index+1)%Q.length;ch=true}return ch}
-const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null,orb:DJ.orb||null}};
+const djView=now=>{djNorm(now);const c=DJ.queue[DJ.index]||null;return{t:now,rev:DJ.rev,playing:!!(DJ.playing&&c),index:DJ.index,startedAt:DJ.startedAt,offset:c?(DJ.playing?(now-DJ.startedAt):DJ.pausedOffset)/1000:0,current:c,queue:DJ.queue,library:'audio/dj/library.json',live:DJ.live||null,ann:DJ.ann&&now<DJ.ann.startsAt+DJ.ann.repeats*(DJ.ann.dur+DJ.ann.gap)*1000?DJ.ann:null,lastBc:DJ.lastBc||null,orb:DJ.orb||null,repeat:DJ.repeat==='one'?'one':null}};
 const DJC=new Set();const djPush=()=>{const m='event: dj\ndata: '+JSON.stringify(djView(Date.now()))+'\n\n';for(const c of DJC)try{c.write(m)}catch(e){};djWake()};
 /* d47b long-poll fallback: trycloudflare quick tunnels do not stream SSE, so clients also pull voice chunks + state-rev changes via GET /api/dj/pull?after=<gs> (held up to 12 s). */
 const PULLW=new Set(),PCMR=[];let PGS=0;function djWake(){const w=[...PULLW];PULLW.clear();for(const f of w)try{f()}catch(e){}}
@@ -212,7 +213,8 @@ function djOp(j,now){djNorm(now);const Q=DJ.queue,op=String(j.op||''),at=qid=>Q.
  case'shuffle':{if(Q.length<2)break;const c=Q.splice(DJ.index,1)[0];for(let i=Q.length-1;i>0;i--){const k=crypto.randomInt(0,i+1);[Q[i],Q[k]]=[Q[k],Q[i]]}Q.unshift(c);DJ.index=0;break}
  case'clear':DJ.queue=[];DJ.index=0;DJ.pausedOffset=0;break;
  case'reset':{const r=DJ.rev;DJ=djSeed();DJ.rev=r;break}
- default:return'op must be add, remove, move, order, play, next, prev, pause, resume, shuffle, clear or reset'}
+ case'repeat':{const m=String(j.mode||'');if(m!=='one'&&m!=='off')return"mode must be 'one' or 'off'";if(m==='one')DJ.repeat='one';else delete DJ.repeat;break}
+ default:return'op must be add, remove, move, order, play, next, prev, pause, resume, shuffle, clear, reset or repeat'}
  DJ.rev++;DJ.updated=now;djSave();djPush();return null}
 /* ---- d47 DJ voice: LIVE talk-over + saved broadcasts. GM-only writes. Mic audio arrives as 16-bit PCM mono chunks (~400 ms, base64, JSON) on POST /api/dj/live;
    each chunk is pushed at once to every listener on the existing SSE /api/dj/stream (event 'pcm'), and appended to the session. On stop the session is saved as

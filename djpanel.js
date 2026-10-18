@@ -1,7 +1,7 @@
 // djpanel.js (d47): in-app Master DJ panel: pick the song for EVERYONE (library + queue, play now / next / prev / pause) and talk LIVE over the music.
 // Same GM-key-protected endpoints as dj.html (/api/dj, /api/dj/live); the key is asked once per device (localStorage.eearGM). Opened from the ⋯ music panel
 // ('🎧 Pick song for everyone') or by tapping the 'Now playing' pill.
-import { VOICE } from './djvoice.js?v=1792357111589';
+import { VOICE } from './djvoice.js?v=1792362251041';
 const DJ = () => window.EEAR_DJ, $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 let LIB = null, el = null, msgT = 0, msgS = null, lastStable = '', down = 0, busy = '';
@@ -28,14 +28,14 @@ function render(tick) { if (!el || el.style.display === 'none') return; const D 
   const liveT = busy || (live ? `⏹ End live (on air ${V.chunks * .4 | 0} s)` : '🎙 Go live');
   const stH = `${onAir && !live ? '🔴 Someone is live now. ' : ''}${ann ? `📢 Broadcast playing for everyone (${ann.repeats}× , ${fmt(ann.dur)}). ` : ''}${L ? `Live delay here ≈ ${(L.median / 1000).toFixed(1)} s. ` : ''}${V.err ? '<span style="color:#ff8a8a">' + esc(V.err) + '</span>' : ''}
    Music ducks while you talk. Mic opens only when you tap Go live.`;
-  const stable = JSON.stringify([key, D.source === 'live', c.item && c.item.qid, c.index, c.playing, st.rev, live, !!busy, onAir, !!last, last && last.dur, !!LIB, Q.map(x => x.qid)]);
+  const stable = JSON.stringify([key, D.source === 'live', c.item && c.item.qid, c.index, c.playing, st.rev, st.repeat || '', live, !!busy, onAir, !!last, last && last.dur, !!LIB, Q.map(x => x.qid)]);
   if (tick && $('djpLive') && (stable === lastStable || (down && performance.now() - down < 1500))) { const n = $('djpNow'), sx = $('djpSt'), b = $('djpLive');
     if (n && n.innerHTML !== nowH) n.innerHTML = nowH; if (sx && sx.innerHTML !== stH) sx.innerHTML = stH; if (b && b.textContent !== liveT) b.textContent = liveT; return }
   lastStable = stable;
   el.innerHTML = `<header><b>🎧 Master DJ · plays to everyone</b><button class=g id=djpX>Close</button></header><div class=sc>
   ${key ? '' : `<div style="margin:6px 0">GM key (asked once on this device): <input id=djpK type=password autocomplete=off style="width:55%"> <button id=djpKs>Save</button></div>`}
   <div style="margin:4px 0" id=djpNow>${nowH}</div>
-  <div><button id=djpPrev>⏮ Prev</button><button id=djpPP>${c.playing ? '⏸ Pause' : '▶ Play'}</button><button id=djpNext>⏭ Next</button><span id=djpMsg style="font-size:12px;margin-left:6px"></span></div>
+  <div><button id=djpPrev>⏮ Prev</button><button id=djpPP>${c.playing ? '⏸ Pause' : '▶ Play'}</button><button id=djpNext>⏭ Next</button><button id=djpRp${st.repeat === 'one' ? ' class=p' : ' class=g'} title="Repeat the current song for everyone">🔂 Repeat one: ${st.repeat === 'one' ? 'ON' : 'off'}</button><span id=djpMsg style="font-size:12px;margin-left:6px"></span></div>
   <h4>🎙 Talk to everyone (live)</h4>
   <div>${live ? `<button class=live id=djpLive>${liveT}</button>` : `<button class=p id=djpLive>${liveT}</button>`}
    <label><small>then repeat</small> <select id=djpRep>${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value=${n}${n == (localStorage.eearDjRep || 0) ? ' selected' : ''}>${n ? n + '×' : 'no'}</option>`).join('')}</select></label>
@@ -51,6 +51,7 @@ function render(tick) { if (!el || el.style.display === 'none') return; const D 
   const need = () => { if (!localStorage.eearGM) { msg('Enter the GM key first', true); return false } return true };
   $('djpPrev').onclick = () => need() && op({ op: 'prev' }); $('djpNext').onclick = () => need() && op({ op: 'next' });
   $('djpPP').onclick = () => need() && op({ op: c.playing ? 'pause' : 'resume' });
+  $('djpRp').onclick = () => need() && op({ op: 'repeat', mode: st.repeat === 'one' ? 'off' : 'one' }).then(ok => ok && msg(st.repeat === 'one' ? 'Repeat off' : 'Repeating this song for everyone'));
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => need() && op({ op: 'play', qid: b.dataset.q }).then(ok => ok && msg('Playing for everyone')));
   el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => need() && op({ op: 'add', id: b.dataset.l, next: true, playNow: true }).then(ok => ok && msg('Playing for everyone')));
   el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => need() && op({ op: 'add', id: b.dataset.n, next: true }).then(ok => ok && msg('Queued next')));

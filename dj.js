@@ -34,6 +34,7 @@ export function at(t = now()) {
   const st = S.st; if (!st || !st.queue || !st.queue.length) return { item: null, offset: 0, index: 0, playing: false };
   const Q = st.queue; let i = st.index >= 0 && st.index < Q.length ? st.index : 0;
   if (!st.playing) return { item: Q[i], offset: st.offset || 0, index: i, playing: false };
+  if (st.repeat === 'one') { const d = (+Q[i].duration || 0) * 1000; if (!(d > 0)) return { item: null, offset: 0, index: 0, playing: false }; let e1 = t - st.startedAt; if (e1 < 0) e1 = 0; return { item: Q[i], offset: (e1 % d) / 1000, index: i, playing: true } }   // d49e repeat one
   const tot = Q.reduce((a, x) => a + (+x.duration || 0), 0) * 1000; if (!(tot > 0)) return { item: null, offset: 0, index: 0, playing: false };
   let el = t - st.startedAt; if (el < 0) el = 0; el %= tot;
   for (let k = 0; k <= Q.length && el >= Q[i].duration * 1000; k++) { el -= Q[i].duration * 1000; i = (i + 1) % Q.length }
@@ -45,7 +46,7 @@ function label(c = at()) { const st = S.st; if (!st) return '🎧 Master DJ: con
   const n = c.item ? c.item.title + ' — ' + c.item.artist : ''; return (c.playing ? '🎧 Now playing: ' : '🎧 DJ paused: ') + n + (S.src === 'offline' ? ' (offline order)' : '') }
 function ui(c) { if (window.EEAR_DJ_NOUI) return; let d = document.getElementById('djNow');
   if (!d && document.body) { const s = document.createElement('style'); s.textContent = '#djNow{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 358px);z-index:21;max-width:min(260px,calc(100vw - 16px));font:600 11px system-ui,sans-serif;color:#fff;background:#2a1446d9;border:1px solid #a45cff88;border-radius:8px;padding:4px 8px;line-height:1.3;pointer-events:auto;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'; document.head.appendChild(s);
-    d = document.createElement('div'); d.id = 'djNow'; d.title = 'Tap: pick the song for everyone'; d.onclick = () => { if (window.EEAR_DJPANEL) EEAR_DJPANEL.open(); else import('./djpanel.js?v=1792357111589').then(M => M.open()) }; document.body.appendChild(d) }
+    d = document.createElement('div'); d.id = 'djNow'; d.title = 'Tap: pick the song for everyone'; d.onclick = () => { if (window.EEAR_DJPANEL) EEAR_DJPANEL.open(); else import('./djpanel.js?v=1792362251041').then(M => M.open()) }; document.body.appendChild(d) }
   if (d) d.textContent = label(c) }
 // ---- audio element
 function el() { if (S.el) return S.el; const a = S.el = new Audio(); a.preload = 'auto'; a.playsInline = true; a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
