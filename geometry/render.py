@@ -51,7 +51,7 @@ for t in V.table():
         d = np.linspace(0, 12000, 200); la, lo = S.destination(t['lat'], t['lon'], k * 30, d); ax.plot(*L(la, lo), color=t['color'], lw=.8, alpha=.75)
         ax.add_patch(Wedge((cx, cy), V.FILL_R, 90 - (k + 1) * 30, 90 - k * 30, color=V.WEDGE_COLS[k], alpha=.35, lw=0))
     ax.plot(cx, cy, 'o', color=t['color'], ms=7, mec='w')
-ax.text(*L(48.11035, -122.80591), '  Ready Athletics Vortex', color='#ffc800', fontsize=10)
+ax.text(*L(48.1062, -122.8057), '  Ready Athletics Vortex', color='#ffc800', fontsize=10)
 ax.text(*L(48.13165, -122.79921), "  Cappy's pillar + Meditation Garden vortex (1.5 m apart)", color='#c9a0ff', fontsize=10)
 for n, la, lo in [("Memory's Vault", 48.1384642, -122.7647029), ('City Hall', 48.1161771, -122.753612), ('Jefferson Healthcare', 48.1060007, -122.7889962), ('Masonic Lodge', 48.1139683, -122.7628233)]:
     x, y = L(la, lo); ax.plot(x, y, 's', color='#ff9', ms=5); ax.text(x, y, '  ' + n, color='#ff9', fontsize=8)

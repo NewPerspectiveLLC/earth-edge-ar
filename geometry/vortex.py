@@ -3,7 +3,7 @@ import json, os, sys, numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sphere as S
 VORTICES = [  # id, name, lat, lon, colour, source
-    ('vxRA', 'Ready Athletics Vortex', 48.11035, -122.80591, '#ffc800', 'index.html TARGETS / daynight.js SITES / figures-registry READY_ATHLETICS'),
+    ('vxRA', 'Ready Athletics Vortex', 48.1062, -122.8057, '#ffc800', 'index.html TARGETS / daynight.js SITES / figures-registry READY_ATHLETICS'),
     ('vxCappy', "Cappy's (Happy's) Trails Vortex pillar", 48.13165, -122.79921, '#30ff60', 'index.html TARGETS / figures-registry CAPPYS'),
     ('vxGarden', "Matt's Meditation Garden vortex (Happy's Trails Vortex music source)", 48.1316475, -122.7992293, '#c080ff', 'index.html GARDEN / audio.js SRC / figures-registry GARDEN'),
 ]

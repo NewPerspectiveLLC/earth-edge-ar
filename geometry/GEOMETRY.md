@@ -36,19 +36,19 @@ Reference implementation: `geometry/sphere.py` (equations), `geometry/vortex.py`
 - Up = +y, North = −z, East = +x in every page.
 
 ## 2. Vortex wedge geometry (locked)
-- Centres: Ready Athletics (48.11035, −122.80591) gold; Cappy's Trails / Happy's Trails vortex pillar (48.13165, −122.79921) green; Matt's Meditation Garden (48.1316475, −122.7992293) purple (the Happy's Trails Vortex music source, 1.46 m from Cappy's pillar at bearing 259°).
+- Centres: Ready Athletics (48.1062, −122.8057) gold; Cappy's Trails / Happy's Trails vortex pillar (48.13165, −122.79921) green; Matt's Meditation Garden (48.1316475, −122.7992293) purple (the Happy's Trails Vortex music source, 1.46 m from Cappy's pillar at bearing 259°).
 - Dividing lines: bearings θ_k = 30k°, k = 0..11 → 6 full great circles (k = 0..5). Normal **n_k = v × d_θk**, d_θ = cos θ·N + sin θ·E. All 12 half-lines meet at the antipode −v.
 - Wedge k = bearings [30k, 30k+30). Test: k = ⌊(bearing(c→p) mod 360)/30⌋ ⇔ p·n(30k) < 0 ∧ p·n(30k+30) > 0 (verified on 2,000 random points per vortex).
 - Coloured fill radius 300 m (flat sector in the tangent plane); ground half-lines 110 km; hub 180 m; world circles full 360°.
 
 | vortex | antipode | k | bearings | normal n_k | circle pole (lat, lon) |
 |---|---|---|---|---|---|
-| vxRA | -48.1103500, 57.1940900 | 0 | 0/180 | (-0.840510722, 0.541794911, 0.000000000) | 0.0, 147.19409 |
-| vxRA | -48.1103500, 57.1940900 | 1 | 30/210 | (-0.526238856, 0.782059768, 0.333849045) | 19.502564, 123.936148 |
-| vxRA | -48.1103500, 57.1940900 | 2 | 60/240 | (-0.070961714, 0.812772342, 0.578243509) | 35.327095, 94.98974 |
-| vxRA | -48.1103500, 57.1940900 | 3 | 90/270 | (0.403329563, 0.625703223, 0.667698091) | 41.88965, 57.19409 |
-| vxRA | -48.1103500, 57.1940900 | 4 | 120/300 | (0.769549008, 0.270977431, 0.578243509) | 35.327095, 19.39844 |
-| vxRA | -48.1103500, 57.1940900 | 5 | 150/330 | (0.929568419, -0.156356545, 0.333849045) | 19.502564, -9.547968 |
+| vxRA | -48.1062000, 57.1943000 | 0 | 0/180 | (-0.840512708, 0.541791830, 0.000000000) | 0.0, 147.1943 |
+| vxRA | -48.1062000, 57.1943000 | 1 | 30/210 | (-0.526254824, 0.782037514, 0.333876005) | 19.504203, 123.937708 |
+| vxRA | -48.1062000, 57.1943000 | 2 | 60/240 | (-0.070987386, 0.812736877, 0.578290203) | 35.330374, 94.991753 |
+| vxRA | -48.1062000, 57.1943000 | 3 | 90/270 | (0.403301066, 0.625664051, 0.667752009) | 41.8938, 57.1943 |
+| vxRA | -48.1062000, 57.1943000 | 4 | 120/300 | (0.769525323, 0.270945047, 0.578290203) | 35.330374, 19.396847 |
+| vxRA | -48.1062000, 57.1943000 | 5 | 150/330 | (0.929555890, -0.156373463, 0.333876005) | 19.504203, -9.549108 |
 | vxCappy | -48.1316500, 57.2007900 | 0 | 0/180 | (-0.840574073, 0.541696620, -0.000000000) | -0.0, 147.20079 |
 | vxCappy | -48.1316500, 57.2007900 | 1 | 30/210 | (-0.526263089, 0.782102528, 0.333710649) | 19.494152, 123.935919 |
 | vxCappy | -48.1316500, 57.2007900 | 2 | 60/240 | (-0.070940335, 0.812944695, 0.578003799) | 35.310263, 94.987192 |
@@ -62,7 +62,7 @@ Reference implementation: `geometry/sphere.py` (equations), `geometry/vortex.py`
 | vxGarden | -48.1316475, 57.2007707 | 4 | 120/300 | (0.769633815, 0.271247794, 0.578003828) | 35.310265, 19.414367 |
 | vxGarden | -48.1316475, 57.2007707 | 5 | 150/330 | (0.929653852, -0.156143866, 0.333710665) | 19.494153, -9.534359 |
 
-Separations: vxRA-vxCappy: 2420.1 m at 11.856°; vxRA-vxGarden: 2419.54 m at 11.825°; vxCappy-vxGarden: 1.46 m at 259.017°
+Separations: vxRA-vxCappy: 2870.63 m at 9.659°; vxRA-vxGarden: 2870.11 m at 9.632°; vxCappy-vxGarden: 1.46 m at 259.017°
 
 ## 3. Continents and Port Townsend shoreline
 See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app renders (Natural Earth 1:50m, public domain). `pt-shoreline.geojson` = fresh OSM coastline (Overpass, 2026-10-17) for the Quimper Peninsula incl. Point Hudson, Fort Worden/Point Wilson, North Beach, Kah Tai, Boat Haven, plus lagoons/harbour structures from `shore.json` (© OpenStreetMap contributors, ODbL). `to_vectors.py` converts both to unit vectors. Renders: `/workspace/geometry-globe.png`, `/workspace/geometry-pt.png`.
@@ -72,13 +72,13 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 
 | cat | id | name | type | lat | lon | size | anchor | source |
 |---|---|---|---|---|---|---|---|---|
-| landmarks | lm1.pillar | Ready Athletics (997800502) - pillar | landmark pillar | 48.11035 | -122.80591 | r_m 1.5, h_m 120 | floor (-1.6 m below eye), flat local map | index.html TARGETS |
-| landmarks | lm1.beam | Ready Athletics (997800502) - light beam | beam | 48.11035 | -122.80591 | r_m 2.5, h_m 200 | floor | index.html addBeamShape |
-| landmarks | lm1.ring | Ready Athletics (997800502) - ground ring | ring | 48.11035 | -122.80591 | r_in_m 5, r_out_m 7 | floor +0.05 m | index.html addBeamShape |
-| landmarks | lm1.shape | Ready Athletics (997800502) - type shape (field) | type shape | 48.11035 | -122.80591 |  | floor | index.html addBeamShape |
-| landmarks | lm1.label | Ready Athletics (997800502) - label | label | 48.11035 | -122.80591 | y_m 135 | floor | index.html |
-| saucers | lm1.saucer | Ready Athletics (997800502) - saucer + landing pad | saucer | 48.1100805 | -122.8055064 | hover_y_m 34, scale 2.2 | floor; offset 30 m east, 30 m south of the landmark (flat) | index.html buildX + extras.makeSaucer |
-| lines | lm1.line | Line to Ready Athletics (997800502) | line to landmark | 48.11035 | -122.80591 |  | viewer-relative generator (no viewer position recorded) | index.html updLocal / quest.html PLACES |
+| landmarks | lm1.pillar | Ready Athletics (997800502) - pillar | landmark pillar | 48.1062 | -122.8057 | r_m 1.5, h_m 120 | floor (-1.6 m below eye), flat local map | index.html TARGETS |
+| landmarks | lm1.beam | Ready Athletics (997800502) - light beam | beam | 48.1062 | -122.8057 | r_m 2.5, h_m 200 | floor | index.html addBeamShape |
+| landmarks | lm1.ring | Ready Athletics (997800502) - ground ring | ring | 48.1062 | -122.8057 | r_in_m 5, r_out_m 7 | floor +0.05 m | index.html addBeamShape |
+| landmarks | lm1.shape | Ready Athletics (997800502) - type shape (field) | type shape | 48.1062 | -122.8057 |  | floor | index.html addBeamShape |
+| landmarks | lm1.label | Ready Athletics (997800502) - label | label | 48.1062 | -122.8057 | y_m 135 | floor | index.html |
+| saucers | lm1.saucer | Ready Athletics (997800502) - saucer + landing pad | saucer | 48.1059305 | -122.8052964 | hover_y_m 34, scale 2.2 | floor; offset 30 m east, 30 m south of the landmark (flat) | index.html buildX + extras.makeSaucer |
+| lines | lm1.line | Line to Ready Athletics (997800502) | line to landmark | 48.1062 | -122.8057 |  | viewer-relative generator (no viewer position recorded) | index.html updLocal / quest.html PLACES |
 | landmarks | lm2.pillar | Cappy's Trails garden (998002802) - pillar | landmark pillar | 48.13165 | -122.79921 | r_m 1.5, h_m 120 | floor (-1.6 m below eye), flat local map | index.html TARGETS |
 | landmarks | lm2.beam | Cappy's Trails garden (998002802) - light beam | beam | 48.13165 | -122.79921 | r_m 2.5, h_m 200 | floor | index.html addBeamShape |
 | landmarks | lm2.ring | Cappy's Trails garden (998002802) - ground ring | ring | 48.13165 | -122.79921 | r_in_m 5, r_out_m 7 | floor +0.05 m | index.html addBeamShape |
@@ -121,14 +121,14 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 | landmarks | lm7.label | Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - label | label | 48.1139683 | -122.7628233 | y_m 135 | floor | index.html |
 | saucers | lm7.saucer | Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) - saucer + landing pad | saucer | 48.1138066 | -122.7625811 | hover_y_m 22, scale 1 | floor; offset 18 m east, 18 m south of the landmark (flat) | index.html buildX + extras.makeSaucer |
 | lines | lm7.line | Line to Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St) | line to landmark | 48.1139683 | -122.7628233 |  | viewer-relative generator (no viewer position recorded) | index.html updLocal / quest.html PLACES |
-| vortex | vxRA.pillar | Ready Athletics Vortex - vortex pillar | vortex pillar | 48.11035 | -122.80591 | h_m 420 | floor, exact ENU | extras.makeVortexPillar |
-| vortex | vxRA.funnel | Ready Athletics Vortex - spiral funnel | spiral | 48.11035 | -122.80591 | h_m 24 | floor | extras.makeVortexLocal (scale .6) |
-| vortex | vxRA.wedges | Ready Athletics Vortex - 12 wedge fills | wedge fill | 48.11035 | -122.80591 | r_m 300 | floor +0.01 | extras.makeVortexWedges(T,300,0) |
-| vortex | vxRA.ground | Ready Athletics Vortex - 12 ground half-lines | great-circle half-lines | 48.11035 | -122.80591 | len_km 110 | floor +0.05 | extras.vortexGroundLines |
-| vortex | vxRA.hub | Ready Athletics Vortex - white hub lines | hub | 48.11035 | -122.80591 | len_m 180 | floor +0.07 | index.html addVortexLocal |
-| vortex | vxRA.circles | Ready Athletics Vortex - 6 world great circles | great circles | 48.11035 | -122.80591 | k 6 | world (ENU km); Quest: projected to 3 km shell | extras.vortexWorldCircles |
-| vortex | vxRA.antipode | Ready Athletics Vortex - antipode marker | antipode | -48.11035 | 57.19409 |  | world, through the Earth (12,742 km chord) | index.html buildVW |
-| vortex | vxRA.label | Ready Athletics Vortex - label | label | 48.11035 | -122.80591 | y_m 440 | floor | index.html addVortexLocal |
+| vortex | vxRA.pillar | Ready Athletics Vortex - vortex pillar | vortex pillar | 48.1062 | -122.8057 | h_m 420 | floor, exact ENU | extras.makeVortexPillar |
+| vortex | vxRA.funnel | Ready Athletics Vortex - spiral funnel | spiral | 48.1062 | -122.8057 | h_m 24 | floor | extras.makeVortexLocal (scale .6) |
+| vortex | vxRA.wedges | Ready Athletics Vortex - 12 wedge fills | wedge fill | 48.1062 | -122.8057 | r_m 300 | floor +0.01 | extras.makeVortexWedges(T,300,0) |
+| vortex | vxRA.ground | Ready Athletics Vortex - 12 ground half-lines | great-circle half-lines | 48.1062 | -122.8057 | len_km 110 | floor +0.05 | extras.vortexGroundLines |
+| vortex | vxRA.hub | Ready Athletics Vortex - white hub lines | hub | 48.1062 | -122.8057 | len_m 180 | floor +0.07 | index.html addVortexLocal |
+| vortex | vxRA.circles | Ready Athletics Vortex - 6 world great circles | great circles | 48.1062 | -122.8057 | k 6 | world (ENU km); Quest: projected to 3 km shell | extras.vortexWorldCircles |
+| vortex | vxRA.antipode | Ready Athletics Vortex - antipode marker | antipode | -48.1062 | 57.1943 |  | world, through the Earth (12,742 km chord) | index.html buildVW |
+| vortex | vxRA.label | Ready Athletics Vortex - label | label | 48.1062 | -122.8057 | y_m 440 | floor | index.html addVortexLocal |
 | vortex | vxCappy.pillar | Cappy's (Happy's) Trails Vortex pillar - vortex pillar | vortex pillar | 48.13165 | -122.79921 | h_m 420 | floor, exact ENU | extras.makeVortexPillar |
 | vortex | vxCappy.funnel | Cappy's (Happy's) Trails Vortex pillar - spiral funnel | spiral | 48.13165 | -122.79921 | h_m 24 | floor | extras.makeVortexLocal (scale .6) |
 | vortex | vxCappy.wedges | Cappy's (Happy's) Trails Vortex pillar - 12 wedge fills | wedge fill | 48.13165 | -122.79921 | r_m 300 | floor +0.01 | extras.makeVortexWedges(T,300,0) |
@@ -181,9 +181,9 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 | circle | circle.pavers | 12 pavers (annular wedges) + seams | pavers | 48.1316475 | -122.7992293 | r_in_m 0.95, r_out_m 2.55 | ground | circle.js |
 | circle | circle.lotus | Lotus dais | dais | 48.1316475 | -122.7992293 | h_m 0.18 | ground, centred on the Garden pin | circle.js |
 | circle | circle.floorGlow | Circle floor glow | glow ring | 48.1316475 | -122.7992293 |  | ground | circle.js |
-| night | night.vxRA.beams | Ready Athletics night beams | beam | 48.11035 | -122.80591 | h_m 1500 | ground, fades in with night | daynight.js |
-| night | night.vxRA.ring | Ready Athletics night ring | ring | 48.11035 | -122.80591 | r_in_m 1, r_out_m 46 | ground +0.12 | daynight.js |
-| night | night.vxRA.halos | Ready Athletics night halos | halo sprites | 48.11035 | -122.80591 |  | ground | daynight.js |
+| night | night.vxRA.beams | Ready Athletics night beams | beam | 48.1062 | -122.8057 | h_m 1500 | ground, fades in with night | daynight.js |
+| night | night.vxRA.ring | Ready Athletics night ring | ring | 48.1062 | -122.8057 | r_in_m 1, r_out_m 46 | ground +0.12 | daynight.js |
+| night | night.vxRA.halos | Ready Athletics night halos | halo sprites | 48.1062 | -122.8057 |  | ground | daynight.js |
 | night | night.vxCappy.beams | Cappy's Trails night beams | beam | 48.13165 | -122.79921 | h_m 1500 | ground, fades in with night | daynight.js |
 | night | night.vxCappy.ring | Cappy's Trails night ring | ring | 48.13165 | -122.79921 | r_in_m 1, r_out_m 46 | ground +0.12 | daynight.js |
 | night | night.vxCappy.halos | Cappy's Trails night halos | halo sprites | 48.13165 | -122.79921 |  | ground | daynight.js |
@@ -244,9 +244,9 @@ See table in HANDOFF.md §4. `continents.geojson` = exactly the rings the app re
 | bots | edge.bot300 | Edge-300 deg (edge marker bot) | edge marker bot | 48.1004174 | -122.8133715 |  | ring r 7 m, bearing 300 deg (one per Ready Athletics wedge ray) | server.js BOTS edge group |
 | bots | edge.bot330 | Edge-330 deg (edge marker bot) | edge marker bot | 48.1004405 | -122.8133371 |  | ring r 7 m, bearing 330 deg (one per Ready Athletics wedge ray) | server.js BOTS edge group |
 | bots | bot.keeper.cappy | Cappy's Keeper | keeper bot | 48.13165 | -122.79921 |  | fixed (GM can pause/hide) | server.js BOTS |
-| bots | bot.keeper.ra | Ready Athletics Keeper | keeper bot | 48.11035 | -122.80591 |  | fixed | server.js BOTS |
+| bots | bot.keeper.ra | Ready Athletics Keeper | keeper bot | 48.1062 | -122.8057 |  | fixed | server.js BOTS |
 | characters | ren | Ren (3dguru) - AI guide robot | AI character (non-human robot) | 48.13165 | -122.7991562 | h_m 1.85, hover_m 0.32, talk_r_m 15, leave_r_m 20, beam_m 400 | 4 m east of Cappy's pillar (flat offset) | figures-registry REN / ren.js |
-| test | test.Ghost-1 | Ghost-1 (server TEST fixture, dummy player marker) | test fixture | 48.11035 | -122.80591 | wander_r_m 150 | target point only (live position not recorded) | server.js GHOSTS |
+| test | test.Ghost-1 | Ghost-1 (server TEST fixture, dummy player marker) | test fixture | 48.1062 | -122.8057 | wander_r_m 150 | target point only (live position not recorded) | server.js GHOSTS |
 | test | test.Ghost-2 | Ghost-2 (server TEST fixture, dummy player marker) | test fixture | 48.13165 | -122.79921 | wander_r_m 150 | target point only (live position not recorded) | server.js GHOSTS |
 | vehicles | quest.ship | Quest spaceship cockpit | vehicle | - | - |  | viewer-relative (no world position) | quest.html cockpit()/QSHIP |
 

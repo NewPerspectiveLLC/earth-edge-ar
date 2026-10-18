@@ -1,5 +1,5 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792357026381><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792357026381></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — GM</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry"><meta name=description content="Live Geometry: Matt's Reality (Ready Security Services Map 1 · Base Geometry Reality)"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792357026381><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792357026381>
-<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js?v=1792357026381></script>
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792357111589><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792357111589></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — GM</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry"><meta name=description content="Live Geometry: Matt's Reality (Ready Security Services Map 1 · Base Geometry Reality)"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792357111589><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792357111589>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src=botstyle.js?v=1792357111589></script>
 <style>
 html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;background:#000;color:#eee;overflow:hidden}
 #map{position:fixed;inset:0;background:#111}
@@ -66,16 +66,16 @@ const labels=L.layerGroup([L.tileLayer('https://server.arcgisonline.com/ArcGIS/r
 const lmG=L.layerGroup().addTo(map),vxG=L.layerGroup().addTo(map),appStreets=L.layerGroup(),trailG=L.layerGroup().addTo(map),accG=L.layerGroup().addTo(map),plG=L.layerGroup().addTo(map);
 L.control.layers({Satellite:sat,Street:street},{'Labels (roads & places)':labels,'Vortex centers':vxG,'Landmarks':lmG,'Accuracy circles':accG,'App streets / Sheridan':appStreets},{position:'bottomright',collapsed:innerWidth<700}).addTo(map);
 L.control.scale({imperial:true,position:'bottomleft'}).addTo(map);
-const VX=[['Ready Athletics vortex',48.11035,-122.80591,'#ffc800'],["Cappy's Trails vortex",48.13165,-122.79921,'#30ff60'],["Matt's Meditation Garden vortex",48.1316475,-122.7992293,'#ff60d0']];
+const VX=[['Ready Athletics vortex',48.1062,-122.8057,'#ffc800'],["Cappy's Trails vortex",48.13165,-122.79921,'#30ff60'],["Matt's Meditation Garden vortex",48.1316475,-122.7992293,'#ff60d0']];
 const LM=[["Memory's Vault, Fort Worden",48.1384642,-122.7647029,'#c060ff'],['Port Townsend City Hall',48.1161771,-122.753612,'#40e0ff'],["Jefferson County Sheriff's Office",48.0241638,-122.764488,'#ff7020'],
  ['Jefferson Healthcare Hospital',48.1060007,-122.7889962,'#ff4060'],['Masonic Lodge No. 6',48.1139683,-122.7628233,'#e0c080']];
 const pin=(t,cls,g,dy)=>L.marker([t[1],t[2]],{icon:L.divIcon({className:'',html:`<div class="lm ${cls}"><div class=i style="background:${t[3]}"></div><div class=t style="${dy?'top:'+dy+'px':''}">${esc(t[0])}</div></div>`,iconSize:[0,0]}),keyboard:false}).addTo(g).bindTooltip(esc(t[0]));
 VX.forEach((t,i)=>pin(t,'vx',vxG,i===2?-22:0));LM.forEach(t=>pin(t,'',lmG));
 $('lmlab').onclick=()=>{document.body.classList.toggle('hidelm');$('lmlab').classList.toggle('on',!document.body.classList.contains('hidelm'))};$('lmlab').classList.add('on');
-fetch('streets.json?v=1792357026381').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
-fetch('sheridan.json?v=1792357026381').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
+fetch('streets.json?v=1792357111589').then(r=>r.json()).then(J=>J.lines.forEach(l=>L.polyline(l.points,{color:l.color,weight:3,opacity:.8}).addTo(appStreets).bindTooltip(l.name))).catch(()=>{});
+fetch('sheridan.json?v=1792357111589').then(r=>r.json()).then(J=>L.polyline(J.segments||J.points,{color:'#ff00cc',weight:4}).addTo(appStreets).bindTooltip('Sheridan St')).catch(()=>{});
 // ---- players
-const RA=[48.11035,-122.80591];
+const RA=[48.1062,-122.8057];
 function hcol(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'hsl('+(h%360)+',95%,55%)'}
 const colOf=p=>p.mode==='stealth'?'#9a9a9a':(p.bot&&EEAR_BOTSTYLE.COL[p.style])||(p.team&&p.team.color)||hcol(p.id);EEAR_BOTSTYLE.svgDefs();
 const arrowSvg=(c,hasH)=>hasH?`<svg viewBox="0 0 34 34"><path d="M17 2 L25 24 L17 19 L9 24 Z" fill="${c}" stroke="#000" stroke-width="1.5" stroke-linejoin=round/><circle cx=17 cy=17 r=4 fill="#fff" stroke="#000"/></svg>`

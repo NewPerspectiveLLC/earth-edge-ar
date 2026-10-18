@@ -4,7 +4,7 @@ function loadLeaflet(){if(window.L&&L.map)return Promise.resolve();if(LP)return 
  LP=new Promise((ok,err)=>{const c=document.createElement('link');c.rel='stylesheet';c.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(c);
   const s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';s.onload=ok;s.onerror=err;document.head.appendChild(s)});return LP}
 const hex=c=>typeof c==='number'?'#'+c.toString(16).padStart(6,'0'):c;
-export async function openMapPicker({center=[48.11035,-122.80591],places=[],onUse}){
+export async function openMapPicker({center=[48.1062,-122.8057],places=[],onUse}){
  let ov=document.getElementById('mpkOv');if(ov)ov.remove();
  ov=document.createElement('div');ov.id='mpkOv';ov.style.cssText='position:fixed;inset:0;z-index:100;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;font:18px sans-serif;color:#fff';
  ov.innerHTML=`<style>#mpkMap .leaflet-control-zoom a{width:64px!important;height:64px!important;line-height:64px!important;font-size:40px!important}#mpkOv button{font-size:22px;padding:12px 20px;margin:4px;border-radius:10px;border:0}#mpkOv .lbl{background:#000a;color:#fff;border:0;font-weight:bold}</style>

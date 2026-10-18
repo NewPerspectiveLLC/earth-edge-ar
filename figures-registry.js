@@ -1,9 +1,9 @@
 // figures-registry.js: single source of truth for WHERE the in-scene figures stand (pure data, no imports, safe to load anywhere).
 // Used by ren.js, performers.js, circle.js (the game) and figures.html (the live dashboard). Frame: x = east m, y = up m, z = -north m,
-// relative to each anchor's ground point. Server-side bots/ghosts (server/server.js?v=1792357026381) are published live at GET /api/figures.
+// relative to each anchor's ground point. Server-side bots/ghosts (server/server.js?v=1792357111589) are published live at GET /api/figures.
 export const GARDEN = { lat: 48.1316475, lon: -122.7992293, name: "Matt's Meditation Garden" };   // vortex pin (Matt's Google Maps link)
 export const CAPPYS = { lat: 48.13165, lon: -122.79921, name: "Cappy's Trails" };                   // Cappy's Trails pillar
-export const READY_ATHLETICS = { lat: 48.11035, lon: -122.80591, name: 'Ready Athletics' };
+export const READY_ATHLETICS = { lat: 48.1062, lon: -122.8057, name: 'Ready Athletics' };
 // Ren (3dguru): stands eastM east of Cappy's pillar; dance wander offsets are stored in decimetres, |w| <= 13 -> <= 1.3 m from home
 export const REN = { home: CAPPYS, eastM: 4, talkRadius: 15, leaveRadius: 20, wanderMaxM: 1.3, heightM: 1.85, hoverM: .32, beamM: 400 };
 // Singer bots: one per singer on a radius-m arc around the Garden pillar, in the gaps between cushions (15 + k*30 deg),
@@ -29,5 +29,5 @@ export function performerSpots(n, cDeg = PERFORMERS.fallbackBearingDeg) {
 }
 // d44 Matt Ready pillars: equilateral triangular prisms (d46: images[] per face, fitted unstretched; default 2x Project Driftwood orb-matt.jpg + 1x pillar-matt.jpg) at OSM public spots listed in pillars.json (id, name, kind, area, lat, lon, optional image).
 // image = the ONE constant to swap for a photo of Matt (a pillar entry may carry its own "image" override). Audio (d45): the current Master DJ track from each pillar, nearest `voices` only.
-export const PILLARS = { url: 'pillars.json?v=1792357026381', image: 'pillar-matt.jpg', images: ['orb-matt.jpg', 'orb-matt.jpg', 'pillar-matt.jpg'] /* d46: faces 0,1 Project Driftwood, face 2 original */, heightM: 1.8, sideM: 0.7, plinthM: .08, capM: .05, visibleM: 2500,
+export const PILLARS = { url: 'pillars.json?v=1792357111589', image: 'pillar-matt.jpg', images: ['orb-matt.jpg', 'orb-matt.jpg', 'pillar-matt.jpg'] /* d46: faces 0,1 Project Driftwood, face 2 original */, heightM: 1.8, sideM: 0.7, plinthM: .08, capM: .05, visibleM: 2500,
   audio: { trackId: 'dj', djTrim: .7, fullM: 3, silentM: 55, voices: 2, duck: .8, fadeS: .35, tauS: .25, scanMs: 250, levelTrim: 1 } };

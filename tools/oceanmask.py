@@ -20,6 +20,6 @@ for L in J['lines']:
 water=votes[:,1]>votes[:,0]
 mask=ndimage.binary_dilation(water[lab]&(lab>0),iterations=1)
 Image.fromarray((mask*255).astype('uint8')).save('ocean-mask.png')
-for nme,a,l in[('RA',48.11035,-122.80591),('CityHall',48.1161771,-122.753612),('Hosp',48.106,-122.789),('Sheriff',48.0241638,-122.764488),('IndianIsl',48.07,-122.725),('Marrowstone',48.06,-122.69),('PTBay',48.08,-122.75),('Strait',48.17,-122.8)]:
+for nme,a,l in[('RA',48.1062,-122.8057),('CityHall',48.1161771,-122.753612),('Hosp',48.106,-122.789),('Sheriff',48.0241638,-122.764488),('IndianIsl',48.07,-122.725),('Marrowstone',48.06,-122.69),('PTBay',48.08,-122.75),('Strait',48.17,-122.8)]:
   x,y=map(int,xy(a,l));print(nme,int(mask[y,x]))
 Image.fromarray((mask*255).astype('uint8')).resize((400,400)).save('/workspace/eear-oceanmask.png')

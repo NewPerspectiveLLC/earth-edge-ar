@@ -2,7 +2,7 @@
  "spec": "Live Geometry geometry record v1.0",
  "date": "2026-10-17",
  "status": "locked (pillars: as of d44 working tree)",
- "generated": "2026-10-17T12:35:46-07:00",
+ "generated": "2026-10-18T13:58:31-07:00",
  "sphere": {
   "R_m": 6371000.0,
   "frame": "ECEF-like, +Z north pole, +X lat0/lon0; heights spherical"
@@ -91,22 +91,22 @@
   }
  ],
  "source_hashes": {
-  "audio.js": "4520d8c872e49697ded05cbf3f6c8f19ff1167c783598f2828af0ba7fc1bc9f1",
-  "circle.js": "06e68d1c1fd91486821e2d0c530ade5a8e33cf2cbfe4310f97c7e844f40daaea",
+  "audio.js": "a2e504f512df485cdd45c674108f8c6cebcd6ba38a8d3711bae18983716d2258",
+  "circle.js": "f9bf50843ee5462da6205558e120b6dae7cfb52f45f1f1b7665af2b88ca5f23f",
   "coast.json": "1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400",
   "continents.json": "1dc47aca434d0e27ec41cb20a36116ee7099a714fb53ef2a423f00aeb096ba16",
-  "daynight.js": "b2c09412dedb27a5483d088c4451c13d7d75c2a03ef097aba37eef8f9ac213bc",
-  "extras.js": "2e9272cd933221137559fb2395166e72dcce2801288a952353b1ac9d003fe57d",
-  "figures-registry.js": "ff3c742280de8eb0ad8c1959be7921fa859f54c636c18437c7c3a49192a9e84c",
-  "index.html": "2f46fd9ae580bd8e034307ec69cce40aa54ba84b1653327427be0373b8083de4",
+  "daynight.js": "9ba2aef5761bb9b9235c9b133f20f459c602293341279a9009d17aced68a4129",
+  "extras.js": "f67506101c7887e55f14a3ff5ecb2b7df95791c30b10a90308fe0019599d1aef",
+  "figures-registry.js": "0228c41e223c17cdf54037ac804059b885687b6b6ee4e4cd25e882a0a3e588a3",
+  "index.html": "327ed0881b44b6784b8d6bb95011ef454d4f3e82a16c276559d0c2c2caf0ed8c",
   "landmass.json": "5a7c28c9497cd51d17080d909f3fd747386fbc2cc9110257bafd82c21b461292",
   "mountains.json": "1de835ec8053149841d86e8fc25261dced14a7e0e88ab19b7547f52d1dabb67b",
   "pillar-matt.jpg": "6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e",
-  "pillars.js": "8a28975c94e75c53f05e437f10e519ef039bd49eb1fa8ffb22f2a034c5109880",
+  "pillars.js": "4d4aad011d976284a6e5d34a73947fdf71c6a19818a02f172ff6ade04b4755b2",
   "pillars.json": "9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486",
-  "quest.html": "b8980b81c2f411280728241982c73c334a0def140d082d75578f64d508310119",
-  "ren.js": "453173b14800e2899f2a7f6a7928578fa9745278a72b89257b1b90a4ca589821",
-  "server/server.js": "a44e7678f4057f91d7f16fe31bc432c61e355d0fe2a36801a87974e23e14902a",
+  "quest.html": "db28d8872acbef629427cadc807f409eedd8cc424ae70d9404c319081b8a26c5",
+  "ren.js": "6a60d225faca7d74318158c636b36733e54aa0722244e38aa4e35627e60b6b6a",
+  "server/server.js": "e344e46e861130e2e7fd99f5d47d2c8087cd7c43330873ba9f39403b4c7c5db4",
   "sheridan.json": "ea0b47785b8ced565befec9c7eb8030d6e99f4bf06f4bbf61b5efbf018376119",
   "shore.json": "228da1eb820e1051209e72f0a7f8c72cc31bce8a3c954f045321cd10ff73f12b",
   "streets.json": "97df6e921390ded7ac280e2c429607d3e9ea2c9fced529b25e360ddaaf998580",
@@ -119,8 +119,8 @@
    "name": "Ready Athletics (997800502) - pillar",
    "type": "landmark pillar",
    "shape": "cylinder 8-sided",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "r_m": 1.5,
     "h_m": 120
@@ -135,8 +135,8 @@
    "name": "Ready Athletics (997800502) - light beam",
    "type": "beam",
    "shape": "open cylinder, fades upward",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "r_m": 2.5,
     "h_m": 200
@@ -151,8 +151,8 @@
    "name": "Ready Athletics (997800502) - ground ring",
    "type": "ring",
    "shape": "annulus",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "r_in_m": 5,
     "r_out_m": 7
@@ -167,8 +167,8 @@
    "name": "Ready Athletics (997800502) - type shape (field)",
    "type": "type shape",
    "shape": "ground disc r 25 m",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {},
    "anchor": "floor",
    "source": "index.html addBeamShape",
@@ -180,8 +180,8 @@
    "name": "Ready Athletics (997800502) - label",
    "type": "label",
    "shape": "sprite pill 160x40, live distance",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "y_m": 135
    },
@@ -195,8 +195,8 @@
    "name": "Ready Athletics (997800502) - saucer + landing pad",
    "type": "saucer",
    "shape": "pad: disc r 19.8 m + ring 19.8-22 m + H; saucer: flattened sphere r 13.2 m (y-scale .22), dome r 5.28, rim torus; 8 pad lights at r 23.76; tractor beam cone r 2.5*S..9*S",
-   "lat": 48.1100805,
-   "lon": -122.8055064,
+   "lat": 48.1059305,
+   "lon": -122.8052964,
    "size": {
     "hover_y_m": 34,
     "scale": 2.2
@@ -211,8 +211,8 @@
    "name": "Line to Ready Athletics (997800502)",
    "type": "line to landmark",
    "shape": "segment from viewer floor point (0,-1.6,0) to landmark floor point; quest: label at true ENU direction, shown at min(d,400 m)",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {},
    "anchor": "viewer-relative generator (no viewer position recorded)",
    "source": "index.html updLocal / quest.html PLACES",
@@ -854,8 +854,8 @@
    "name": "Ready Athletics Vortex - vortex pillar",
    "type": "vortex pillar",
    "shape": "two open cylinders (r 16->9.6 and 6->3.6, h 420) + ring 10-14 m + core line",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "h_m": 420
    },
@@ -869,8 +869,8 @@
    "name": "Ready Athletics Vortex - spiral funnel",
    "type": "spiral",
    "shape": "6 arms: r(u)=0.6*(2+28u^2), y=0.6*40u, angle=2pi k/6 + 6pi u, u in [0,1]; spins",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "h_m": 24
    },
@@ -884,8 +884,8 @@
    "name": "Ready Athletics Vortex - 12 wedge fills",
    "type": "wedge fill",
    "shape": "12 x 30 deg circular sectors, wedge k = bearings [30k,30k+30), alpha fades smoothstep(.15,1,r/300)",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "r_m": 300
    },
@@ -913,8 +913,8 @@
    "name": "Ready Athletics Vortex - 12 ground half-lines",
    "type": "great-circle half-lines",
    "shape": "p(s)=cos(s)v+sin(s)d_theta, theta=30k, 0<=s<=110 km/R, exact ENU incl. curvature drop",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "len_km": 110
    },
@@ -928,8 +928,8 @@
    "name": "Ready Athletics Vortex - white hub lines",
    "type": "hub",
    "shape": "first 180 m of each of the 12 half-lines, white, 7 px",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "len_m": 180
    },
@@ -943,8 +943,8 @@
    "name": "Ready Athletics Vortex - 6 world great circles",
    "type": "great circles",
    "shape": "full circles at bearings 30k, k=0..5 (through the planet), normals n=v x d_theta (see vortex table)",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "k": 6
    },
@@ -953,34 +953,34 @@
    "color": "#ffc800",
    "normals": [
     [
-     -0.840510722,
-     0.541794911,
+     -0.840512708,
+     0.54179183,
      0.0
     ],
     [
-     -0.526238856,
-     0.782059768,
-     0.333849045
+     -0.526254824,
+     0.782037514,
+     0.333876005
     ],
     [
-     -0.070961714,
-     0.812772342,
-     0.578243509
+     -0.070987386,
+     0.812736877,
+     0.578290203
     ],
     [
-     0.403329563,
-     0.625703223,
-     0.667698091
+     0.403301066,
+     0.625664051,
+     0.667752009
     ],
     [
-     0.769549008,
-     0.270977431,
-     0.578243509
+     0.769525323,
+     0.270945047,
+     0.578290203
     ],
     [
-     0.929568419,
-     -0.156356545,
-     0.333849045
+     0.92955589,
+     -0.156373463,
+     0.333876005
     ]
    ]
   },
@@ -990,8 +990,8 @@
    "name": "Ready Athletics Vortex - antipode marker",
    "type": "antipode",
    "shape": "two rings facing viewer: 150-190 and 260-275 (scene km) + label",
-   "lat": -48.11035,
-   "lon": 57.19409,
+   "lat": -48.1062,
+   "lon": 57.1943,
    "size": {},
    "anchor": "world, through the Earth (12,742 km chord)",
    "source": "index.html buildVW",
@@ -1003,8 +1003,8 @@
    "name": "Ready Athletics Vortex - label",
    "type": "label",
    "shape": "sprite",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "y_m": 440
    },
@@ -1893,8 +1893,8 @@
    "name": "Ready Athletics night beams",
    "type": "beam",
    "shape": "two open cylinders r 3.5 and 1.2, h 1500",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "h_m": 1500
    },
@@ -1908,8 +1908,8 @@
    "name": "Ready Athletics night ring",
    "type": "ring",
    "shape": "annulus 1..46 m, pulsing",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "r_in_m": 1,
     "r_out_m": 46
@@ -1924,8 +1924,8 @@
    "name": "Ready Athletics night halos",
    "type": "halo sprites",
    "shape": "screen-size sprites at y 40 and 700 m",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {},
    "anchor": "ground",
    "source": "daynight.js",
@@ -3442,8 +3442,8 @@
    "name": "Ready Athletics Keeper",
    "type": "keeper bot",
    "shape": "bot marker (mp.js avatar)",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {},
    "anchor": "fixed",
    "source": "server.js BOTS"
@@ -3472,8 +3472,8 @@
    "name": "Ghost-1 (server TEST fixture, dummy player marker)",
    "type": "test fixture",
    "shape": "bot-style marker; random walk 0.8-3 m/s within 150 m of target",
-   "lat": 48.11035,
-   "lon": -122.80591,
+   "lat": 48.1062,
+   "lon": -122.8057,
    "size": {
     "wander_r_m": 150
    },

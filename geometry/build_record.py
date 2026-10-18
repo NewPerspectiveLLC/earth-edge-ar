@@ -13,9 +13,9 @@ REC = []
 def add(cat, id, name, type, shape, lat=None, lon=None, size=None, anchor='ground', src='', **kw):
     o = {'cat': cat, 'id': id, 'name': name, 'type': type, 'shape': shape, 'lat': None if lat is None else r7(lat), 'lon': None if lon is None else r7(lon), 'size': size or {}, 'anchor': anchor, 'source': src}
     o.update(kw); REC.append(o); return o
-GARDEN = (48.1316475, -122.7992293); CAPPY = (48.13165, -122.79921); RA = (48.11035, -122.80591)
+GARDEN = (48.1316475, -122.7992293); CAPPY = (48.13165, -122.79921); RA = (48.1062, -122.8057)
 # ---------------- 1. landmarks (index.html TARGETS; quest.html PLACES)
-TARGETS = [('Ready Athletics (997800502)', 48.11035, -122.80591, '#ffc800', 'field'), ("Cappy's Trails garden (998002802)", 48.13165, -122.79921, '#30ff60', 'park'),
+TARGETS = [('Ready Athletics (997800502)', 48.1062, -122.8057, '#ffc800', 'field'), ("Cappy's Trails garden (998002802)", 48.13165, -122.79921, '#30ff60', 'park'),
            ("Memory's Vault, Fort Worden", 48.1384642, -122.7647029, '#c060ff', 'landmark'), ('Port Townsend City Hall', 48.1161771, -122.753612, '#40e0ff', 'building'),
            ("Jefferson County Sheriff's Office", 48.0241638, -122.764488, '#ff7020', 'building'), ('Jefferson Healthcare Hospital', 48.1060007, -122.7889962, '#ff4060', 'hospital'),
            ('Masonic Lodge (PT Lodge No. 6, 1338 Jefferson St)', 48.1139683, -122.7628233, '#e0c080', 'building')]

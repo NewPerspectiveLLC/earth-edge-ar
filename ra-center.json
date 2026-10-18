@@ -1,7 +1,9 @@
-{"use": "pin",
- "_help": "ONE-LINE SWITCH for the Ready Athletics vortex centre: set use to \"parcel\" (or back to \"pin\"), then run: python3 tools/ra_center.py --apply  (dry-run without --apply). Rewrites every file listed below, then rebuild/deploy as usual.",
+{"use": "standing",
+ "_help": "ONE-LINE SWITCH for the Ready Athletics vortex centre: set use to \"standing\", \"parcel\" or \"pin\", then run: python3 tools/ra_center.py --apply  (dry-run without --apply). Rewrites every file listed below, then rebuild/deploy as usual.",
+ "standing": [48.1062, -122.8057],
+ "standing_src": "Matt's standing spot at 1:11 PM PT 2026-10-18 (screenshot position). Refinement from his gfixes 13:10:00-13:12:30 PT (accuracy-weighted median, n=32) landed 55.6 m away (>10 m tolerance), so the screenshot point is used as-is.",
  "pin": [48.11035, -122.80591],
  "pin_src": "original app pin (2026-10, typed in by hand); it sits on a city storm-pond tract ~508 m N (bearing 357 deg) of the parcel centroid",
  "parcel": [48.1057855, -122.8056022],
  "parcel_src": "area-weighted centroid of the official Jefferson County polygon for parcel 997800502 (READY ATHLETICS LLC, 0.745 ac, 3014 m2), computed in local metres (UTM 10N cross-check identical)",
- "files": ["index.html","quest.html","gm.html","map10.js","mappick.js","figures-registry.js","daynight.js","server/server.js","tools/ghosts.py","tools/watch.py","tools/oceanmask.py","geometry/build_record.py","geometry/render.py","geometry/vortex.py","geometry/make_docs.py","geometry/vortex-table.json","geometry/record.json","geometry/handoff.json","geometry/HANDOFF.md","geometry/GEOMETRY.md"]}
+ "files": ["index.html", "quest.html", "gm.html", "map10.js", "mappick.js", "figures-registry.js", "daynight.js", "server/server.js", "tools/ghosts.py", "tools/watch.py", "tools/oceanmask.py", "geometry/build_record.py", "geometry/render.py", "geometry/vortex.py", "geometry/make_docs.py", "geometry/vortex-table.json", "geometry/record.json", "geometry/handoff.json", "geometry/HANDOFF.md", "geometry/GEOMETRY.md"]}

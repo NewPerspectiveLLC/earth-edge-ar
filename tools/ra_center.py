@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ready Athletics vortex centre switch (d49). Reads ../ra-center.json ("use": "pin" | "parcel") and rewrites the RA centre
+"""Ready Athletics vortex centre switch (d49). Reads ../ra-center.json ("use": "standing" | "pin" | "parcel") and rewrites the RA centre
 (lat, lon, and the antipode lat/lon written in the geometry docs) in every listed file from whichever value is currently in them.
 Dry run by default; --apply writes. Only exact literals are touched (48.11035 / -122.80591 style, optional trailing zeros,
 ASCII or Unicode minus), so other nearby numbers (shoreline, pillars, streets) are never changed. Server BOTS 'Ready Athletics
@@ -8,7 +8,7 @@ daynight SITES (orb tour + night beams), gm.html VX/RA, map defaults and the geo
 import json, os, re, sys
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 C = json.load(open(os.path.join(R, 'ra-center.json')))
-new = C[C['use']]; olds = [C[k] for k in ('pin', 'parcel') if C[k] != new]
+new = C[C['use']]; olds = [C[k] for k in ('pin', 'parcel', 'standing') if k in C and C[k] != new]
 def lit(x): s = ('%.7f' % abs(x)).rstrip('0'); return re.escape(s) + r'0*(?!\d)'
 def antip(la, lo): return -la, (lo + 180 if lo < 0 else lo - 180)
 tot = 0

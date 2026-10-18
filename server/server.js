@@ -56,7 +56,7 @@ const settings=g=>{try{return JSON.parse(g.settings||'{}')}catch(e){return{}}};
 const lastFix=pid=>one('select lat,lon,acc,hdg,t from gfixes where pid=? order by t desc limit 1',pid)||null;
 const teamOf=id=>id?one('select id,name,color from teams where id=?',id):null;
 // dummy ghost players: server-side test fixtures (see ghosts block below + /api/gm/ghost). Hex pids so gm.html colours them.
-const GHOSTS={'Ghost-1':{pid:'ab0001',lat:48.11035,lon:-122.80591,place:'Ready Athletics'},'Ghost-2':{pid:'5e0002',lat:48.13165,lon:-122.79921,place:"Cappy's Trails garden"}};
+const GHOSTS={'Ghost-1':{pid:'ab0001',lat:48.1062,lon:-122.8057,place:'Ready Athletics'},'Ghost-2':{pid:'5e0002',lat:48.13165,lon:-122.79921,place:"Cappy's Trails garden"}};
 const isGhost=id=>Object.values(GHOSTS).some(g=>g.pid===id);
 // ---- stealth policy (GM-editable via /api/gm/policy, public read /api/policy). Device class: client claim cross-checked with the User-Agent
 // (client-side + spoofable; this is a game rule, not a security boundary). Android phones and anything unrecognised count as 'desktop'.
@@ -74,7 +74,7 @@ const polClass=d=>d==='iphone'?'iphone':d==='quest'?'quest':'desktop';
 const STEALTH_WARN={desktop:"Stealth isn't available on desktop. Use the iPhone app to go stealth.",quest:"Stealth isn't available on Quest yet. Use the iPhone app to go stealth.",android:"Stealth isn't available on this device. Use the iPhone app to go stealth."};
 const stealthOk=d=>!!getPol().canGoStealth[polClass(d)];
 // ---- permanent bots (tag BOT; distinct from TEST ghosts). State in server/bots.json; GM can pause (freeze) or hide (not live) each.
-const BOTS={"Cappy's Keeper":{pid:'b0c0a1',lat:48.13165,lon:-122.79921,kind:'fixed'},"Ready Athletics Keeper":{pid:'b0a7a2',lat:48.11035,lon:-122.80591,kind:'fixed'},"Matt's Shadow":{pid:'b05ad3',lat:48.117325,lon:-122.791138,kind:'shadow'}};
+const BOTS={"Cappy's Keeper":{pid:'b0c0a1',lat:48.13165,lon:-122.79921,kind:'fixed'},"Ready Athletics Keeper":{pid:'b0a7a2',lat:48.1062,lon:-122.8057,kind:'fixed'},"Matt's Shadow":{pid:'b05ad3',lat:48.117325,lon:-122.791138,kind:'shadow'}};
 /* 12 city-edge bots (group 'edge'): one per Ready Athletics 30-degree wedge ray, gathered in a small ring at the SR 20 (W Sims Way) / Mill Road signal = first signal on SR 20 entering Port Townsend, by the 'Welcome to Port Townsend' sign.
    Anchor = mean of the 4 OSM highway=traffic_signals nodes 12630503607-610. Edge-N° sits N° clockwise from north on the ring. Style per bot: lightblue (cardinal), plaid (navy/green tartan), default (330). Anchor+styles editable by GM, persisted in bots.json */
 const EDGE_DEF={lat:48.100386,lon:-122.81329,r:7,name:'SR 20 (West Sims Way) / Mill Road signal, Port Townsend'};
@@ -175,7 +175,7 @@ function btStep(n){const d=BOTS[n],s=BS[n],now=Date.now();if(s.hidden){run('upda
  run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',d.pid,s.lat,s.lon,4,now,s.hdg);run("update gplayers set seen=?,live=1,mode='regular',device='bot' where id=?",now,d.pid)}
 let btPrune=0,btSv=0;setInterval(()=>{try{for(const n in BOTS)btStep(n);const now=Date.now();if(now-btSv>30000){btSv=now;btSave()}if(now-btPrune>600000){btPrune=now;for(const d of Object.values(BOTS))run('delete from gfixes where pid=? and t<?',d.pid,now-3600000)}}catch(e){console.error('bots',e.message)}},2000);
 const btState=()=>({edge:EDGE,styles:BOT_STYLES,bots:Object.entries(BOTS).map(([n,d])=>{const s=BS[n];return{id:n,pid:d.pid,kind:d.kind,group:d.group||null,ray:d.ang??null,style:s.style||'default',bot:true,lat:s.lat,lon:s.lon,heading:s.hdg,paused:!!s.paused,hidden:!!s.hidden,frozen:!!s.frozen,anchor_t:s.anchorT||null}})});
-const GH_LOCAL=[['ready athletics',48.11035,-122.80591],["cappy",48.13165,-122.79921],['meditation garden',48.1316475,-122.7992293],["memory's vault",48.1384642,-122.7647029],['memorys vault',48.1384642,-122.7647029],['city hall',48.1161771,-122.753612],['sheriff',48.0241638,-122.764488],['jefferson healthcare',48.1060007,-122.7889962],['masonic',48.1139683,-122.7628233]];
+const GH_LOCAL=[['ready athletics',48.1062,-122.8057],["cappy",48.13165,-122.79921],['meditation garden',48.1316475,-122.7992293],["memory's vault",48.1384642,-122.7647029],['memorys vault',48.1384642,-122.7647029],['city hall',48.1161771,-122.753612],['sheriff',48.0241638,-122.764488],['jefferson healthcare',48.1060007,-122.7889962],['masonic',48.1139683,-122.7628233]];
 async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.includes(x[0]));if(hit)return{lat:hit[1],lon:hit[2],name:qs+' (app landmark)'};
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
  const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}

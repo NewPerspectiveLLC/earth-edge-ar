@@ -12,8 +12,8 @@ import argparse, json, math, os, sys, time, io, datetime, urllib.request, ssl
 
 KEYFILE = os.environ.get('EEAR_GM_KEY_FILE', '/home/box/agent-data/secrets/earth-edge-ar-gm-key.txt')
 DEFAULT_URL = os.environ.get('EEAR_URL', 'https://verse-concerning-summit-equipped.trycloudflare.com')
-RA = (48.11035, -122.80591)
-LANDMARKS = [("Ready Athletics", 48.11035, -122.80591), ("Cappy's Trails garden", 48.13165, -122.79921),
+RA = (48.1062, -122.8057)
+LANDMARKS = [("Ready Athletics", 48.1062, -122.8057), ("Cappy's Trails garden", 48.13165, -122.79921),
              ("Matt's Meditation Garden", 48.1316475, -122.7992293), ("Memory's Vault, Fort Worden", 48.1384642, -122.7647029),
              ("PT City Hall", 48.1161771, -122.753612), ("Jefferson County Sheriff", 48.0241638, -122.764488),
              ("Jefferson Healthcare Hospital", 48.1060007, -122.7889962), ("Masonic Lodge No. 6", 48.1139683, -122.7628233)]

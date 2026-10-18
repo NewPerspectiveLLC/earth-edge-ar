@@ -69,7 +69,7 @@ function ribbon(T,pts,w,y){/* pts: [Vector3] ground points -> flat strip w metre
  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.setAttribute('uv',new T.BufferAttribute(new Float32Array(UV),2));g.setAttribute('s',new T.BufferAttribute(new Float32Array(S),1));g.setIndex(I);return g}
 const densify=(L,step=4)=>{const o=[];for(let i=0;i<L.length-1;i++){const[a,b]=[L[i],L[i+1]];const d=Math.hypot((b[0]-a[0])*111320,(b[1]-a[1])*74400),n=Math.max(1,Math.ceil(d/step));for(let k=0;k<n;k++)o.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n])}o.push(L[L.length-1]);return o};
 
-export const SITES=[{key:'vxRA',name:'Ready Athletics',lat:48.11035,lon:-122.80591,col:'#ffc800',trail:'#ffe070',trails:'ra'},{key:'vxCappy',name:"Cappy's Trails",lat:48.13165,lon:-122.79921,col:'#30ff60',trail:'#6dffc0',trails:'cappy',outline:'cappy_outline'}];
+export const SITES=[{key:'vxRA',name:'Ready Athletics',lat:48.1062,lon:-122.8057,col:'#ffc800',trail:'#ffe070',trails:'ra'},{key:'vxCappy',name:"Cappy's Trails",lat:48.13165,lon:-122.79921,col:'#30ff60',trail:'#6dffc0',trails:'cappy',outline:'cappy_outline'}];
 export const GARDEN={lat:48.1316475,lon:-122.7992293,col:'#c080ff'};
 
 export function initDayNight(T,o){/* o: {scene, skyGroup(), skyRadius, base:()=>Date, latlon:()=>[lat,lon], pass:()=>bool, applySky(cols,f), trailsUrl} */
@@ -77,7 +77,7 @@ export function initDayNight(T,o){/* o: {scene, skyGroup(), skyRadius, base:()=>
  const N={clock:C,f:0,phase:'day',sunAlt:90,U,built:null};
  const hemi=new T.HemisphereLight(0xbfd8ff,0x3a3020,.9),sun=new T.DirectionalLight(0xffffff,1),moon=new T.DirectionalLight(0x9ab0ff,0);hemi.name='dnHemi';o.scene.add(hemi,sun,moon,sun.target,moon.target);N.lights={hemi,sun,moon};
  const stars=starField(T,o.skyRadius*.95);N.stars=stars;let starParent=null;
- let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792357026381').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
+ let trailsJ=null;const tp=fetch(o.trailsUrl||'trails.json?v=1792357111589').then(r=>r.json()).then(j=>trailsJ=j).catch(e=>console.warn('trails',e));
  N.build=async(parent,proj)=>{await tp;if(N.built)N.built.parent&&N.built.parent.remove(N.built);const G=new T.Group();G.name='nightGlow';N.built=G;N.mats=[];
   for(const S of SITES){const sg=new T.Group();sg.userData.layer=o.layerOf?o.layerOf(S.key):undefined;G.add(sg);const c=proj(S.lat,S.lon,0);
    const bm=beamMat(T,S.col,U);for(const[r,h]of[[3.5,1500],[1.2,1500]]){const b=new T.Mesh(new T.CylinderGeometry(r,r,h,20,1,true),bm);b.position.copy(c).y+=h/2;b.renderOrder=9;b.frustumCulled=false;sg.add(b)}

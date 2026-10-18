@@ -16,7 +16,8 @@ export function current() { const u = new URLSearchParams(location.search).get('
 export const layKey = r => r === 'ra-master-map' ? 'eearLayers_ra' : 'eearLayers';
 /** layer state for a room (stored, else that room's defaults) */
 export function layersFor(r, base) { let st = {}; try { st = JSON.parse(localStorage[layKey(r)] || '{}') } catch (e) { }
-  /* d49b: Cappy's corner columns are on by default in BOTH rooms (one-time migration of an early Master Map state) */ if (r === 'ra-master-map' && st._rv !== 2) { delete st.colsCappy; st._rv = 2 } return Object.assign({}, base, r === 'ra-master-map' ? RA_PRESET : MR_DEFAULTS, st) }
+  /* d49b: Cappy's corner columns are on by default in BOTH rooms (one-time migration of an early Master Map state) */ if (r === 'ra-master-map' && st._rv !== 2) { delete st.colsCappy; st._rv = 2 }
+  /* d49c: RA vortex moved to Matt's 1:11 PM standing spot - one-time: vortex (RA + local + world) back on in BOTH rooms */ if (!st._vx49c) { delete st.vxRA; delete st.vortexL; delete st.vortexW; st._vx49c = 1 } return Object.assign({}, base, r === 'ra-master-map' ? RA_PRESET : MR_DEFAULTS, st) }
 const dist = (a, b, c, d) => { const R = 6371000, r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)) };
 const brg = (a, b, c, d) => { const r = Math.PI / 180, y = Math.sin((d - b) * r) * Math.cos(c * r), x = Math.cos(a * r) * Math.sin(c * r) - Math.sin(a * r) * Math.cos(c * r) * Math.cos((d - b) * r); return (Math.atan2(y, x) / r + 360) % 360 };
 const card8 = b => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(b / 45) % 8];

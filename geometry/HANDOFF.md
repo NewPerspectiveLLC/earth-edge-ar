@@ -23,7 +23,7 @@ Generator for each centre c (v = v(c)): 12 half-lines θ_k = 30k°, k = 0..11 (=
 
 | vortex | lat | lon | colour | antipode | n₀ (θ=0/180) | n₃ (θ=90/270) |
 |---|---|---|---|---|---|---|
-| Ready Athletics Vortex | 48.11035 | -122.80591 | #ffc800 | -48.1103500, 57.1940900 | -0.840511, 0.541795, 0.000000 | 0.403330, 0.625703, 0.667698 |
+| Ready Athletics Vortex | 48.1062 | -122.8057 | #ffc800 | -48.1062000, 57.1943000 | -0.840513, 0.541792, 0.000000 | 0.403301, 0.625664, 0.667752 |
 | Cappy's (Happy's) Trails Vortex pillar | 48.13165 | -122.79921 | #30ff60 | -48.1316500, 57.2007900 | -0.840574, 0.541697, -0.000000 | 0.403391, 0.625959, 0.667421 |
 | Matt's Meditation Garden vortex (Happy's Trails Vortex music source) | 48.1316475 | -122.7992293 | #c080ff | -48.1316475, 57.2007707 | -0.840574, 0.541697, 0.000000 | 0.403391, 0.625959, 0.667421 |
 
@@ -46,7 +46,7 @@ Each outline is an ordered vertex list of (lat, lon), mapped by P = R·v(lat,lon
 | `coast.json` | wider OSM coastline used for the ocean mask (bbox 48.01..48.19,-122.915..-122.645) |  | 112277 | `1ece83fa5f3880a7d84a050d54a733f8f9cbc9c7de76bd54fb2744dbb5d9e400` | OSM Overpass 2026-10-14; ODbL |
 | `pillars.json` | d44 Matt Ready prism pillar positions (id, name, kind, area, lat, lon) |  | 14880 | `9bb94d3932fe7f3629e69f9fa4831e88b3a59897e511df9c148dbeb693bd0486` | OSM-derived public spots, 2026-10-17; ODbL |
 | `pillar-matt.jpg` | pillar texture (see textures) |  | 39473 | `6e0f410e1bef74fc0fb65db6875e1697c137598c9b7360a4fe2f9577aa516f0e` | project asset; project |
-| `geometry/vortex-table.json` | vortex normals / antipodes / wedge tests |  | 14140 | `0e51823636a787db29e34eeaee3c55b7133c19a5b868169d6f40b1b8ff606ac5` | computed; - |
+| `geometry/vortex-table.json` | vortex normals / antipodes / wedge tests |  | 14120 | `279d1bbf620a727a764e7c5d51946f427a06ae38399db84883fe46b0eab1e080` | computed; - |
 
 Encoding: GeoJSON coordinates are [lon,lat] (RFC 7946); the app JSON files (trails/streets/sheridan/shore/continents/landmass/pillars-as-fields) use [lat,lon]. Decimal degrees, 7 decimals (~1.1 cm). Rings closed (first==last). Consecutive vertices are joined by great-circle arcs (slerp). .f32 = little-endian float32 xyz unit vectors (~0.6 m precision; use float64 from the GeoJSON for sub-metre work).
 
@@ -57,7 +57,7 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 
 | landmark | lat | lon |
 |---|---|---|
-| Ready Athletics (997800502) | 48.11035 | -122.80591 |
+| Ready Athletics (997800502) | 48.1062 | -122.8057 |
 | Cappy's Trails garden (998002802) | 48.13165 | -122.79921 |
 | Memory's Vault, Fort Worden | 48.1384642 | -122.7647029 |
 | Port Townsend City Hall | 48.1161771 | -122.753612 |
@@ -68,7 +68,7 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 - **Far markers**: North Pole (90.0, 0.0); South Pole (-90.0, 0.0); Great Pyramid of Giza (29.97917, 31.13417); Pyramid of Khafre (29.97611, 31.13083); Great Pyramid of Cholula (19.0575, -98.30194); Pyramid of the Sun, Teotihuacan (19.693, -98.844); IceCube Neutrino Observatory (-89.99, -63.45306). Pillar r 12S h 700S, S = render distance/9010.
 - **Meditation circle** at (48.1316475, −122.7992293), offsets (E,N) = r(sin b, cos b): 12 stones r 3.6 b = 30k; 12 cushions r 3.02 b = 30k; 6 orbs r 3.55 b = 60k+15 y 1.25; pavers 12 annular sectors .95–2.55 with edges at 30k; lotus dais r .78/.86 h .18 with 24 petals; fallback glow ring 1–9 m. Music beacon at the same point.
 - **Edge ring**: anchor (48.100386, −122.81329); 12 edge marker bots at r 7 m, b = 30k: lat = lat0 + 7cos b/111320, lon = lon0 + 7 sin b/(111320 cos lat0).
-- **Keeper bots**: Cappy's (48.13165, −122.79921); Ready Athletics (48.11035, −122.80591). **Ren** (AI robot): 4 m east of Cappy's pillar → (48.13165, -122.7991562), h 1.85 hover .32, talk radius 15 m, beam 400 m.
+- **Keeper bots**: Cappy's (48.13165, −122.79921); Ready Athletics (48.1062, −122.8057). **Ren** (AI robot): 4 m east of Cappy's pillar → (48.13165, -122.7991562), h 1.85 hover .32, talk radius 15 m, beam 400 m.
 - **Night glow** (Ready Athletics, Cappy's): beams r 3.5/1.2 h 1500, ring 1–46 m, halos y 40/700; trails (trails.json, 9 ways) as 1 m ribbons + 6 m glow; parcel 998002802 outline ribbon .6 m.
 - **Quest spaceship**: cockpit fixed to the viewer rig (no world position).
 - **Matt Ready prism pillars** (96): equilateral triangular prism, side 0.7 m, total height 1.8 m (plinth .08 side .826, faces .08–1.75, cyan cap .05 side .742), ground ring .55–1.1 m; corner k local (s/√3)(sin 120k, cos 120k) rotated by yaw, so world corner bearing = 180 − yaw − 120k; **yaw = FNV-1a32(id)/2³²·360°**. Sound: Disco Jam, gain 1 ≤ 3 m → raised-cosine → 0 at 55 m, nearest 2 voices. Visible within 2.5 km.
@@ -180,4 +180,4 @@ Use generators where given; raw tables only for irregular data. Full per-object 
 - other singer performer bots: 0 configured now (one per player-named singer, dynamic)
 - GhostBot (purple Victorian tux, client-side, walks loops around the viewer): 1
 
-Record: `geometry/record.json` sha256 `0a780149396267d4ee09cd40bed2f6e3d688b6d0861cc8c6ab363c20d2f95758`, generated 2026-10-17T12:35:46-07:00.
+Record: `geometry/record.json` sha256 `9f3b0bf00d6b8857975bd55653270d6959d08d9984affbd5122f6b8f953a7435`, generated 2026-10-18T13:58:31-07:00.
