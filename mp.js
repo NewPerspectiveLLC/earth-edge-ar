@@ -1,5 +1,5 @@
 // Opt-in multiplayer + glowing x-ray stick figures. Nothing leaves the device until the user consents and joins.
-import*as T from'three';import{liveUI}from'./liveui.js?v=1792453209966';
+import*as T from'three';import{liveUI}from'./liveui.js?v=1792453397229';
 export function initMP({scene,cam,getPos,toLocal}){
 const API=(window.EEAR_API||'')+'/api';let timer=null,others={};window.MP_OTHERS=others;
 const css=`#mpb{position:fixed;right:8px;bottom:40px;z-index:7}#radar{position:fixed;left:8px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 134px);z-index:7;width:120px;height:120px;border-radius:60px;background:#0008;display:none}`;
@@ -39,7 +39,7 @@ const seen={};for(const o of r.players||[]){if(!o.last)continue;seen[o.id]=1;con
  if(!others[o.id]){const nm=o.name+(o.device==='quest'?' (Quest)':'')+(o.bot?' · BOT':o.dummy?' · TEST':'')+(st?' · STEALTH':'');const BSY=window.EEAR_BOTSTYLE;others[o.id]={g:stick(nm,st?'#9a9a9a':BSY?BSY.col(o,colorOf(o.id)):colorOf(o.id),st,o.bot&&o.style),o,sg,born:performance.now()};scene.add(others[o.id].g)}others[o.id].o=o}
 for(const k in others)if(!seen[k]){scene.remove(others[k].g);delete others[k]}}catch(e){}}
 const tmp=new T.Vector3();
-/* d49: live flying-sound orb on the round minimap: purple glow dot + 3 s fading trail (orbit.js?v=1792453209966 trail, 5 Hz), hidden when Flying sound is off */
+/* d49: live flying-sound orb on the round minimap: purple glow dot + 3 s fading trail (orbit.js?v=1792453397229 trail, 5 Hz), hidden when Flying sound is off */
 function orbVis(){const A=window.EEAR_AUDIO,D=window.EEAR_DJ;return !!(A&&A.flyOn&&D&&D.at&&D.at().playing&&window.EEAR_ORBAPI)}
 function orbRadar(rc){if(!orbVis())return;const O=EEAR_ORBAPI,L=EEAR_AUDIO.listener;if(!L||!isFinite(L.lat))return;const M=111320,k=Math.cos(L.lat*Math.PI/180);
  const px=(la,lo)=>{const e=(lo-L.lon)*M*k,n=(la-L.lat)*M,d=Math.hypot(e,n),rr=Math.min(110,d/10),a=Math.atan2(e,n);return[120+rr*Math.sin(a),120-rr*Math.cos(a)]};

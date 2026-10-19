@@ -1,22 +1,24 @@
 // drivein.js (d50): Matt Ready DRIVE-IN - a giant double-sided outdoor movie screen floating over the Port Townsend peninsula,
 // north of downtown, looping Matt's Drive folder 'Matt Ready Library/videos on loop' (reel built by tools/video_sync.py -> video/drivein/screen.json).
-// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792452910256).
+// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792453397229).
 // Picture: ONE <video> (muted + playsinline + loop: iOS autoplay) -> VideoTexture on a DoubleSide plane, so people behind it (north side) see the
 //   same picture mirrored, never a black back. Frame/marquee/glow look right from both sides (marquee text = two back-to-back planes).
 // Sound: muted by default. 'Screen sound' (localStorage.eearScreenSound) is the master switch; spatial gain on top (driveinGain):
 //   gain = 1 within 5 miles (8047 m) of the NEAREST point of the screen, then a raised-cosine S-curve fade to 0 at 10 miles (16093 m).
-//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792452910256). Never ducks the DJ music.
+//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792453397229). Never ducks the DJ music.
 // Far marker: beyond ~9 km (the screen gets tiny, Quest's far plane is 10 km) a gold '🎬 DRIVE-IN' billboard of fixed angular size (~3°) floats
 //   exactly in the screen's direction with its distance; iPhone/desktop also get an edge-of-view arrow when it is off screen.
 // Lite (Quest Lite): 640x360 reel, no glow plane, cheaper texture filtering.
 import * as THREE from 'three';
 export const DRIVEIN = {
-  lat: 48.1300, lon: -122.7650,   // over the peninsula north of downtown / uptown (Fort Worden side), ~1.9 km NNW of downtown Water St, 4.0 km NE of the RA vortex
-  altM: 340,                      // screen centre height above the ground (bottom edge ~197 m)
-  wM: 480, hM: 270,               // 16:9 picture, 480 x 270 m (frame adds 8 m a side)
-  faceBrg: 190,                   // the front faces bearing 190° (SSW): between downtown (155°) and Ready Athletics (229°); north side sees the mirror image
+  /* d51: GIANT - the base runs almost from Cape George (48.1037,-122.8846) to Fort Worden / Point Wilson (48.1442,-122.7553), 307 m inside each:
+     base ends A 48.10487,-122.88086 -> B 48.14303,-122.75904 (line bearing 64.9°), centre 48.12395,-122.81995 over the Quimper peninsula */
+  lat: 48.12395, lon: -122.81995,
+  altM: 3112.5,                   // centre height; bottom edge 300 m, top edge 5925 m above the ground
+  wM: 10000, hM: 5625,            // 16:9 picture, 10.0 x 5.63 km (6.21 x 3.50 mi); frame/sign scale with wM
+  faceBrg: 154.9,                 // front faces the town (SSE, perpendicular to the Cape George - Fort Worden line); mirrored back faces 334.9° (NNW)
   fullM: 8047, silentM: 16093,    // sound: full within 5 mi of the NEAREST point of the screen, raised-cosine S-curve to silence at 10 mi
-  markerM: 9000, markerFadeM: 1500, markerDeg: 4, markerR: 600,
+  markerM: 60000, markerFadeM: 10000, markerDeg: 4, markerR: 600,   // marker by distance to the NEAREST point (the giant screen itself stays readable to ~60 km)
   url: 'video/drivein/screen' + '.json',   // fetched no-cache WITHOUT ?v= (the service worker would pin it per build); reel names carry a content hash
 };
 const D = Math.PI / 180, MI = 1609.344;
@@ -44,23 +46,23 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
   const pic = new THREE.Mesh(new THREE.PlaneGeometry(C.wM, C.hM), picM); pic.frustumCulled = false; scr.add(pic);
   v.addEventListener('loadeddata', () => { picM.map = vt; picM.color.set(0xffffff); picM.needsUpdate = true });
   // ---- frame: dark box border + warm marquee trim (boxes = same from both sides) ----
-  const B = 8, Dp = 5, fm = new THREE.MeshBasicMaterial({ color: 0x1b1026 }), tm = new THREE.MeshBasicMaterial({ color: 0xffc860, toneMapped: false });
+  const K = C.wM / 480, B = 8 * K, Dp = 5 * K, fm = new THREE.MeshBasicMaterial({ color: 0x1b1026 }), tm = new THREE.MeshBasicMaterial({ color: 0xffc860, toneMapped: false });
   const box = (w, h, d, x, y, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, 0); scr.add(o); return o };
   const W2 = C.wM / 2, H2 = C.hM / 2;
   box(C.wM + 2 * B, B, Dp, 0, H2 + B / 2, fm); box(C.wM + 2 * B, B, Dp, 0, -H2 - B / 2, fm); box(B, C.hM, Dp, -W2 - B / 2, 0, fm); box(B, C.hM, Dp, W2 + B / 2, 0, fm);
-  const t = 1.6; box(C.wM + 2 * t, t, Dp + .6, 0, H2 + t / 2, tm); box(C.wM + 2 * t, t, Dp + .6, 0, -H2 - t / 2, tm); box(t, C.hM, Dp + .6, -W2 - t / 2, 0, tm); box(t, C.hM, Dp + .6, W2 + t / 2, 0, tm);
-  box(C.wM + 2 * B + 4, 2.4, Dp + 1, 0, H2 + B + 1.2, tm); box(C.wM + 2 * B + 4, 2.4, Dp + 1, 0, -H2 - B - 1.2, tm);
+  const t = 1.6 * K; box(C.wM + 2 * t, t, Dp + .6 * K, 0, H2 + t / 2, tm); box(C.wM + 2 * t, t, Dp + .6 * K, 0, -H2 - t / 2, tm); box(t, C.hM, Dp + .6 * K, -W2 - t / 2, 0, tm); box(t, C.hM, Dp + .6 * K, W2 + t / 2, 0, tm);
+  box(C.wM + 2 * B + 4 * K, 2.4 * K, Dp + K, 0, H2 + B + 1.2 * K, tm); box(C.wM + 2 * B + 4 * K, 2.4 * K, Dp + K, 0, -H2 - B - 1.2 * K, tm);
   // marquee: readable from both sides (two back-to-back single-sided planes)
   const mq = canvasTex(1024, 128, (g, w, h) => { g.fillStyle = '#12081c'; g.fillRect(0, 0, w, h); g.strokeStyle = '#ffc860'; g.lineWidth = 6; g.strokeRect(5, 5, w - 10, h - 10);
     for (let i = 0; i < 26; i++) { g.fillStyle = i % 2 ? '#fff3c0' : '#ffb030'; g.beginPath(); g.arc(24 + i * 37.9, 14, 5, 0, 7); g.fill(); g.beginPath(); g.arc(24 + i * 37.9, h - 14, 5, 0, 7); g.fill() }
     g.fillStyle = '#ffd77a'; g.font = 'bold 66px Georgia,serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = '#ff9a00'; g.shadowBlur = 18; g.fillText('★  MATT READY DRIVE-IN  ★', w / 2, h / 2 + 3) });
-  const mqM = new THREE.MeshBasicMaterial({ map: mq, toneMapped: false }), mqW = 240, mqH = mqW / 8, mqY = H2 + B + 2.4 + mqH / 2 + 2;
-  for (const s of [0, 1]) { const o = new THREE.Mesh(new THREE.PlaneGeometry(mqW, mqH), mqM); o.position.set(0, mqY, s ? -.4 : .4); o.rotation.y = s * Math.PI; scr.add(o) }
-  box(mqW + 4, mqH + 4, .6, 0, mqY, fm);
+  const mqM = new THREE.MeshBasicMaterial({ map: mq, toneMapped: false }), mqW = C.wM / 2, mqH = mqW / 8, mqY = H2 + B + 2.4 * K + mqH / 2 + 2 * K;
+  for (const s of [0, 1]) { const o = new THREE.Mesh(new THREE.PlaneGeometry(mqW, mqH), mqM); o.position.set(0, mqY, s ? -.4 * K : .4 * K); o.rotation.y = s * Math.PI; scr.add(o) }
+  box(mqW + 4 * K, mqH + 4 * K, .6 * K, 0, mqY, fm);
   // glow: soft additive halo around the screen (skipped in Lite)
   if (!lite) { const gt = canvasTex(256, 160, (g, w, h) => { const r = g.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w / 2); r.addColorStop(0, 'rgba(255,220,150,.55)'); r.addColorStop(.55, 'rgba(255,170,80,.22)'); r.addColorStop(1, 'rgba(255,140,40,0)'); g.fillStyle = r; g.fillRect(0, 0, w, h) });
     const gm = new THREE.MeshBasicMaterial({ map: gt, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false, opacity: .8 });
-    for (const z of [-3.2, 3.2]) { const o = new THREE.Mesh(new THREE.PlaneGeometry(C.wM * 1.6, C.hM * 1.75), gm); o.position.z = z; o.renderOrder = -1; scr.add(o) } }
+    for (const z of [-3.2 * K, 3.2 * K]) { const o = new THREE.Mesh(new THREE.PlaneGeometry(C.wM * 1.6, C.hM * 1.75), gm); o.position.z = z; o.renderOrder = -1; scr.add(o) } }
   // ---- far marker: fixed angular size billboard in the screen's direction ----
   const mk = new THREE.Group(); mk.visible = false; mk.renderOrder = 999; root.add(mk);
   let mkTxt = ''; const mkT = canvasTex(512, 320, () => { }); mkT.minFilter = THREE.LinearFilter;
@@ -108,9 +110,9 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
     const now = performance.now(), on = !!enabled(); root.visible = on;
     if (!on) { if (!v.paused) v.pause(); S.want = false; if (edge) edge.style.display = 'none'; if (g) g.gain.value = 0; return }
     if (now - lastP > 500) { lastP = now; const o = toLocal(C.lat, C.lon); if (o) scr.position.set(o.x, o.y + C.altM, o.z) }
-    cam.getWorldPosition(camW); parent.worldToLocal(camW); const d3 = camW.distanceTo(scr.position); S.d = d3;
+    cam.getWorldPosition(camW); parent.worldToLocal(camW); const d3 = nearestD(scr.position.x - camW.x, -(scr.position.z - camW.z), scr.position.y - camW.y); S.d = d3;
     // far marker (fixed angular size, always in the screen's direction)
-    const far = d3 > C.markerM - C.markerFadeM; S.far = d3 > C.markerM; mk.visible = far; pic.visible = d3 < 60000;
+    const far = d3 > C.markerM - C.markerFadeM; S.far = d3 > C.markerM; mk.visible = far; pic.visible = d3 < 400000;
     if (far) { const R = C.markerR, k = Math.min(1, (d3 - (C.markerM - C.markerFadeM)) / C.markerFadeM); mkM.opacity = k;
       scrW.copy(scr.position).sub(camW).normalize(); mk.position.copy(camW).addScaledVector(scrW, R);
       cam.getWorldQuaternion(q); const pq = new THREE.Quaternion(); parent.getWorldQuaternion(pq); mk.quaternion.copy(pq.invert().multiply(q));
@@ -122,7 +124,7 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
           edge.style.left = ((x + 1) / 2 * innerWidth) + 'px'; edge.style.top = ((1 - y) / 2 * innerHeight) + 'px'; edge.firstChild.style.transform = 'rotate(' + (Math.atan2(x, y) / D) + 'deg)'; edge.lastChild.textContent = '🎬 Drive-in ' + fmtD(d3).split(' · ')[0]; show = true } }
       edge.style.display = show ? 'block' : 'none' }
     // playback: keep running while it could be seen or heard (pause far away to save battery)
-    const want = d3 < 60000 || (soundWanted() && (S.dGps || d3) < C.silentM); if (want !== S.want) { S.want = want; if (want) { kick(); sync(true) } else v.pause() }
+    const want = d3 < 400000 || (soundWanted() && (S.dGps || d3) < C.silentM); if (want !== S.want) { S.want = want; if (want) { kick(); sync(true) } else v.pause() }
     if (now - lastS > 2000) { lastS = now; if (S.want) { if (v.paused && !S.blocked) kick(); sync(false) } const c = S.cfg; if (c) { const tg = target(); S.clip = c.clips.find(x => tg >= x.start && tg < x.start + x.dur) || c.clips[c.clips.length - 1] } }
     // spatial sound (throttled 10 Hz)
     if (now - lastA > 100) { lastA = now; const AU = window.EEAR_AUDIO, L = AU && AU.listener; let dd = d3, e = scr.position.x - camW.x, n = -(scr.position.z - camW.z), u = scr.position.y - camW.y;

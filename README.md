@@ -104,3 +104,11 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
 - Toggles: Layers checkbox **🎬 Drive-in screen** (iPhone/desktop, both rooms, on by default), XR panel + Quest panel **Places -> Drive-in
   screen**. Server: `.mp4` added to the static allowlist + `video/mp4` MIME (server.js).
 - Adding videos: see `/workspace/videos/loop_sync/README.md` (`python3 tools/video_sync.py plan|apply|status`, idempotent, not scheduled).
+
+## d51 — Quest lite start + portals; giant drive-in (iPhone/desktop)
+- Quest: a one-time reset (localStorage flag `eearQStart='d51'`) turns Lite on and every layer off except the PT shoreline (`shore`). Users can turn layers back on in the Y panel. Trigger fast flight is unchanged.
+- Quest: no drive-in screen in the main world (no screen, no marker, no video). `quest-portals.js` adds two portals 5 m north of the start:
+  - 🎬 MOVIE THEATER: a camera-layer-5 room with seats and a 24×13.5 m screen playing the synced reel (lite copy in Lite mode) with sound. Walking in or the trigger counts as the gesture. Exit through the EXIT portal behind the seats.
+  - 🌀 READY ATHLETICS: teleports to 48.1062,-122.8057, with a ↩ BACK portal.
+  - Y panel → Portals has the same actions.
+- Drive-in (index): the screen is 10 × 5.625 km, centred at 48.12395,-122.81995, with its base from about Cape George to about Fort Worden. Bottom 300 m, top 5925 m. It faces 154.9° (back 334.9°). Audio distance is to the nearest point of the screen. The far marker shows beyond 60 km.
