@@ -1,7 +1,7 @@
 // quest-portals.js (d51): Quest main-world portals.
 //  🎬 MOVIE THEATER portal -> a big dim theater room (rows of seats, 24 m screen) playing the Videos on Loop reel WITH sound,
 //     server-time synced like the drive-in (same epoch: pos = ((serverNow - epoch)/1000) mod duration). EXIT portal (behind the seats) -> back.
-//  🌀 READY ATHLETICS portal -> the RA vortex standing spot (ra-center.json?v=1792453397229 'standing' 48.1062,-122.8057); a '↩ Back' portal appears there.
+//  🌀 READY ATHLETICS portal -> the RA vortex standing spot (ra-center.json?v=1792454269680 'standing' 48.1062,-122.8057); a '↩ Back' portal appears there.
 // Enter: walk/fly into a portal ring, or aim the right laser at it and pull the trigger (trigger fast flight is untouched; it still flies).
 // Also in the Y-panel: Portals section. While in the theater only the room + your rig render (camera layer 5), so the world / passthrough
 // disappear; leaving restores the normal view. Lite-friendly: unlit materials, instanced seats, 640x360 reel in Lite mode.

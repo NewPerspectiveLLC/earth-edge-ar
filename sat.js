@@ -19,7 +19,7 @@ export function makeSat(T,{proj,projGlobe,unit=1,maxTiles=190,renderOrder=-10,pf
  const g=new T.Group();g.name='sat';const loc=new T.Group(),glob=new T.Group();g.add(loc);
  const L=new T.TextureLoader();L.setCrossOrigin('anonymous');const cache=new Map();let key='',opacity=.6,loads=0,fails=0,styleId=STYLES[style]?style:'sat';
  const st=()=>STYLES[styleId];
- const TINT=new T.Color(1,1,1);/* day-night: shared colour multiplier (daynight.js?v=1792453397229 dims imagery at night) */
+ const TINT=new T.Color(1,1,1);/* day-night: shared colour multiplier (daynight.js?v=1792454269680 dims imagery at night) */
  const mat=tex=>{const m=new T.MeshBasicMaterial({map:tex,transparent:true,opacity,depthWrite:false,depthTest:true,side:T.FrontSide});m.color=TINT;pf(m);return m};
  const surf=(la0,la1,lo0,lo1,nx,ny,merc,pj=proj)=>{/* grid of lat/lon -> proj; rows spaced linearly in mercator y so the texture is not distorted */
   const P=[],U=[],I=[],y0=lat2y(la0,0),y1=lat2y(la1,0);let c=null;

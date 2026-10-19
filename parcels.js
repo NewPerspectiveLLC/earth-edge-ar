@@ -1,9 +1,9 @@
 // parcels.js (d49): official Jefferson County assessor parcel outlines (parcels.json, from /workspace/parcels/*.geojson) drawn on the ground:
 // glowing ground-hugging ribbon (depth-tested, gentle pulse) + soft outer glow, corner posts, small floating label. One Layers key per parcel.
-// + 8 ft (2.44 m) stone columns at each parcel's 4 principal corners (parcels.json?v=1792453397229 .corners): plinth, fluted shaft, capital, abacus; one merged low-poly geometry,
+// + 8 ft (2.44 m) stone columns at each parcel's 4 principal corners (parcels.json?v=1792454269680 .corners): plinth, fluted shaft, capital, abacus; one merged low-poly geometry,
 //   one shared matcap stone material (procedural 256 px canvas texture, no scene lights needed), one InstancedMesh per parcel (own Layers key .colsKey). Lite: 8 sides, no flutes.
 // addParcels(T, parent, origin[lat,lon], groundY, mx, my, label, opts) -> {groups, parcels}. Shared by index.html and quest.html.
-let PJ = null; export const loadParcels = () => PJ || (PJ = fetch('parcels.json?v=1792453397229').then(r => r.json()));
+let PJ = null; export const loadParcels = () => PJ || (PJ = fetch('parcels.json?v=1792454269680').then(r => r.json()));
 function ribbon(T, pts, w, y) { const pos = [], idx = []; const n = pts.length;
   for (let i = 0; i < n; i++) { const p = pts[i], a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n]; let dx = b[0] - a[0], dz = b[1] - a[1]; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
     pos.push(p[0] - dz * w / 2, y, p[1] + dx * w / 2, p[0] + dz * w / 2, y, p[1] - dx * w / 2) }
@@ -50,7 +50,7 @@ export async function addParcels(T, parent, o, G, mx, my, label, opts = {}) { co
   return { groups, parcels: J.parcels } }
 
 /** OSM trail polylines from trails.json[key] as a ground-hugging glowing line (depth-tested), one Layers key */
-export async function addTrail(T, parent, o, G, mx, my, key, col, layer) { const J = await fetch('trails.json?v=1792453397229').then(r => r.json()); const W = J[key] || [], g = new T.Group(); g.userData.layer = layer; g.name = 'trail-' + key;
+export async function addTrail(T, parent, o, G, mx, my, key, col, layer) { const J = await fetch('trails.json?v=1792454269680').then(r => r.json()); const W = J[key] || [], g = new T.Group(); g.userData.layer = layer; g.name = 'trail-' + key;
   const m = new T.MeshBasicMaterial({ color: col, transparent: true, opacity: .9, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 });
   for (const w of W) { const pts = w.pts.map(([a, l]) => [(l - o[1]) * mx, -(a - o[0]) * my]); if (pts.length < 2) continue; const pos = [], idx = [], hw = .3;
     for (let i = 0; i < pts.length; i++) { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)]; let dx = b[0] - a[0], dz = b[1] - a[1]; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l; pos.push(pts[i][0] - dz * hw, G + .06, pts[i][1] + dx * hw, pts[i][0] + dz * hw, G + .06, pts[i][1] - dx * hw);

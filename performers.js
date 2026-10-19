@@ -8,8 +8,8 @@
 // foot-tap layer and hand-gesture layer (snaps on 2 & 4, points, open palms, flourishes, mic gestures), articulated gloves,
 // and secondary motion on tails / hat / bow tie. Other singers use a simpler library and no extra layers.
 import * as THREE from 'three';
-import * as BEAT from './beat.js?v=1792453397229';
-import { GARDEN as GARDEN_REG, PERFORMERS as PF_REG } from './figures-registry.js?v=1792453397229';
+import * as BEAT from './beat.js?v=1792454269680';
+import { GARDEN as GARDEN_REG, PERFORMERS as PF_REG } from './figures-registry.js?v=1792454269680';
 
 export const GARDEN = GARDEN_REG;
 const PI = Math.PI, TAU = 2 * PI, clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
