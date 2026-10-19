@@ -1,7 +1,7 @@
 // djpanel.js (d47): in-app Master DJ panel: pick the song for EVERYONE (library + queue, play now / next / prev / pause) and talk LIVE over the music.
 // Same GM-key-protected endpoints as dj.html (/api/dj, /api/dj/live); the key is asked once per device (localStorage.eearGM). Opened from the ⋯ music panel
 // ('🎧 Pick song for everyone') or by tapping the 'Now playing' pill.
-import { VOICE } from './djvoice.js?v=1792437081527';
+import { VOICE } from './djvoice.js?v=1792443133403';
 const DJ = () => window.EEAR_DJ, $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 let LIB = null, el = null, msgT = 0, msgS = null, lastStable = '', down = 0, busy = '';

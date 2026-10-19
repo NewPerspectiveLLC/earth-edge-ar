@@ -80,3 +80,26 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
   - Rewrites every file that holds the RA centre.
   - Then regenerate the geometry docs (`geometry/build_record.py`, `make_docs.py`) and deploy.
 - **dj-help.html:** "How to talk to everyone (Live DJ voice)", linked from dj.html and gm.html.
+
+## d50 (2026-10-19): Matt Ready Drive-in screen (Videos on Loop)
+- `drivein.js` (index.html + quest.html): a giant double-sided outdoor movie screen floating over the Port Townsend peninsula north of
+  downtown. Centre **48.1300, -122.7650**, **340 m** above ground, picture **480 x 270 m** (16:9) in an 8 m dark frame with gold trim,
+  a "MATT READY DRIVE-IN" marquee (readable from both sides) and a soft glow (glow skipped in Quest Lite). Front faces bearing 190° (SSW,
+  between downtown and Ready Athletics); the north side shows the same picture mirrored (DoubleSide video plane), never a black back.
+  ~1.9 km NNW of downtown Water St, ~4.0 km NE of the RA vortex. All constants: `DRIVEIN` at the top of drivein.js.
+- Video: Drive `My Drive/Matt Ready Library/videos on loop` (read-only) -> `tools/video_sync.py` -> one reel
+  `video/drivein/reel-<hash>.mp4` (1280x720 H.264 High + AAC, faststart, 1 s GOP) + `reel-<hash>-lite.mp4` (640x360, Quest Lite) +
+  `video/drivein/screen.json` (epoch, duration, clip table). Every clip is fitted unstretched (black bars), loudness -16 LUFS.
+- Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration; serverNow uses the Master DJ clock offset (dj.js).
+  Drift > 0.8 s is corrected by a seek (at most every 4 s). Needs HTTP byte ranges (Mac server + Pages both do).
+- Sound: muted by default (iOS autoplay = muted + playsinline). **Screen sound** (Layers sheet button / XR + Quest panel 'Places ->
+  Drive-in screen sound', localStorage.eearScreenSound) is the master switch; spatial gain on top, from the viewer's GPS/world position
+  to the screen: gain = 1 for d <= 1 mi (1609 m); then g = c², c = ½(1 + cos(π(d-1609)/(16093-1609))); 0 beyond 10 mi (16093 m).
+  1 mi 1.00 · 2 mi 0.94 · 3 mi 0.78 · 5 mi 0.34 · 7 mi 0.06 · 10 mi 0.00. HRTF panner for direction (no extra distance rolloff).
+  Plays into the app master volume; never ducks the DJ music.
+- Far marker: beyond ~9 km (fading in from 7.5 km) a gold "🎬 DRIVE-IN · x mi · y km" billboard with a down-arrow, fixed angular
+  size, always drawn on top exactly in the screen's direction (Quest far plane is 10 km). iPhone/desktop also get an edge-of-view arrow
+  when it is off screen (hidden with the other UI in hide-all-buttons mode; the 3D marker stays).
+- Toggles: Layers checkbox **🎬 Drive-in screen** (iPhone/desktop, both rooms, on by default), XR panel + Quest panel **Places -> Drive-in
+  screen**. Server: `.mp4` added to the static allowlist + `video/mp4` MIME (server.js).
+- Adding videos: see `/workspace/videos/loop_sync/README.md` (`python3 tools/video_sync.py plan|apply|status`, idempotent, not scheduled).

@@ -1,4 +1,4 @@
-import{CONSENT_REQUIRED}from'./config.js?v=1792437081527';
+import{CONSENT_REQUIRED}from'./config.js?v=1792443133403';
 // Live-tracking UI shared by the main build and quest.html: top-level consent modal, one-tap rejoin with remembered
 // consent, and a persistent "Live" pill (pause / stealth / leave / delete). Nothing is sent until the user agrees once.
 export function liveUI({key='eearSession',device='phone',api='/api',start,stop}){
