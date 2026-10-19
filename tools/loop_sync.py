@@ -193,7 +193,7 @@ def c_maccmd(a):
     b = '~/earth-edge-ar-backups/pre-loopfolder-%s' % ts
     cmd = ['set -e', 'cd ~/earth-edge-ar', 'B=%s; mkdir -p $B/audio/dj' % b, 'md5 -q server/data.json > $B/data.json.md5',
            'printf "%%s\\n" %s > $B/files.txt' % ' '.join(files)]
-    for f in files: cmd.append('[ -f %s ] && cp -p %s $B/%s || true' % (f, f, f))
+    for f in files: cmd.append('mkdir -p $B/%s && { [ -f %s ] && cp -p %s $B/%s || true; }' % (os.path.dirname(f) or '.', f, f, f))
     for f in files:
         cmd.append('curl -fsSL -o %s.part "%s/%s/%s"' % (f, RAW, sha, f))
         cmd.append('[ "$(md5 -q %s.part)" = "%s" ] || { echo "md5 mismatch %s"; exit 1; }' % (f, sums[f], f))
