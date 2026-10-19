@@ -1,1 +1,1 @@
-{"v": "1792423954362", "note": "d49h: Ground map style Satellite (Esri) + Street (OpenStreetMap) toggle on all platforms; persisted in localStorage.eearMapStyle; Layers sheet + Quest/WebXR panels"}
+{"v": "1792437081527", "note": "d49i: Matt's song 'The Blue Cup Waits' in the DJ library (audio/dj/the-blue-cup-waits.mp3, 128 kbps 44.1 kHz, -14.4 LUFS); DJ repeat 'all' (cycle off/one/all on dj.html + in-app panel); POST /api/dj {op:'repeat',mode:'all',ids:[...]} loops exactly those songs and saves the old queue, mode 'off' restores it"}

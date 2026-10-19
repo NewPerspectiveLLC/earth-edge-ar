@@ -16,6 +16,19 @@
    "attribution": "Meet Me on the Dance Floor, an original song by Matt Ready (@meditationmatt)"
   },
   {
+   "id": "the-blue-cup-waits",
+   "title": "The Blue Cup Waits",
+   "artist": "Matt Ready",
+   "genre": "Original song",
+   "bpm": null,
+   "url": "audio/dj/the-blue-cup-waits.mp3",
+   "duration": 164.017,
+   "license": "Original",
+   "licenseUrl": null,
+   "source": "Matt Ready (@meditationmatt), made with Suno (clip e52310b6-204b-4455-b134-5939dc674d5a); from Matt's Google Drive 'Matt Ready Library/The Blue Cup Waits.mp3' (MP3 48 kHz ~179 kbps), transcoded to 128 kbps MP3 44.1 kHz with +2.3 dB to match -14.4 LUFS",
+   "attribution": "The Blue Cup Waits, an original song by Matt Ready (@meditationmatt)"
+  },
+  {
    "id": "disco-jam",
    "title": "Disco Jam (instrumental)",
    "artist": "Live Geometry",

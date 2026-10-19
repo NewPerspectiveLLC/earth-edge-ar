@@ -1,7 +1,7 @@
 // djpanel.js (d47): in-app Master DJ panel: pick the song for EVERYONE (library + queue, play now / next / prev / pause) and talk LIVE over the music.
 // Same GM-key-protected endpoints as dj.html (/api/dj, /api/dj/live); the key is asked once per device (localStorage.eearGM). Opened from the ⋯ music panel
 // ('🎧 Pick song for everyone') or by tapping the 'Now playing' pill.
-import { VOICE } from './djvoice.js?v=1792423954362';
+import { VOICE } from './djvoice.js?v=1792437081527';
 const DJ = () => window.EEAR_DJ, $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 let LIB = null, el = null, msgT = 0, msgS = null, lastStable = '', down = 0, busy = '';
@@ -35,7 +35,7 @@ function render(tick) { if (!el || el.style.display === 'none') return; const D 
   el.innerHTML = `<header><b>🎧 Master DJ · plays to everyone</b><button class=g id=djpX>Close</button></header><div class=sc>
   ${key ? '' : `<div style="margin:6px 0">GM key (asked once on this device): <input id=djpK type=password autocomplete=off style="width:55%"> <button id=djpKs>Save</button></div>`}
   <div style="margin:4px 0" id=djpNow>${nowH}</div>
-  <div><button id=djpPrev>⏮ Prev</button><button id=djpPP>${c.playing ? '⏸ Pause' : '▶ Play'}</button><button id=djpNext>⏭ Next</button><button id=djpRp${st.repeat === 'one' ? ' class=p' : ' class=g'} title="Repeat the current song for everyone">🔂 Repeat one: ${st.repeat === 'one' ? 'ON' : 'off'}</button><span id=djpMsg style="font-size:12px;margin-left:6px"></span></div>
+  <div><button id=djpPrev>⏮ Prev</button><button id=djpPP>${c.playing ? '⏸ Pause' : '▶ Play'}</button><button id=djpNext>⏭ Next</button><button id=djpRp${st.repeat ? ' class=p' : ' class=g'} title="${st.repeat === 'one' ? 'Repeating this song. Tap: loop the whole queue' : st.repeat === 'all' ? 'Looping the queue. Tap: repeat off' + (st.savedQueue ? ' (restores the saved queue)' : '') : 'Repeat the current song for everyone (tap again: repeat all, again: off)'}">${st.repeat === 'one' ? '🔂 Repeat one: ON' : st.repeat === 'all' ? '🔁 Repeat all: ON' : '🔂 Repeat one: off'}</button><span id=djpMsg style="font-size:12px;margin-left:6px"></span></div>
   <h4>🎙 Talk to everyone (live)</h4>
   <div>${live ? `<button class=live id=djpLive>${liveT}</button>` : `<button class=p id=djpLive>${liveT}</button>`}
    <label><small>then repeat</small> <select id=djpRep>${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value=${n}${n == (localStorage.eearDjRep || 0) ? ' selected' : ''}>${n ? n + '×' : 'no'}</option>`).join('')}</select></label>
@@ -51,7 +51,7 @@ function render(tick) { if (!el || el.style.display === 'none') return; const D 
   const need = () => { if (!localStorage.eearGM) { msg('Enter the GM key first', true); return false } return true };
   $('djpPrev').onclick = () => need() && op({ op: 'prev' }); $('djpNext').onclick = () => need() && op({ op: 'next' });
   $('djpPP').onclick = () => need() && op({ op: c.playing ? 'pause' : 'resume' });
-  $('djpRp').onclick = () => need() && op({ op: 'repeat', mode: st.repeat === 'one' ? 'off' : 'one' }).then(ok => ok && msg(st.repeat === 'one' ? 'Repeat off' : 'Repeating this song for everyone'));
+  $('djpRp').onclick = () => { const nx = st.repeat === 'one' ? 'all' : st.repeat === 'all' ? 'off' : 'one'; need() && op({ op: 'repeat', mode: nx }).then(ok => ok && msg(nx === 'one' ? 'Repeating this song for everyone' : nx === 'all' ? 'Looping the whole queue for everyone' : 'Repeat off')) };
   el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => need() && op({ op: 'play', qid: b.dataset.q }).then(ok => ok && msg('Playing for everyone')));
   el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => need() && op({ op: 'add', id: b.dataset.l, next: true, playNow: true }).then(ok => ok && msg('Playing for everyone')));
   el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => need() && op({ op: 'add', id: b.dataset.n, next: true }).then(ok => ok && msg('Queued next')));

@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792423954362><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792423954362></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — Master DJ</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry DJ"><meta name=description content="Live Geometry: Matt's Reality Master DJ: one global playlist for everyone in the world"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792423954362><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792423954362>
+<!doctype html><html><head><meta charset=utf-8><meta name=eear-v content=1792437081527><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792437081527></script><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Live Geometry — Master DJ</title><meta name=application-name content="Live Geometry"><meta name=apple-mobile-web-app-title content="Live Geometry DJ"><meta name=description content="Live Geometry: Matt's Reality Master DJ: one global playlist for everyone in the world"><link rel=manifest href=manifest.webmanifest><link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792437081527><link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792437081527>
 <style>
 :root{--p:#a45cff;--c:#2ff5df}
 html,body{margin:0;background:#0b0912;color:#eee;font:14px system-ui,-apple-system,sans-serif}
@@ -27,7 +27,7 @@ a{color:#c9a6ff}.ro .w{display:none}
 <h1>🎧 Master DJ <small>Live Geometry · Matt&#39;s Reality: one playlist for everyone in the world. Every Matt Ready pillar and every in-app music player set to “Master DJ” plays the song shown here, in sync.</small></h1>
 <div class=card id=np><div class=t id=npT>Connecting…</div><div class=a id=npA></div><div class=g id=npG></div>
 <div class=bar><i id=npB></i></div><div class=tm><span id=npE>0:00</span><span id=npS></span><span id=npD>0:00</span></div>
-<div class=ctl><button class="big w" id=bPrev title="Previous track">⏮</button><button class="big pri w" id=bPP title="Pause / resume for everyone">⏸</button><button class="big w" id=bNext title="Next track">⏭</button><button class=w id=bShuf>🔀 Shuffle</button><button class=w id=bRep title="Repeat the current song for everyone (tap again to turn off)">🔂 Repeat one: off</button><button class=w id=bReset title="Reload the seeded 15-track DJ set">↺ Seed set</button><button id=bListen title="Hear the DJ on this device (tap needed for audio)">🔈 Listen here</button></div></div>
+<div class=ctl><button class="big w" id=bPrev title="Previous track">⏮</button><button class="big pri w" id=bPP title="Pause / resume for everyone">⏸</button><button class="big w" id=bNext title="Next track">⏭</button><button class=w id=bShuf>🔀 Shuffle</button><button class=w id=bRep title="Repeat the current song for everyone (tap again: repeat all, again: off)">🔂 Repeat one: off</button><button class=w id=bReset title="Reload the seeded 15-track DJ set">↺ Seed set</button><button id=bListen title="Hear the DJ on this device (tap needed for audio)">🔈 Listen here</button></div></div>
 <div class=card><div id=lock><input id=k type=password autocomplete=off placeholder="GM key (same as the GM page)"><button id=go class=pri>Unlock controls</button><button id=lo style="display:none">Lock</button></div><div id=msg></div></div>
 <div class=card><b>🎙 Talk to everyone</b> <small style="color:#aaa">live over the music (music ducks), saved for repeat / replay</small> <a href=dj-help.html style="color:#c9a6ff;font-size:13px">How it works ›</a><div style="margin-top:6px"><button class=pri id=bVoice>🎙 Live voice &amp; broadcasts…</button></div></div>
 <h2>Queue <span id=qn style="color:#888;font-weight:400"></span><small style="color:#888;font-weight:400">drag ☰ or use ↑ ↓ to reorder · ▶ plays now · loops at the end</small></h2>
@@ -39,8 +39,8 @@ a{color:#c9a6ff}.ro .w{display:none}
 </div>
 <script>window.EEAR_DJ_NOUI=1</script>
 <script type=module>
-import './djvoice.js?v=1792423954362';
-import { DJ } from './dj.js?v=1792423954362';
+import './djvoice.js?v=1792437081527';
+import { DJ } from './dj.js?v=1792437081527';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BASE=DJ.base;let KEY=localStorage.eearGM||'',LIB=null,canW=false;
 const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
@@ -50,7 +50,7 @@ async function op(o){if(!KEY){msg('Enter the GM key to control the DJ.');return}
 async function checkKey(){if(!KEY){canW=false;render();return}try{const r=await fetch(BASE+'/api/gm/policy',{headers:{'x-gm-key':KEY},cache:'no-store'});canW=r.ok;msg(r.ok?'Controls unlocked.':'That GM key was not accepted.',r.ok)}catch(e){canW=false;msg('Server not reachable from here ('+e.message+'). Showing the offline order.')}render()}
 $('go').onclick=()=>{KEY=$('k').value.trim();if(!KEY)return;localStorage.eearGM=KEY;$('k').value='';checkKey()};$('k').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
 $('lo').onclick=()=>{KEY='';canW=false;render();msg('Locked on this page (the key stays saved for the GM map).')};
-$('bPrev').onclick=()=>op({op:'prev'});$('bNext').onclick=()=>op({op:'next'});$('bShuf').onclick=()=>op({op:'shuffle'});$('bRep').onclick=()=>op({op:'repeat',mode:DJ.state&&DJ.state.repeat==='one'?'off':'one'});
+$('bPrev').onclick=()=>op({op:'prev'});$('bNext').onclick=()=>op({op:'next'});$('bShuf').onclick=()=>op({op:'shuffle'});$('bRep').onclick=()=>{const r=DJ.state&&DJ.state.repeat;op({op:'repeat',mode:r==='one'?'all':r==='all'?'off':'one'})};
 $('bReset').onclick=()=>{if(confirm('Replace the queue with the seeded 15-track DJ set?'))op({op:'reset'})};
 $('bPP').onclick=()=>op({op:DJ.at().playing?'pause':'resume'});
 let ac=null,lis=false;$('bListen').onclick=()=>{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();const n=DJ.attach(ac);n&&n.connect(ac.destination)}lis=!lis;if(lis){ac.resume();DJ.unlock()}DJ.want('page',lis);$('bListen').textContent=lis?'🔇 Stop listening':'🔈 Listen here'};
@@ -58,7 +58,7 @@ let lastSig='';
 function render(){const st=DJ.state,c=DJ.at();document.body.classList.toggle('ro',!canW);$('lo').style.display=canW?'':'none';$('k').style.display=$('go').style.display=canW?'none':'';
  if(!st){$('npT').textContent='Connecting…';return}const it=c.item;
  $('npT').textContent=it?(c.playing?'':'⏸ ')+it.title:'Queue is empty (silence)';$('npA').textContent=it?it.artist:'';$('npG').textContent=it?[it.genre,it.bpm?it.bpm+' BPM':'',it.license].filter(Boolean).join(' · '):'';
- $('npS').textContent=(DJ.source==='offline'?'offline order (server unreachable)':c.playing?'live for everyone':'paused for everyone');$('bPP').textContent=c.playing?'⏸':'▶';{const rp=st.repeat==='one';$('bRep').textContent=rp?'🔂 Repeat one: ON':'🔂 Repeat one: off';$('bRep').classList.toggle('pri',rp)}
+ $('npS').textContent=(DJ.source==='offline'?'offline order (server unreachable)':c.playing?'live for everyone':'paused for everyone');$('bPP').textContent=c.playing?'⏸':'▶';{const r=st.repeat,sv=st.savedQueue||0;$('bRep').textContent=r==='one'?'🔂 Repeat one: ON':r==='all'?'🔁 Repeat all: ON ('+st.queue.length+' songs)':'🔂 Repeat one: off';$('bRep').title=r==='one'?'Repeating the current song for everyone. Tap: loop the whole queue':r==='all'?'Looping the queue for everyone. Tap: repeat off'+(sv?' (restores the saved '+sv+'-song queue)':''):'Repeat the current song for everyone (tap again: repeat all, again: off)';$('bRep').classList.toggle('pri',!!r)}
  const sig=JSON.stringify([st.rev,c.index,canW,DJ.source]);if(sig===lastSig)return;lastSig=sig;
  $('qn').textContent='('+st.queue.length+' tracks, '+fmt(st.queue.reduce((a,x)=>a+x.duration,0))+')';
  $('q').innerHTML=st.queue.map((x,i)=>`<div class="row${i===c.index?' cur':''}" draggable=${canW} data-q="${x.qid}"><span class="h w">☰</span><span class=n>${i+1}</span><div class=m><b>${i===c.index?'🎧 ':''}${esc(x.title)}</b><span>${esc(x.artist)} · ${esc(x.genre||'')} · ${fmt(x.duration)}</span></div><button class=w data-a=play title="Play now">▶</button><button class=w data-a=up ${i?'':'disabled'}>↑</button><button class=w data-a=dn ${i<st.queue.length-1?'':'disabled'}>↓</button><button class=w data-a=rm title="Remove">✕</button></div>`).join('')||'<div class=row>Empty. Add songs from the library below.</div>';
@@ -82,4 +82,4 @@ fetch('audio/dj/library.json',{cache:'no-cache'}).then(r=>r.json()).then(j=>{LIB
 addEventListener('eear:dj',()=>{lastSig='';render()});
 setInterval(()=>{const st=DJ.state,c=DJ.at();if(st&&c.item){$('npE').textContent=fmt(c.offset);$('npD').textContent=fmt(c.item.duration);$('npB').style.width=Math.min(100,100*c.offset/c.item.duration)+'%'}render()},500);
 if(KEY)checkKey();else render();
-</script><script type=module>document.getElementById('bVoice').onclick=()=>import('./djpanel.js?v=1792423954362').then(M=>M.open())</script></body></html>
+</script><script type=module>document.getElementById('bVoice').onclick=()=>import('./djpanel.js?v=1792437081527').then(M=>M.open())</script></body></html>
