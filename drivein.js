@@ -1,11 +1,11 @@
 // drivein.js (d50): Matt Ready DRIVE-IN - a giant double-sided outdoor movie screen floating over the Port Townsend peninsula,
 // north of downtown, looping Matt's Drive folder 'Matt Ready Library/videos on loop' (reel built by tools/video_sync.py -> video/drivein/screen.json).
-// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792443133403).
+// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792452910256).
 // Picture: ONE <video> (muted + playsinline + loop: iOS autoplay) -> VideoTexture on a DoubleSide plane, so people behind it (north side) see the
 //   same picture mirrored, never a black back. Frame/marquee/glow look right from both sides (marquee text = two back-to-back planes).
 // Sound: muted by default. 'Screen sound' (localStorage.eearScreenSound) is the master switch; spatial gain on top (driveinGain):
-//   gain = 1 within 1 mile (1609 m) of the screen, then a squared raised-cosine fade to 0 at 10 miles (16093 m), silent beyond.
-//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792443133403). Never ducks the DJ music.
+//   gain = 1 within 5 miles (8047 m) of the NEAREST point of the screen, then a raised-cosine S-curve fade to 0 at 10 miles (16093 m).
+//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792452910256). Never ducks the DJ music.
 // Far marker: beyond ~9 km (the screen gets tiny, Quest's far plane is 10 km) a gold '🎬 DRIVE-IN' billboard of fixed angular size (~3°) floats
 //   exactly in the screen's direction with its distance; iPhone/desktop also get an edge-of-view arrow when it is off screen.
 // Lite (Quest Lite): 640x360 reel, no glow plane, cheaper texture filtering.
@@ -15,13 +15,17 @@ export const DRIVEIN = {
   altM: 340,                      // screen centre height above the ground (bottom edge ~197 m)
   wM: 480, hM: 270,               // 16:9 picture, 480 x 270 m (frame adds 8 m a side)
   faceBrg: 190,                   // the front faces bearing 190° (SSW): between downtown (155°) and Ready Athletics (229°); north side sees the mirror image
-  fullM: 1609, silentM: 16093,    // sound: full within 1 mi, silent at 10 mi
+  fullM: 8047, silentM: 16093,    // sound: full within 5 mi of the NEAREST point of the screen, raised-cosine S-curve to silence at 10 mi
   markerM: 9000, markerFadeM: 1500, markerDeg: 4, markerR: 600,
   url: 'video/drivein/screen' + '.json',   // fetched no-cache WITHOUT ?v= (the service worker would pin it per build); reel names carry a content hash
 };
 const D = Math.PI / 180, MI = 1609.344;
-/** spatial gain: 1 within fullM, squared raised-cosine fade to 0 at silentM (1 mi 1.00, 3 mi 0.78, 5 mi 0.34, 10 mi 0.00) */
-export const driveinGain = d => { if (d <= DRIVEIN.fullM) return 1; if (d >= DRIVEIN.silentM) return 0; const c = .5 * (1 + Math.cos(Math.PI * (d - DRIVEIN.fullM) / (DRIVEIN.silentM - DRIVEIN.fullM))); return c * c };
+/** spatial gain (d = distance to the NEAREST point of the screen): 1 within fullM (5 mi), raised-cosine S-curve to 0 at silentM (10 mi): 1 mi 1.00, 5 mi 1.00, 7 mi 0.65, 8 mi 0.35, 10 mi 0.00 */
+export const driveinGain = d => { if (d <= DRIVEIN.fullM) return 1; if (d >= DRIVEIN.silentM) return 0; return .5 * (1 + Math.cos(Math.PI * (d - DRIVEIN.fullM) / (DRIVEIN.silentM - DRIVEIN.fullM))) };
+/** distance from an ENU offset (e, n, u metres, viewer -> screen centre) to the nearest point of the screen rectangle (width along the base line, height vertical) */
+export function nearestD(e, n, u) { const b = DRIVEIN.faceBrg * D, wx = Math.cos(b), wy = -Math.sin(b), nx = Math.sin(b), ny = Math.cos(b);
+  const pw = -(e * wx + n * wy), pn = -(e * nx + n * ny), pu = -u, W2 = DRIVEIN.wM / 2 + 8, H2 = DRIVEIN.hM / 2 + 8;
+  return Math.hypot(pw - Math.max(-W2, Math.min(W2, pw)), pu - Math.max(-H2, Math.min(H2, pu)), pn) }
 const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 * Math.cos(a * D); return Math.hypot(x, y) };
 const fmtD = m => m < 1000 ? Math.round(m) + ' m' : (m / MI).toFixed(m < 16 * MI ? 1 : 0) + ' mi · ' + (m / 1000).toFixed(m < 1e4 ? 1 : 0) + ' km';
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g, w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.userData.c = c; return t }
@@ -82,17 +86,23 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
   function sync(force) { if (!S.cfg || v.readyState < 1 || v.seeking) return; const dur = v.duration || S.cfg.duration, tg = target(); let e = v.currentTime - tg; if (e > dur / 2) e -= dur; if (e < -dur / 2) e += dur;
     if (force || (Math.abs(e) > .8 && performance.now() - S.lastSeek > 4000)) { S.lastSeek = performance.now(); try { v.currentTime = tg } catch (x) { } } }
   function kick() { if (!S.cfg || !S.want) return; const p = v.play(); if (p && p.catch) p.catch(() => { S.blocked = true }) }
-  const gesture = () => { if (S.want && (S.blocked || v.paused)) { S.blocked = false; kick(); sync(false) } if (soundWanted() && (v.muted || !g || (ctx && ctx.state !== 'running'))) applySound(true) };
+  const gesture = () => { if (S.want && (S.blocked || v.paused)) { S.blocked = false; kick(); sync(false) } if (soundWanted() && (v.muted || v.paused || (IOS && (!g || (ctx && ctx.state !== 'running'))))) applySound(true) };
   for (const ev of ['pointerdown', 'touchend', 'keydown']) addEventListener(ev, gesture, { passive: true, capture: true });
   // ---- sound graph ----
   let g = null, pan = null, ctx = null;
-  function graph() { if (g) return true; const AU = window.EEAR_AUDIO; ctx = AU && AU.ctx;
+  /* d50b fix: desktop 'Screen sound' stayed silent. Everywhere except iOS the video now plays through its OWN output with v.volume = gain
+     (no MediaElementSource / extra AudioContext that can sit suspended or silent); iOS (volume is read-only) keeps the WebAudio gain path. */
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  S.path = IOS ? 'webaudio' : 'element';
+  function graph() { if (!IOS) return true; if (g) return true; const AU = window.EEAR_AUDIO; ctx = AU && AU.ctx;
     if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false; ctx = S.ctxOwn = new AC() }
     try { S.src = ctx.createMediaElementSource(v) } catch (e) { console.warn('drivein audio', e); return false }
     g = ctx.createGain(); g.gain.value = 0; pan = ctx.createPanner(); Object.assign(pan, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1, rolloffFactor: 0, maxDistance: 1e7, coneInnerAngle: 360, coneOuterAngle: 360 });
     S.src.connect(g); g.connect(pan); pan.connect(S.ctxOwn ? ctx.destination : (AU.out || ctx.destination)); return true }
   function applySound(on) {   // call from a tap (iOS: unmuting / resuming audio needs a user gesture)
-    if (on) { if (!graph()) return; ctx.resume && ctx.resume().catch(() => { }); v.muted = false; kick() } else { v.muted = true; if (g) g.gain.setTargetAtTime(0, ctx.currentTime, .05) } }
+    if (on) { if (!IOS) { v.volume = Math.max(.001, Math.min(1, (S.gain || driveinGain(S.dGps || S.d || 0)) * (opts.level || .9))) } else { if (!graph()) return; if (ctx.state !== 'running' && ctx.resume) ctx.resume().catch(() => { }) }
+      v.muted = false; S.want = true; S.blocked = false; const p = v.play(); if (p && p.catch) p.catch(e => { S.blocked = true; S.perr = String(e && e.name || e); window.eearToast && eearToast('🎬 Tap once more to allow drive-in sound', 3000) }) }
+    else { v.muted = true; if (g) g.gain.setTargetAtTime(0, ctx.currentTime, .05) } }
   const camW = new THREE.Vector3(), scrW = new THREE.Vector3(), q = new THREE.Quaternion(), ndc = new THREE.Vector3(); let lastA = 0, lastS = 0, lastP = 0;
   function frame() {
     const now = performance.now(), on = !!enabled(); root.visible = on;
@@ -116,8 +126,10 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
     if (now - lastS > 2000) { lastS = now; if (S.want) { if (v.paused && !S.blocked) kick(); sync(false) } const c = S.cfg; if (c) { const tg = target(); S.clip = c.clips.find(x => tg >= x.start && tg < x.start + x.dur) || c.clips[c.clips.length - 1] } }
     // spatial sound (throttled 10 Hz)
     if (now - lastA > 100) { lastA = now; const AU = window.EEAR_AUDIO, L = AU && AU.listener; let dd = d3, e = scr.position.x - camW.x, n = -(scr.position.z - camW.z), u = scr.position.y - camW.y;
-      if (L && L.lat != null && !(window.FLY && FLY.alt > .5)) { const h = dist(L.lat, L.lon, C.lat, C.lon); e = (C.lon - L.lon) * 111320 * Math.cos(L.lat * D); n = (C.lat - L.lat) * 111320; u = C.altM - (L.alt || 0) - 1.6; dd = Math.hypot(h, u); S.dGps = dd }
+      if (L && L.lat != null && !(window.FLY && FLY.alt > .5)) { e = (C.lon - L.lon) * 111320 * Math.cos(L.lat * D); n = (C.lat - L.lat) * 111320; u = C.altM - (L.alt || 0) - 1.6 }
+      dd = nearestD(e, n, u); S.dGps = dd;
       const sw = soundWanted(); S.gain = sw ? driveinGain(dd) : 0;
+      if (!IOS && sw && !v.muted) { const vv = Math.min(1, S.gain * (opts.level || .9)); if (Math.abs(v.volume - vv) > .005) v.volume = vv }
       if (g && ctx) { const tt = ctx.currentTime; g.gain.setTargetAtTime(S.gain * (opts.level || .9), tt, .25);
         if (pan.positionX) { pan.positionX.setTargetAtTime(e, tt, .1); pan.positionY.setTargetAtTime(u, tt, .1); pan.positionZ.setTargetAtTime(-n, tt, .1) } else pan.setPosition(e, u, -n);
         if (!(AU && AU.on) && L && L.hdg != null) { const hh = L.hdg * D, l = ctx.listener, f = [Math.sin(hh), 0, -Math.cos(hh)]; if (l.forwardX) { l.forwardX.setTargetAtTime(f[0], tt, .1); l.forwardY.setTargetAtTime(0, tt, .1); l.forwardZ.setTargetAtTime(f[2], tt, .1); l.upX.value = 0; l.upY.value = 1; l.upZ.value = 0 } else l.setOrientation(f[0], 0, f[2], 0, 1, 0) } }
@@ -126,7 +138,7 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
   const api = {
     update() { try { frame() } catch (e) { if (!S.ferr) { S.ferr = 1; console.warn('drivein frame', e) } } },
     setSound(on) { localStorage.eearScreenSound = on ? '1' : '0'; applySound(!!on); window.dispatchEvent(new Event('eear:screensound')) },
-    get sound() { return soundWanted() }, get state() { return { dist: S.d && Math.round(S.d), distGps: S.dGps && Math.round(S.dGps), gain: +S.gain.toFixed(3), far: S.far, playing: !v.paused, muted: v.muted, t: +v.currentTime.toFixed(2), target: S.cfg ? +target().toFixed(2) : null, clip: S.clip && S.clip.title, src: v.currentSrc, err: S.err, ready: v.readyState, lite } },
+    get sound() { return soundWanted() }, get state() { return { dist: S.d && Math.round(S.d), distGps: S.dGps && Math.round(S.dGps), gain: +S.gain.toFixed(3), path: S.path, volume: +v.volume.toFixed(3), perr: S.perr || null, far: S.far, playing: !v.paused, muted: v.muted, t: +v.currentTime.toFixed(2), target: S.cfg ? +target().toFixed(2) : null, clip: S.clip && S.clip.title, src: v.currentSrc, err: S.err, ready: v.readyState, lite } },
     gain: driveinGain, cfg: () => S.cfg, root, video: v, C,
   };
   window.EEAR_DRIVEIN = api; return api;

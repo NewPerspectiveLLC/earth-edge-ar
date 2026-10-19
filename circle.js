@@ -3,7 +3,7 @@
 // with edge-lit petals, and floating orbs. Cheap fake bloom: radial halo sprites + fresnel shells (no post-processing),
 // 2 point lights. setNight(t 0..1): glow ~2.5x at night, subtle by day. Normal blending everywhere (safe over iOS video).
 import * as THREE from 'three';
-import { GARDEN as GARDEN_REG, CIRCLE as CIRCLE_REG } from './figures-registry.js?v=1792443133403';
+import { GARDEN as GARDEN_REG, CIRCLE as CIRCLE_REG } from './figures-registry.js?v=1792452910256';
 export const GARDEN = GARDEN_REG;
 const PI = Math.PI, TAU = 2 * PI, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const PURPLE = 0xa45cff, TEAL = 0x2ff5df, GOLD = 0xffc46b;

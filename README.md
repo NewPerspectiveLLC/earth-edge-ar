@@ -94,9 +94,10 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
   Drift > 0.8 s is corrected by a seek (at most every 4 s). Needs HTTP byte ranges (Mac server + Pages both do).
 - Sound: muted by default (iOS autoplay = muted + playsinline). **Screen sound** (Layers sheet button / XR + Quest panel 'Places ->
   Drive-in screen sound', localStorage.eearScreenSound) is the master switch; spatial gain on top, from the viewer's GPS/world position
-  to the screen: gain = 1 for d <= 1 mi (1609 m); then g = c², c = ½(1 + cos(π(d-1609)/(16093-1609))); 0 beyond 10 mi (16093 m).
-  1 mi 1.00 · 2 mi 0.94 · 3 mi 0.78 · 5 mi 0.34 · 7 mi 0.06 · 10 mi 0.00. HRTF panner for direction (no extra distance rolloff).
-  Plays into the app master volume; never ducks the DJ music.
+  to the NEAREST point of the screen (d50b): gain = 1 for d <= 5 mi (8047 m); then g = ½(1 + cos(π(d-8047)/(16093-8047))); 0 beyond
+  10 mi (16093 m). 1 mi 1.00 · 5 mi 1.00 · 7 mi 0.65 · 8 mi 0.35 · 10 mi 0.00. Desktop/Quest/Android: the video element's own output with
+  v.volume = gain (d50b fix: the WebAudio route left desktop silent). iOS: MediaElementSource -> gain -> HRTF panner -> app master volume.
+  Never ducks the DJ music.
 - Far marker: beyond ~9 km (fading in from 7.5 km) a gold "🎬 DRIVE-IN · x mi · y km" billboard with a down-arrow, fixed angular
   size, always drawn on top exactly in the screen's direction (Quest far plane is 10 km). iPhone/desktop also get an edge-of-view arrow
   when it is off screen (hidden with the other UI in hide-all-buttons mode; the 3D marker stays).
