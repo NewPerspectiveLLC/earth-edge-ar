@@ -1,5 +1,5 @@
-// orbctl.js (d49): Orb flight controls, shown in the 'Ghost & Orb controls' screen (ghostctl.js?v=1792368740394) + a floating joystick for Manual.
-// Settings: localStorage.eearOrbCfg (orbit.js?v=1792368740394 setOrbCfg). The orb's PATH is computed on each device around its own listener (per-device),
+// orbctl.js (d49): Orb flight controls, shown in the 'Ghost & Orb controls' screen (ghostctl.js?v=1792423954362) + a floating joystick for Manual.
+// Settings: localStorage.eearOrbCfg (orbit.js?v=1792423954362 setOrbCfg). The orb's PATH is computed on each device around its own listener (per-device),
 // so Manual steering stays local. Matt (GM key) can 'Apply to everyone': mode / tour pick / radius / linger / speed / go-to spot go into the
 // server DJ state (.orb, POST /api/orb, GM-gated); every device follows them unless it turns off 'Follow Matt's orb settings'.
 const API = () => window.EEAR_ORBAPI;
@@ -45,7 +45,7 @@ export function render(el) { host = el || host; if (!host) return; const A = API
   const q = s => host.querySelector(s);
   host.querySelectorAll('[data-om]').forEach(x => x.onclick = () => { const m = x.dataset.om;
     if (m === 'manual') { apply({ mode: 'manual' }); showPad(true); window.EEAR_GHOSTCTL && EEAR_GHOSTCTL.close() }
-    else if (m === 'goto') { window.EEAR_MAP10_GOTO = 1; const mb = document.getElementById('mapB'); if (mb) mb.click(); else import('./map10.js?v=1792368740394').then(M => M.openMap10({ places: [] })); window.EEAR_GHOSTCTL && EEAR_GHOSTCTL.close(); toast('Tap the map to send the orb there') }
+    else if (m === 'goto') { window.EEAR_MAP10_GOTO = 1; const mb = document.getElementById('mapB'); if (mb) mb.click(); else import('./map10.js?v=1792423954362').then(M => M.openMap10({ places: [] })); window.EEAR_GHOSTCTL && EEAR_GHOSTCTL.close(); toast('Tap the map to send the orb there') }
     else if (m === 'tour') tourNow(); else { apply({ mode: m }); showPad(false) } render() });
   q('#orbTour').onchange = e => apply({ tour: e.target.value });
   host.querySelectorAll('[data-ok]').forEach(r => { r.oninput = () => { const k = r.dataset.ok, st = +r.step; q('#orbv_' + k).textContent = (+r.value).toFixed(st < 1 ? (st < .1 ? 2 : 1) : 0); A.setOrbCfg({ [k]: +r.value }) }; r.onchange = () => apply({ [r.dataset.ok]: +r.value }) });

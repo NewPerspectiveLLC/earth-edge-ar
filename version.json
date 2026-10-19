@@ -1,1 +1,1 @@
-{"v": "1792368740394", "note": "d49g: iPhone music while buttons are hidden - a small '\ud83c\udfb5 Tap for music' pill appears next to the eye whenever music is off or iOS has stalled it (after a reload/lock), and while hidden any tap restarts stalled music; hiding never pauses audio"}
+{"v": "1792423954362", "note": "d49h: Ground map style Satellite (Esri) + Street (OpenStreetMap) toggle on all platforms; persisted in localStorage.eearMapStyle; Layers sheet + Quest/WebXR panels"}

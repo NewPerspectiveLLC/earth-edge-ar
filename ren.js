@@ -6,12 +6,12 @@
 // (phone/desktop) and a 3D Talk button + presets (Quest/XR); optional speechSynthesis that respects the music mute;
 // beat-synced per-song dances that are improvised + recorded once, then shared via <API>/api/ren/dance.
 import * as THREE from 'three';
-import * as BEAT from './beat.js?v=1792368740394';
-import { REN as REN_REG } from './figures-registry.js?v=1792368740394';
-export { TRACK_META, apiBase } from './beat.js?v=1792368740394';
+import * as BEAT from './beat.js?v=1792423954362';
+import { REN as REN_REG } from './figures-registry.js?v=1792423954362';
+export { TRACK_META, apiBase } from './beat.js?v=1792423954362';
 
 export const REN_VERSION = 1;
-export const REN_HOME = REN_REG.home; // Cappy's Trails pillar (figures-registry.js?v=1792368740394)
+export const REN_HOME = REN_REG.home; // Cappy's Trails pillar (figures-registry.js?v=1792423954362)
 export const REN_EAST_M = REN_REG.eastM;            // stand ~4 m east of Cappy's pillar (clear of Cappy's + Meditation Garden beams)
 export const TALK_RADIUS = REN_REG.talkRadius, LEAVE_RADIUS = REN_REG.leaveRadius;
 const FALLBACK = 'Ren is meditating… try again soon.';
@@ -335,7 +335,7 @@ export function addRen(scene, where, camera, opts = {}) {
     else { presetsUntil = 0; ask(b.userData.text); } return true;
   }
 
-  // ---- dance: shared beat engine + saved choreography (beat.js?v=1792368740394)
+  // ---- dance: shared beat engine + saved choreography (beat.js?v=1792423954362)
   const D = { w: 0, mode: 'off', key: null, store: null };
   function improvise(bar, R, st) { // pick this bar's move (phrase aware: 2-bar repeats, big move at phrase ends)
     const prev = R.moves[(bar + R.bars - 1) % R.bars], e = clamp((st.energy || 0) * 6, .35, 1);
