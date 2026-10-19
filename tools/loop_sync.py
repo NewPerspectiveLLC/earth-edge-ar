@@ -186,22 +186,21 @@ def c_apply(a):
     print(json.dumps({'added': added, 'commit': sh('git', '-C', REPO, 'rev-parse', '--short', 'HEAD').stdout.strip(), 'pending_deploy': m.get('pending_deploy', [])}))
 
 def c_maccmd(a):
+    """Print a bash script for the Mac Studio (run it with: bash <<'EOF' ... EOF). Push first: files come from GitHub raw at HEAD."""
     m = man(); files = m.get('pending_deploy', [])
     if not files: print('# nothing pending'); return
     sha = sh('git', '-C', REPO, 'rev-parse', 'HEAD').stdout.strip(); ts = time.strftime('%Y%m%d-%H%M%S')
-    sums = {f: md5('%s/%s' % (REPO, f)) for f in files}
-    b = '~/earth-edge-ar-backups/pre-loopfolder-%s' % ts
-    cmd = ['set -e', 'cd ~/earth-edge-ar', 'B=%s; mkdir -p $B/audio/dj' % b, 'md5 -q server/data.json > $B/data.json.md5',
-           'printf "%%s\\n" %s > $B/files.txt' % ' '.join(files)]
-    for f in files: cmd.append('mkdir -p $B/%s && { [ -f %s ] && cp -p %s $B/%s || true; }' % (os.path.dirname(f) or '.', f, f, f))
-    for f in files:
-        cmd.append('curl -fsSL -o %s.part "%s/%s/%s"' % (f, RAW, sha, f))
-        cmd.append('[ "$(md5 -q %s.part)" = "%s" ] || { echo "md5 mismatch %s"; exit 1; }' % (f, sums[f], f))
-    for f in files: cmd.append('mv -f %s.part %s' % (f, f))
-    cmd.append('[ "$(md5 -q server/data.json)" = "$(cat $B/data.json.md5)" ] && echo "data.json untouched"')
-    cmd.append('echo deployed %d files at %s' % (len(files), sha[:7]))
-    print(' && '.join(cmd[:1]) + '\n' + '\n'.join(cmd[1:]))
-    print('# after the Mac command succeeds:  python3 tools/loop_sync.py deployed', file=sys.stderr)
+    L = ['set -e', 'cd ~/earth-edge-ar', 'B=~/earth-edge-ar-backups/pre-loopfolder-%s; mkdir -p $B' % ts,
+         'md5 -q server/data.json > $B/data.json.md5', "printf '%%s\\n' %s > $B/files.txt" % ' '.join(files),
+         'for f in $(cat $B/files.txt); do mkdir -p $B/$(dirname $f); [ -f $f ] && cp -p $f $B/$f || true; done',
+         'R=%s/%s' % (RAW, sha),
+         'dl(){ curl -fsSL -o $1.part "$R/$1"; [ "$(md5 -q $1.part)" = "$2" ] || { echo "md5 mismatch $1"; exit 1; }; }']
+    L += ['dl %s %s' % (f, md5('%s/%s' % (REPO, f))) for f in files]
+    L += ['for f in $(cat $B/files.txt); do mv -f $f.part $f; done',
+          '[ "$(md5 -q server/data.json)" = "$(cat $B/data.json.md5)" ] && echo "data.json untouched"',
+          'echo "deployed %d files at %s, backup $B"' % (len(files), sha[:7])]
+    print('\n'.join(L))
+    print('# push first; after the Mac script succeeds:  python3 tools/loop_sync.py deployed', file=sys.stderr)
 
 def c_deployed(a):
     m = man()
