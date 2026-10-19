@@ -164,7 +164,7 @@ export function vortexGroundLines(la,lo,proj,maxKm=80){const out=[],ds=[0];for(l
 
 // opaque dark sky/ground sphere that hides camera passthrough (writes alpha=1 on purpose; never alpha-fixed)
 export function makeDarkSky(T){const m=new T.ShaderMaterial({side:T.BackSide,depthTest:false,depthWrite:false,uniforms:{zen:{value:new T.Color(.008,.016,.08)},hor:{value:new T.Color(.04,.10,.23)},gnd:{value:new T.Color(.03,.05,.09)}},vertexShader:'varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
- fragmentShader:'uniform vec3 zen,hor,gnd;varying vec3 vD;void main(){float y=vD.y;vec3 sky=mix(hor,zen,smoothstep(0.,.8,y));vec3 gnd=mix(gnd,vec3(0.),smoothstep(0.,-.7,y));gl_FragColor=vec4(y>0.?sky:gnd,1.);}'});
+ fragmentShader:'uniform vec3 zen,hor,gnd;varying vec3 vD;void main(){gl_FragColor=vec4(0.,0.,0.,1.);}'/* d50c: flat black backdrop (no sky/ground gradient or horizon); stays an opaque sphere so VR / camera-off still hides the room */});
  m.userData.pf=1;m.userData.cpf=1;const s=new T.Mesh(new T.SphereGeometry(60,32,16),m);s.renderOrder=-100;s.frustumCulled=false;s.visible=false;s.name='darkSky';return s}
 
 // ---- true-scale geography (Antarctica, Australia, mountains). `proj(lat,lon,h_m)` -> THREE.Vector3 in the caller's frame

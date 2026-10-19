@@ -293,7 +293,7 @@ window.setLoc=setLoc;
 TARGETS.forEach((t,i)=>locSel.insertAdjacentHTML('beforeend',`<option value=${i}>${t[0]}</option>`));
 locSel.onchange=()=>{if(locSel.value==='gps')navigator.geolocation.getCurrentPosition(p=>setLoc(p.coords.latitude,p.coords.longitude),()=>alert('No GPS fix'));else{const t=TARGETS[+locSel.value];setLoc(t[1],t[2])}};
 window.exitDesk=()=>{desk=false;document.getElementById('desk').style.display='none';if(camOn()){document.body.style.background='#000';startCam()}};
-function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';if(!(camOn()&&vid.srcObject)){document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#000)';vid.style.display='none'}
+function enterDesk(){if(desk||ori)return;desk=true;document.getElementById('desk').style.display='block';if(!(camOn()&&vid.srcObject)){document.body.style.background='#000';vid.style.display='none'}
  if(!MYPOS){ui.textContent='No GPS yet, using Ready Athletics';setLoc(48.1062,-122.8057);locSel.value='0'}}
 document.querySelectorAll('#desk button').forEach(b=>b.onclick=()=>{yaw=+b.dataset.h});window.EEAR_SETYAW=v=>{yaw=v};
 let drag=null;addEventListener('pointerdown',e=>{if(desk&&!e.target.closest('button,select,#mpc,#trkM,#hpP,#hpD,#card,#zoom'))drag=[e.clientX,e.clientY,yaw,pitch,0]});
@@ -394,7 +394,7 @@ async function startCam(){if(ren.xr.isPresenting||!camOn())return;vid.setAttribu
 window.startCam=startCam;
 async function camApply(){const on=camOn();camB.textContent='Camera: '+(on?'on':'off');DSKY.visible=!on&&ren.xr.isPresenting;
  if(ren.xr.isPresenting)return;
- if(!on){if(vid.srcObject){vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null}vid.style.display='none';camMsg(null);document.body.style.background='linear-gradient(#020414,#0a1a3a 55%,#03060c 56%,#000)'}
+ if(!on){if(vid.srcObject){vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null}vid.style.display='none';camMsg(null);document.body.style.background='#000'}
  else if(STARTED||vid.srcObject){await startCam()}}
 /* iOS suspends the stream in the background: resume on return */
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&STARTED&&camOn()&&!ren.xr.isPresenting){const t=vid.srcObject&&vid.srcObject.getVideoTracks()[0];if(!t||t.readyState!=='live'){vid.srcObject=null;startCam()}else vid.play().catch(()=>{})}});

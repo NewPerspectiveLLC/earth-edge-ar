@@ -17,7 +17,8 @@ export function skyCols(alt){let z,h;if(alt>=KEYS[0][0]){z=hx(KEYS[0][1]);h=hx(K
  else for(let i=0;i<KEYS.length-1;i++){const a=KEYS[i],b=KEYS[i+1];if(alt<=a[0]&&alt>=b[0]){const t=sst(0,1,(a[0]-alt)/(a[0]-b[0]));z=mix(hx(a[1]),hx(b[1]),t);h=mix(hx(a[2]),hx(b[2]),t);break}}
  const g=mix(h,[0,0,0],.72);return{zen:z,hor:h,gnd:g}}
 export const css=c=>'rgb('+c.map(v=>Math.round(v*255)).join(',')+')';
-export function bodyGradient(c){return`linear-gradient(${css(c.zen)},${css(mix(c.zen,c.hor,.55))} 38%,${css(c.hor)} 55%,${css(c.gnd)} 56%,#000)`}
+/* d50c: flat black page background (the old screen-space sky/ground gradient had a frozen 'horizon' at 55% of the screen that never moved with the 3D overlay) */
+export function bodyGradient(c){return'#000'}
 
 // ---- clock -------------------------------------------------------------------------------------------------
 const ptMin=d=>{const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(d);const g=k=>+p.find(x=>x.type===k).value;return g('hour')*60+g('minute')+g('second')/60};
