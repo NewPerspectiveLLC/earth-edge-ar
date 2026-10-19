@@ -1,0 +1,55 @@
+{
+ "epoch": 1792440000000,
+ "duration": 75.231,
+ "main": "video/drivein/reel-d9db1abdf7.mp4",
+ "lite": "video/drivein/reel-d9db1abdf7-lite.mp4",
+ "sizes": {
+  "main": 24012883,
+  "lite": 6125587
+ },
+ "pages_ok": true,
+ "clips": [
+  {
+   "n": 1,
+   "title": "Clip 1",
+   "drive_title": "grok-video-d9ab5536-0d54-4223-92b1-c16de424131c (1).mp4",
+   "drive_id": "1DspOwjpTfc4RYOHtz-8Vcly0FZTNPz4G",
+   "start": 0,
+   "dur": 15.042
+  },
+  {
+   "n": 2,
+   "title": "Clip 2",
+   "drive_title": "grok-video-d9ab5536-0d54-4223-92b1-c16de424131c.mp4",
+   "drive_id": "1ZgGMreqhqM4RCoA4MyBM5YGBfrFDTqhy",
+   "start": 15.042,
+   "dur": 15.042
+  },
+  {
+   "n": 3,
+   "title": "Clip 3",
+   "drive_title": "grok-video-f429ef5b-54d0-493b-808f-7d3987453de1.mp4",
+   "drive_id": "1It-Us3akVmP1U4K1MDCSHcrMUgjbi-Id",
+   "start": 30.084,
+   "dur": 15.042
+  },
+  {
+   "n": 4,
+   "title": "Clip 4",
+   "drive_title": "grok-video-3159e2df-c50e-44dd-922d-1b51a0cd1b00.mp4",
+   "drive_id": "1A6Eyy3sbt3vJgdyrcufWw8_0ueIVolWY",
+   "start": 45.126,
+   "dur": 15.042
+  },
+  {
+   "n": 5,
+   "title": "Clip 5",
+   "drive_title": "grok-video-2e7749e1-e9f0-45fa-9eb0-28848c75d43a.mp4",
+   "drive_id": "1CTl0R5hYeOhhyDqRLFX0haJTGW8EWWko",
+   "start": 60.168,
+   "dur": 15.042
+  }
+ ],
+ "folder": "My Drive/Matt Ready Library/videos on loop",
+ "updated": "2026-10-19T13:36:04-0700"
+}
