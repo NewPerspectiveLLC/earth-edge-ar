@@ -1,1 +1,1 @@
-{"v": "1792452910256", "note": "d50b: drive-in Screen sound fix - desktop/Quest/Android play the video's own audio with volume = spatial gain (the WebAudio MediaElementSource route left desktop silent); iOS keeps WebAudio; gain from the NEAREST point of the screen: full within 5 mi, raised-cosine S-curve to silence at 10 mi"}
+{"v": "1792453209966", "note": "d50c: flat black background on all platforms - frozen screen-space sky/ground gradient (fixed 'horizon' at 55% of the screen) removed; camera feed unchanged when Camera is on"}
