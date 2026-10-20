@@ -15,7 +15,7 @@ const fbm = (n, x) => .65 * n(x) + .35 * n(x * 2.3 + 17);
 const nSpd = noise1(), nDir = noise1(), nEl = noise1(), nR = noise1();
 const S = { t: 0, az: Math.random() * 6.283, azv: 0, r: 28, u: 16, mode: 'wander', mt: 0, mdur: 0, nextL: rnd(8, 20), nextX: rnd(30, 60), xr: 45, linger: 0, boost: 1, gain: .8, e: 0, n: 13, lingers: 0, excursions: 0, tours: 0, tourSkips: 0, tourSite: '', tourW: 0, nextT: rnd(...ORB.tour.firstS), flying: true };
 export const state = S;
-// d49 ORB CONTROLS (orbctl.js?v=1792454269680 UI; localStorage.eearOrbCfg; GM 'Apply to everyone' -> server DJ state .orb, followed unless the device opts out).
+// d49 ORB CONTROLS (orbctl.js?v=1792455290575 UI; localStorage.eearOrbCfg; GM 'Apply to everyone' -> server DJ state .orb, followed unless the device opts out).
 // mode: auto | manual (joystick: window.EEAR_ORBSTEER {x:east,y:north,h:up} -1..1, local only) | goto ({lat,lon,id}: smooth arc there, linger, then Auto unless hold) | tour (start one now)
 // tour: alt | ra | cappy | off · radius m (wander centre, hard min 25 m stays) · lingerF x (0 = never) · speed x
 export const ORB_DEFAULTS = { mode: 'auto', tour: 'alt', radius: 30, lingerF: 1, speed: 1, hold: false, goto: null, tourReq: 0, follow: true };
@@ -32,7 +32,7 @@ export function orbLatLon() { const L = listener(); if (!L) return null; return 
 S.trail = []; let trT = 0;
 const tau = (cur, tgt, dt, k) => cur + (tgt - cur) * (1 - Math.exp(-dt / k));
 // ---- tour paths (lat/lon polylines, chained nearest-neighbour, closed back to the start)
-let TRAILS = null; fetch('trails.json?v=1792454269680').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
+let TRAILS = null; fetch('trails.json?v=1792455290575').then(r => r.json()).then(j => TRAILS = j).catch(() => { });
 const M = 111320, enu = (la0, lo0, la, lo) => [(lo - lo0) * M * Math.cos(la0 * Math.PI / 180), (la - la0) * M];
 function sitePath(key) { const W = (TRAILS && TRAILS[key] || []).map(w => w.pts.slice()); if (!W.length) return null; const out = W.shift();
   while (W.length) { const [la, lo] = out[out.length - 1]; let bi = 0, bd = 1e18, rev = false;
@@ -112,7 +112,7 @@ function manualStep(dt, C) { S.mode = 'manual'; const st = window.EEAR_ORBSTEER 
   { const d0 = Math.hypot(S.e, S.n, S.u), m = ORB.min3dM; S.pushed = d0 < m; if (d0 < m) { if (d0 < 1e-3) { S.e = 0; S.n = 0; S.u = m } else { const k = m / d0; S.e *= k; S.n *= k; S.u *= k } } }
   const d = Math.hypot(S.e, S.n, S.u), g = Math.max(ORB.gainFloor, Math.min(1, Math.pow(ORB.gainRef / Math.max(d, 1), ORB.gainExp))); S.boost = tau(S.boost, 1, dt, .25); S.gain = g * S.boost; S.dist = d; return S }
 let lastT = 0;
-/** step once per animation frame no matter how many callers (audio.js?v=1792454269680 + orbball.js) */
+/** step once per animation frame no matter how many callers (audio.js?v=1792455290575 + orbball.js) */
 export function frame(nowMs = performance.now()) { if (nowMs - lastT < 4) return S; let dt = lastT ? Math.min(2, (nowMs - lastT) / 1000) : 0; lastT = nowMs;   /* wall-clock: sub-step slow frames so the orbit never slows down */
   while (dt > .1) { step(.05); dt -= .05 } const r = step(dt); if (nowMs - trT > 200) { trT = nowMs; const p = orbLatLon(); if (p) { S.trail.push([p.lat, p.lon]); if (S.trail.length > 15) S.trail.shift() } } return r }
 window.EEAR_ORB = S; window.EEAR_ORBAPI = { orbCfg, orbCfgLocal, setOrbCfg, orbLatLon, ORB_DEFAULTS, state: S };

@@ -1,11 +1,11 @@
 // drivein.js (d50): Matt Ready DRIVE-IN - a giant double-sided outdoor movie screen floating over the Port Townsend peninsula,
 // north of downtown, looping Matt's Drive folder 'Matt Ready Library/videos on loop' (reel built by tools/video_sync.py -> video/drivein/screen.json).
-// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792454269680).
+// Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792455290575).
 // Picture: ONE <video> (muted + playsinline + loop: iOS autoplay) -> VideoTexture on a DoubleSide plane, so people behind it (north side) see the
 //   same picture mirrored, never a black back. Frame/marquee/glow look right from both sides (marquee text = two back-to-back planes).
 // Sound: muted by default. 'Screen sound' (localStorage.eearScreenSound) is the master switch; spatial gain on top (driveinGain):
 //   gain = 1 within 5 miles (8047 m) of the NEAREST point of the screen, then a raised-cosine S-curve fade to 0 at 10 miles (16093 m).
-//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792454269680). Never ducks the DJ music.
+//   video -> MediaElementSource -> gain -> HRTF panner (direction only, rolloff 0) -> app master volume (audio.js?v=1792455290575). Never ducks the DJ music.
 // Far marker: beyond ~9 km (the screen gets tiny, Quest's far plane is 10 km) a gold '🎬 DRIVE-IN' billboard of fixed angular size (~3°) floats
 //   exactly in the screen's direction with its distance; iPhone/desktop also get an edge-of-view arrow when it is off screen.
 // Lite (Quest Lite): 640x360 reel, no glow plane, cheaper texture filtering.
