@@ -1,0 +1,32 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792455290575><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792455290575></script>
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent>
+<meta name=theme-color content=#000000><link rel=apple-touch-icon href=apple-touch-icon.png>
+<title>Matt's 3D World</title>
+<style>
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:-apple-system,system-ui,Helvetica,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}
+canvas#c{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:block}
+#front{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 50% 40%,#1a0a33 0%,#05030c 60%,#000 100%)}
+#front h1{font-weight:800;letter-spacing:.02em;font-size:clamp(30px,7vw,64px);margin:0 0 6px;background:linear-gradient(90deg,#ffd77a,#ff7ae0,#9a6bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#front p{margin:0 0 28px;color:#c9b8ff;font-size:clamp(13px,2.4vw,17px)}
+#enter{display:inline-block;font:700 clamp(18px,3.6vw,26px) -apple-system,system-ui,sans-serif;color:#12081c;background:linear-gradient(90deg,#ffd77a,#ffb030);padding:18px 34px;border-radius:999px;text-decoration:none;box-shadow:0 0 40px #b026ff88,0 0 0 2px #ffe3a0 inset;cursor:pointer}
+#enter:active{transform:scale(.97)}
+#front small{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);color:#7b6aa0;font-size:12px;padding:0 12px}
+#hud{position:fixed;left:calc(env(safe-area-inset-left,0px) + 10px);top:calc(env(safe-area-inset-top,0px) + 10px);z-index:20;display:none;max-width:min(70vw,420px);pointer-events:none}
+#stop{font:800 clamp(16px,2.6vw,22px) -apple-system,sans-serif;text-shadow:0 2px 6px #000}
+#sub{font:500 13px -apple-system,sans-serif;color:#e8dcff;text-shadow:0 1px 4px #000;margin-top:3px}
+#now{margin-top:6px;font:600 12px -apple-system,sans-serif;color:#fff;background:#2a1446cc;border:1px solid #a45cff88;border-radius:8px;padding:4px 8px;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#btns{position:fixed;right:calc(env(safe-area-inset-right,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:20;display:none;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
+#btns button{font:600 13px -apple-system,sans-serif;color:#fff;background:#000a;border:1px solid #ffffff40;border-radius:10px;padding:9px 11px}
+#cap{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);transform:translateX(-50%);z-index:19;font:italic 600 clamp(14px,2.4vw,19px) Georgia,serif;color:#ffe9b0;text-shadow:0 2px 8px #000;opacity:0;transition:opacity 1.2s;pointer-events:none;text-align:center;width:90vw}
+</style></head><body>
+<canvas id=c></canvas>
+<div id=front><h1>Matt's 3D World</h1><p>A drone flight over Port Townsend · Matt Ready Radio overhead</p>
+<a id=enter href="#enter" role=button>Enter Matt's 3D World</a>
+<small>Turn your sound up · best in landscape</small></div>
+<div id=hud><div id=stop>Matt's 3D World</div><div id=sub></div><div id=now>📻 Matt Ready Radio: tuning in…</div></div>
+<div id=cap></div>
+<div id=btns><button id=bPause>⏸ Pause</button><button id=bScreen>🎬 Screen sound: off</button><button id=bFs>⛶ Full screen</button></div>
+<script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<script type=module src=tour.js?v=1792455290575></script>
+</body></html>
