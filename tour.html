@@ -17,7 +17,8 @@ canvas#c{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:b
 #sub{font:500 13px -apple-system,sans-serif;color:#e8dcff;text-shadow:0 1px 4px #000;margin-top:3px}
 #now{margin-top:6px;font:600 12px -apple-system,sans-serif;color:#fff;background:#2a1446cc;border:1px solid #a45cff88;border-radius:8px;padding:4px 8px;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #btns{position:fixed;right:calc(env(safe-area-inset-right,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:20;display:none;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
-#btns button{font:600 13px -apple-system,sans-serif;color:#fff;background:#000a;border:1px solid #ffffff40;border-radius:10px;padding:9px 11px}
+#btns button{min-height:40px;font:600 13px -apple-system,sans-serif;color:#fff;background:#000a;border:1px solid #ffffff40;border-radius:10px;padding:9px 11px}
+#btns #bMute{font-size:16px;padding:12px 16px;min-height:46px;background:#3a1466dd;border-color:#c99bff}#btns #bMute.on{background:#661428dd;border-color:#ff8aa0}
 #cap{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);transform:translateX(-50%);z-index:19;font:italic 600 clamp(14px,2.4vw,19px) Georgia,serif;color:#ffe9b0;text-shadow:0 2px 8px #000;opacity:0;transition:opacity 1.2s;pointer-events:none;text-align:center;width:90vw}
 </style></head><body>
 <canvas id=c></canvas>
@@ -26,7 +27,7 @@ canvas#c{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:b
 <small>Turn your sound up · best in landscape</small></div>
 <div id=hud><div id=stop>Matt's 3D World</div><div id=sub></div><div id=now>📻 Matt Ready Radio: tuning in…</div></div>
 <div id=cap></div>
-<div id=btns><button id=bPause>⏸ Pause</button><button id=bScreen>🎬 Screen sound: off</button><button id=bFs>⛶ Full screen</button></div>
+<div id=btns><button id=bMute>🔊 Mute music</button><button id=bPause>⏸ Pause</button><button id=bScreen>🎬 Screen sound: off</button><button id=bMot>📱 Motion look: off</button><button id=bCtr>🎯 Recenter</button><button id=bFs>⛶ Full screen</button></div>
 <script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
-<script type=module src=tour.js?v=1792455290575></script>
+<script type=module src=tour.js?v=1792470000055></script>
 </body></html>

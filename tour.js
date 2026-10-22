@@ -180,7 +180,7 @@ function introAt(s, out, look) { const e = s * s * (3 - 2 * s), k0 = KEYS[0], ll
     alt = Math.exp(Math.log(introFrom.alt) + (Math.log(ll.alt) - Math.log(introFrom.alt)) * Math.pow(s, .8)); enu(la, lo, alt, out);
   const tgt = enu(48.117, -122.76, 0); look.copy(tgt).lerp(k0.look, e) }
 // ---------- audio: Matt Ready Radio from the orb ----------
-const A = { ctx: null, master: null, pan: null, orbG: null, vIn: null, quiet: 1 };
+const A = { muted: (() => { try { return sessionStorage.eearTourMute === '1' } catch (e) { return false } })(), ctx: null, master: null, pan: null, orbG: null, vIn: null, quiet: 1 };
 const listener = { lat: O[0], lon: O[1], alt: 0, hdg: 0, pitch: 0 };
 window.EEAR_AUDIO = { get ctx() { return A.ctx }, get out() { return A.master }, flyOn: true, on: true, listener, voiceIn: () => A.vIn };
 function startAudio() { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
@@ -199,7 +199,7 @@ function audioFrame() { const c = A.ctx; if (!c) return; const t = c.currentTime
   if (l.forwardX) { l.forwardX.setTargetAtTime(fw.x, t, .05); l.forwardY.setTargetAtTime(fw.y, t, .05); l.forwardZ.setTargetAtTime(fw.z, t, .05); l.upX.setTargetAtTime(up.x, t, .05); l.upY.setTargetAtTime(up.y, t, .05); l.upZ.setTargetAtTime(up.z, t, .05) } else l.setOrientation(fw.x, fw.y, fw.z, up.x, up.y, up.z);
   rel.copy(orb.root.position).sub(cam.position); if (!orb.root.visible) rel.set(0, 20, -25);
   if (A.pan.positionX) { A.pan.positionX.setTargetAtTime(rel.x, t, .05); A.pan.positionY.setTargetAtTime(rel.y, t, .05); A.pan.positionZ.setTargetAtTime(rel.z, t, .05) } else A.pan.setPosition(rel.x, rel.y, rel.z);
-  const og = window.EEAR_ORB ? Math.max(.85, Math.min(1, EEAR_ORB.gain || 1)) : 1; A.orbG.gain.setTargetAtTime(og * A.quiet, t, .4) }
+  const og = window.EEAR_ORB ? Math.max(.85, Math.min(1, EEAR_ORB.gain || 1)) : 1; A.orbG.gain.setTargetAtTime(A.muted ? 0 : og * A.quiet, t, A.muted ? .05 : .4) }
 // ---------- orb ----------
 const orb = initOrb(world, toLocal, cam, {}); orb.state.spawn = { lat: -O[0], lon: O[1] + 180, d: 0, b: 0 };   // no ground poster in the tour (parked on the far side of the Earth)
 orb.spawn.visible = false;
@@ -215,17 +215,52 @@ $('bScreen').onclick = () => { drive.setSound(!drive.sound); scrBtn(); startAudi
 $('bPause').onclick = () => { paused = !paused; $('bPause').textContent = paused ? '▶ Resume' : '⏸ Pause'; startAudio() };
 if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) $('bFs').style.display = 'none';
 $('bFs').onclick = () => { const d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || (() => { })).call(d) };
-function enter(e) { if (e) e.preventDefault(); startAudio(); try { drive.video.play().catch(() => { }) } catch (x) { }
+function enter(e) { if (e) e.preventDefault(); if (HAS_MOTION) askMotion(); startAudio(); try { drive.video.play().catch(() => { }) } catch (x) { }
   const d = document.documentElement; if (!MOBILE || !/iPhone|iPod/.test(navigator.userAgent)) try { const p = (d.requestFullscreen || d.webkitRequestFullscreen || (() => { })).call(d, { navigationUI: 'hide' }); p && p.catch && p.catch(() => { }) } catch (x) { }
   try { screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => { }) } catch (x) { }
-  $('front').style.display = 'none'; $('hud').style.display = 'block'; $('btns').style.display = 'flex'; scrBtn(); running = true; intro = 0; tT = 0; setStop("Matt's 3D World", 'Diving in from space…'); caption('Welcome to Matt\'s 3D World', 3500); setTimeout(fit, 400) }
+  $('front').style.display = 'none'; $('hud').style.display = 'block'; $('btns').style.display = 'flex'; scrBtn(); running = true; intro = 0; tT = 0; recenter(false); motBtn(); setStop("Matt's 3D World", 'Diving in from space…'); caption('Welcome to Matt\'s 3D World', 3500); setTimeout(fit, 400) }
 $('enter').addEventListener('click', enter);
+$('bMot').onclick = () => { if (LOOK.on) { LOOK.on = false; LOOK.want = false; motBtn() } else if (LOOK.perm === 'granted' || LOOK.perm === 'not required') { LOOK.on = true; LOOK.want = true; recenter(true); motBtn() } else askMotion() };
+function muteBtn() { const b = $('bMute'); b.textContent = A.muted ? '🔇 Music muted' : '🔊 Mute music'; b.classList.toggle('on', A.muted) }
+$('bMute').onclick = () => { A.muted = !A.muted; try { sessionStorage.eearTourMute = A.muted ? '1' : '0' } catch (e) { } muteBtn(); startAudio(); audioFrame() }; muteBtn();
+$('bCtr').onclick = () => recenter(false);
 addEventListener('pointerdown', () => { if (running && A.ctx && A.ctx.state !== 'running') A.ctx.resume().catch(() => { }) }, { passive: true });
 if (/[?&]autostart=1/.test(location.search)) addEventListener('load', () => setTimeout(() => enter(), 300));
+// ---------- d55 LOOK AROUND: phone motion (DeviceOrientation) + touch/mouse drag, as an offset on top of the tour camera ----------
+// Device quaternion = the main Live Geometry app's math (index.html setCam / three DeviceOrientationControls): Euler(beta, alpha, -gamma, 'YXZ')
+// x q1 (-90 deg about X: camera looks out of the back of the screen) x rotZ(-screen angle). Offset = q0^-1 x qDevice (relative to the pose at Recenter),
+// expressed in the camera's own frame, so turning the phone turns the view the same way whatever the tour is doing. Drag adds yaw/pitch on top.
+const baseQ = new THREE.Quaternion();
+const LOOK = { q: new THREE.Quaternion(), on: false, perm: 'unknown', got: false, ori: null, q0: null, qs: new THREE.Quaternion(), yaw: 0, pitch: 0, dragging: false, events: 0 };
+const zee = new THREE.Vector3(0, 0, 1), q1 = new THREE.Quaternion(-Math.sqrt(.5), 0, 0, Math.sqrt(.5)), eu = new THREE.Euler(), qDev = new THREE.Quaternion(), qRel = new THREE.Quaternion(), qDrag = new THREE.Quaternion(), qz = new THREE.Quaternion(), qYaw = new THREE.Quaternion(), yAx = new THREE.Vector3(0, 1, 0);
+const scrAngle = () => (window.TOUR_SO != null ? TOUR_SO : (screen.orientation && screen.orientation.angle != null ? screen.orientation.angle : (window.orientation || 0)));
+function devQ(o, out) { eu.set((o.beta || 0) * D, (o.alpha || 0) * D, -(o.gamma || 0) * D, 'YXZ'); out.setFromEuler(eu); out.multiply(q1); out.multiply(qz.setFromAxisAngle(zee, -scrAngle() * D)); return out }
+function onOri(e) { if (e.alpha == null && e.beta == null) return; LOOK.ori = { alpha: e.alpha, beta: e.beta, gamma: e.gamma }; LOOK.events++;
+  if (!LOOK.got) { LOOK.got = true; if (LOOK.perm !== 'denied') { LOOK.on = LOOK.on || LOOK.want !== false; motBtn() } } if (LOOK.on && !LOOK.q0) recenter(true) }
+addEventListener('deviceorientation', onOri);
+function recenter(motionOnly) { if (LOOK.ori) LOOK.q0 = devQ(LOOK.ori, new THREE.Quaternion()); else LOOK.q0 = null; LOOK.qs.identity(); if (!motionOnly) { LOOK.yaw = 0; LOOK.pitch = 0 } }
+addEventListener('orientationchange', () => setTimeout(() => recenter(true), 250)); if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', () => setTimeout(() => recenter(true), 250));
+function askMotion() {   // must be called straight from a tap (iOS)
+  const DOE = window.DeviceOrientationEvent; if (!DOE) { LOOK.perm = 'unsupported'; motBtn(); return Promise.resolve('unsupported') }
+  if (typeof DOE.requestPermission === 'function') return DOE.requestPermission().then(r => { LOOK.perm = r; if (r === 'granted') { LOOK.on = true; LOOK.want = true; recenter(true) } else LOOK.on = false; motBtn(); return r }).catch(e => { LOOK.perm = 'error'; motBtn(); return 'error' });
+  LOOK.perm = 'not required'; LOOK.on = true; LOOK.want = true; recenter(true); motBtn(); return Promise.resolve('not required') }
+function lookFrame(dt) { if (LOOK.on && LOOK.ori) { if (!LOOK.q0) recenter(true); devQ(LOOK.ori, qDev); qRel.copy(LOOK.q0).invert().multiply(qDev); LOOK.qs.slerp(qRel, 1 - Math.exp(-dt * 14)) }   // light smoothing (~70 ms)
+  else LOOK.qs.slerp(qz.identity(), 1 - Math.exp(-dt * 4));
+  if (!LOOK.dragging && !LOOK.on) { /* drag offset stays until Recenter */ }
+  eu.setFromQuaternion(LOOK.qs, 'YXZ'); LOOK.ey = eu.y + LOOK.yaw; LOOK.ex = Math.max(-1.5, Math.min(1.5, eu.x + LOOK.pitch)); LOOK.ez = eu.z;
+  qYaw.setFromAxisAngle(yAx, LOOK.ey); eu.set(LOOK.ex, 0, LOOK.ez, 'YXZ'); LOOK.q.setFromEuler(eu) }   // yaw about the WORLD vertical (no pitch/yaw mixing while the tour looks down), pitch + roll in the camera frame
+// drag look (touch fallback on phones, mouse on desktop): on the 3D view only
+{ let px = 0, py = 0, id = null; const K = () => (cam.fov * D) / Math.max(1, innerHeight);
+  canvas.addEventListener('pointerdown', e => { id = e.pointerId; px = e.clientX; py = e.clientY; LOOK.dragging = true; try { canvas.setPointerCapture(id) } catch (x) { } });
+  canvas.addEventListener('pointermove', e => { if (e.pointerId !== id) return; const k = K(); LOOK.yaw += (e.clientX - px) * k; LOOK.pitch = Math.max(-1.45, Math.min(1.45, LOOK.pitch + (e.clientY - py) * k)); px = e.clientX; py = e.clientY });
+  const up = e => { if (e.pointerId === id) { id = null; LOOK.dragging = false } }; canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up) }
+const HAS_MOTION = !!window.DeviceOrientationEvent && MOBILE;
+function motBtn() { const b = $('bMot'); if (!b) return; b.style.display = HAS_MOTION || LOOK.got ? '' : 'none';
+  b.textContent = '📱 Motion look: ' + (LOOK.perm === 'denied' ? 'blocked (tap to retry)' : LOOK.perm === 'error' ? 'error (tap to retry)' : LOOK.on ? 'on' : 'off') }
 // ---------- main loop ----------
 const qT = new THREE.Quaternion(), mtx = new THREE.Matrix4(), tmp = new THREE.Vector3();
 let built = false; Promise.all([landmarksReady]).then(() => { buildTour(); built = true; if (!running) { cam.position.copy(enu(introFrom.lat, introFrom.lon, introFrom.alt)); cam.lookAt(enu(48.117, -122.76, 0)) } });
-cam.position.copy(enu(introFrom.lat, introFrom.lon, introFrom.alt)); cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0);
+cam.position.copy(enu(introFrom.lat, introFrom.lon, introFrom.alt)); cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0); baseQ.copy(cam.quaternion);
 let lastStop = '';
 function loop(now) { requestAnimationFrame(loop); const dt = Math.min(.1, (now - (lastNow || now)) / 1000); lastNow = now;
   if (built && running && !paused) {
@@ -233,11 +268,12 @@ function loop(now) { requestAnimationFrame(loop); const dt = Math.min(.1, (now -
     if (intro < INTRO) { intro += dt; introAt(Math.min(1, intro / INTRO), P, LK); }
     else { tT += dt; if (tT > TOTAL) tT = KEYS[LOOP0].t + (tT - TOTAL); s = sample(tT); }
     cam.position.copy(P); mtx.lookAt(P, LK, tmp.set(0, 1, 0)); qT.setFromRotationMatrix(mtx);
-    if (intro < INTRO && intro < dt * 2) cam.quaternion.copy(qT); else cam.quaternion.slerp(qT, 1 - Math.exp(-dt * (intro < INTRO ? 6 : 2.6)));
+    if (intro < INTRO && intro < dt * 2) baseQ.copy(qT); else baseQ.slerp(qT, 1 - Math.exp(-dt * (intro < INTRO ? 6 : 2.6)));
     if (s) { const k = s.key, st = k.stop && STOPS[k.stop]; if (st) setStop(st.name, k.sub2 || st.sub); else if (k.name) setStop(k.name, k.sub);
       if (k.stop !== lastStop) { lastStop = k.stop; if (k.stop === 'drivein') caption('Flying over the giant drive-in screen', 4500) }
       const quiet = s.seg.quiet && s.seg.hold; if (quiet && A.quiet === 1) caption('A quiet moment at Keohans Tree', 6000); A.quiet = quiet ? .45 : 1 }
     else if (intro >= INTRO * .55) setStop('Arriving over Port Townsend', 'Quimper Peninsula · Admiralty Inlet') }
+  lookFrame(dt); cam.quaternion.copy(qYaw).multiply(baseQ).multiply(LOOK.q);   // d55: look-around offset (phone motion and/or drag) on top of the tour direction
   // near/far for the altitude (orb is always 25-34 m away; continents from space)
   const alt = toLL(cam.position).alt; camAlt = alt; const agl = Math.max(1, cam.position.y - (TER ? 0 : 0)); const space = alt > 20000;
   cam.near = space ? alt * .003 : Math.min(8, Math.max(.5, alt * .02)); cam.far = space ? alt * 4 + 2e6 : Math.max(9e4, alt * 45); cam.updateProjectionMatrix();
@@ -250,4 +286,4 @@ function loop(now) { requestAnimationFrame(loop); const dt = Math.min(.1, (now -
   for (const s of labels) { s.getWorldPosition(tmp); const d = tmp.distanceTo(cam.position); s.visible = d < 6000 && !space; s.material.opacity = Math.min(1, (6000 - d) / 1500) }
   ren.render(scene, cam) }
 requestAnimationFrame(loop);
-window.TOUR = { get t() { return tT }, get intro() { return intro }, get keys() { return KEYS }, get total() { return TOTAL }, STOPS, orb, drive, A, DJ, cam, seek(t) { intro = INTRO; tT = t }, keyTime(stop) { const k = KEYS.find(k => k.stop === stop && k.slow || k.stop === stop && k.hold); return k ? k.t : null }, get stop() { return HUD.stop }, enu, toLL, ground, get downtownBlocks() { return downtownBuilt } };
+window.TOUR = { LOOK, recenter, baseQ, get t() { return tT }, get intro() { return intro }, get keys() { return KEYS }, get total() { return TOTAL }, STOPS, orb, drive, A, DJ, cam, seek(t) { intro = INTRO; tT = t }, keyTime(stop) { const k = KEYS.find(k => k.stop === stop && k.slow || k.stop === stop && k.hold); return k ? k.t : null }, get stop() { return HUD.stop }, enu, toLL, ground, get downtownBlocks() { return downtownBuilt } };
