@@ -4,7 +4,7 @@
 // and the giant drive-in screen (drivein.js). Sound: Matt Ready Radio = the Master DJ loop + live voice/announcements (dj.js / djvoice.js), played FROM the
 // orb (orbball.js + orbit.js: wanders 25-34 m around the camera, so it stays loud), HRTF-panned. The entry tap unlocks audio (iOS + desktop).
 import * as THREE from 'three';
-import { DJ } from './dj.js?v=1792455290575';
+import { DJ } from './dj.js?v=1792470000056';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
 import { initDriveIn } from './drivein.js?v=1792455290575';
@@ -184,22 +184,33 @@ const A = { muted: (() => { try { return sessionStorage.eearTourMute === '1' } c
 const listener = { lat: O[0], lon: O[1], alt: 0, hdg: 0, pitch: 0 };
 window.EEAR_AUDIO = { get ctx() { return A.ctx }, get out() { return A.master }, flyOn: true, on: true, listener, voiceIn: () => A.vIn };
 function startAudio() { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  A.ios = IOS; A.desk = !IOS;   // d56: desktop uses element volume (d50b pattern); iPhone keeps Web Audio HRTF through the orb
   if (!A.ctx) { const c = A.ctx = new AC(); try { if (navigator.audioSession) navigator.audioSession.type = 'playback' } catch (e) { }
     A.master = c.createGain(); A.master.gain.value = 1; const comp = c.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 3; A.master.connect(comp); comp.connect(c.destination);
     A.pan = c.createPanner(); Object.assign(A.pan, { panningModel: 'HRTF', distanceModel: 'inverse', refDistance: 1, rolloffFactor: 0, maxDistance: 1e6, coneInnerAngle: 360, coneOuterAngle: 360 });
     A.orbG = c.createGain(); A.orbG.gain.value = 1; A.pan.connect(A.orbG); A.orbG.connect(A.master);
-    const bus = c.createGain(); bus.gain.value = 1.25; bus.connect(A.pan); const n = DJ.attach(c); n && n.connect(bus);
-    A.vIn = c.createGain(); A.vIn.gain.value = 1.2; A.vIn.connect(A.pan);
-    const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0) }   // iOS unlock
-  if (A.ctx.state !== 'running') A.ctx.resume().catch(() => { });
-  DJ.want('tour', true); DJ.unlock() }
+    const bus = c.createGain(); bus.gain.value = 1.25; bus.connect(A.pan);
+    const n = DJ.attach(c, A.desk ? { dry: true } : undefined);
+    if (n && !A.desk) n.connect(bus);   // dry: element speaks on its own; stub node stays silent
+    A.vIn = c.createGain(); A.vIn.gain.value = 1.2; A.vIn.connect(A.desk ? A.master : A.pan);   // live voice: plain on desktop, from the orb on iPhone
+    const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0) }
+  const kick = () => { DJ.want('tour', true); DJ.unlock(); if (A.desk && DJ.el) { try { DJ.el.muted = false } catch (e) { } } };
+  kick();
+  const r = A.ctx.state !== 'running' ? A.ctx.resume() : Promise.resolve();
+  r.then(kick).catch(() => { });
+  // keep kicking for a few seconds in case /api/dj was still loading at Enter (autoplay needs a gesture-linked play)
+  if (!A.kickTimer) { let n = 0; A.kickTimer = setInterval(() => { kick(); if (++n >= 10 || (DJ.el && !DJ.el.paused && DJ.el.currentSrc)) { clearInterval(A.kickTimer); A.kickTimer = 0 } }, 400) }
+}
 const fw = new THREE.Vector3(), up = new THREE.Vector3(), rel = new THREE.Vector3();
 function audioFrame() { const c = A.ctx; if (!c) return; const t = c.currentTime;
   cam.getWorldDirection(fw); up.set(0, 1, 0).applyQuaternion(cam.quaternion); const l = c.listener;
   if (l.forwardX) { l.forwardX.setTargetAtTime(fw.x, t, .05); l.forwardY.setTargetAtTime(fw.y, t, .05); l.forwardZ.setTargetAtTime(fw.z, t, .05); l.upX.setTargetAtTime(up.x, t, .05); l.upY.setTargetAtTime(up.y, t, .05); l.upZ.setTargetAtTime(up.z, t, .05) } else l.setOrientation(fw.x, fw.y, fw.z, up.x, up.y, up.z);
   rel.copy(orb.root.position).sub(cam.position); if (!orb.root.visible) rel.set(0, 20, -25);
   if (A.pan.positionX) { A.pan.positionX.setTargetAtTime(rel.x, t, .05); A.pan.positionY.setTargetAtTime(rel.y, t, .05); A.pan.positionZ.setTargetAtTime(rel.z, t, .05) } else A.pan.setPosition(rel.x, rel.y, rel.z);
-  const og = window.EEAR_ORB ? Math.max(.85, Math.min(1, EEAR_ORB.gain || 1)) : 1; A.orbG.gain.setTargetAtTime(A.muted ? 0 : og * A.quiet, t, A.muted ? .05 : .4) }
+  const og = window.EEAR_ORB ? Math.max(.85, Math.min(1, EEAR_ORB.gain || 1)) : 1, lvl = A.muted ? 0 : og * A.quiet;
+  if (A.desk && DJ.el) { const vv = Math.max(0, Math.min(1, lvl * .95)); if (Math.abs((DJ.el.volume || 0) - vv) > .01) DJ.el.volume = vv; if (DJ.el.muted && !A.muted) DJ.el.muted = false }
+  else if (A.orbG) A.orbG.gain.setTargetAtTime(lvl, t, A.muted ? .05 : .4) }
 // ---------- orb ----------
 const orb = initOrb(world, toLocal, cam, {}); orb.state.spawn = { lat: -O[0], lon: O[1] + 180, d: 0, b: 0 };   // no ground poster in the tour (parked on the far side of the Earth)
 orb.spawn.visible = false;
@@ -208,7 +219,8 @@ const HUD = { stop: '', t0: 0 }; let paused = false, running = false, tT = 0, in
 function setStop(name, sub) { if (HUD.stop === name) return; HUD.stop = name; $('stop').textContent = name; $('sub').textContent = sub || '' }
 let capT = 0; function caption(txt, ms = 4000) { const c = $('cap'); c.textContent = txt; c.style.opacity = 1; clearTimeout(capT); capT = setTimeout(() => c.style.opacity = 0, ms) }
 function nowPlaying() { const c = DJ.at(), st = window.EEAR_DJ && DJ.state; let t = '📻 Matt Ready Radio';
-  if (st && st.live) t += ' · 🎙 LIVE'; if (c.item && c.playing) t += ': ' + c.item.title + (c.item.artist ? ' — ' + c.item.artist : ''); else if (st && !c.playing) t += ' · paused by the DJ'; else t += ': tuning in…'; $('now').textContent = t }
+  if (A.muted) t = '🔇 Music muted'; else { if (st && st.live) t += ' · 🎙 LIVE'; if (c.item && c.playing) t += ': ' + c.item.title + (c.item.artist ? ' — ' + c.item.artist : ''); else if (st && !c.playing) t += ' · paused by the DJ'; else t += ': tuning in…' }
+  $('now').textContent = t }
 setInterval(nowPlaying, 1000);
 function scrBtn() { $('bScreen').textContent = '🎬 Screen sound: ' + (drive.sound ? 'on' : 'off') }
 $('bScreen').onclick = () => { drive.setSound(!drive.sound); scrBtn(); startAudio() };
@@ -218,13 +230,14 @@ $('bFs').onclick = () => { const d = document.documentElement; (d.requestFullscr
 function enter(e) { if (e) e.preventDefault(); if (HAS_MOTION) askMotion(); startAudio(); try { drive.video.play().catch(() => { }) } catch (x) { }
   const d = document.documentElement; if (!MOBILE || !/iPhone|iPod/.test(navigator.userAgent)) try { const p = (d.requestFullscreen || d.webkitRequestFullscreen || (() => { })).call(d, { navigationUI: 'hide' }); p && p.catch && p.catch(() => { }) } catch (x) { }
   try { screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => { }) } catch (x) { }
-  $('front').style.display = 'none'; $('hud').style.display = 'block'; $('btns').style.display = 'flex'; scrBtn(); running = true; intro = 0; tT = 0; recenter(false); motBtn(); setStop("Matt's 3D World", 'Diving in from space…'); caption('Welcome to Matt\'s 3D World', 3500); setTimeout(fit, 400) }
+  $('front').style.display = 'none'; $('hud').style.display = 'block'; $('btns').style.display = 'flex'; scrBtn(); running = true; intro = 0; tT = 0; recenter(false); motBtn();
+  if (A.muted) caption('Music is muted — tap 🔊 Mute music to hear the radio', 5000); setStop("Matt's 3D World", 'Diving in from space…'); caption('Welcome to Matt\'s 3D World', 3500); setTimeout(fit, 400) }
 $('enter').addEventListener('click', enter);
 $('bMot').onclick = () => { if (LOOK.on) { LOOK.on = false; LOOK.want = false; motBtn() } else if (LOOK.perm === 'granted' || LOOK.perm === 'not required') { LOOK.on = true; LOOK.want = true; recenter(true); motBtn() } else askMotion() };
 function muteBtn() { const b = $('bMute'); b.textContent = A.muted ? '🔇 Music muted' : '🔊 Mute music'; b.classList.toggle('on', A.muted) }
 $('bMute').onclick = () => { A.muted = !A.muted; try { sessionStorage.eearTourMute = A.muted ? '1' : '0' } catch (e) { } muteBtn(); startAudio(); audioFrame() }; muteBtn();
 $('bCtr').onclick = () => recenter(false);
-addEventListener('pointerdown', () => { if (running && A.ctx && A.ctx.state !== 'running') A.ctx.resume().catch(() => { }) }, { passive: true });
+addEventListener('pointerdown', () => { if (running) startAudio() }, { passive: true });
 if (/[?&]autostart=1/.test(location.search)) addEventListener('load', () => setTimeout(() => enter(), 300));
 // ---------- d55 LOOK AROUND: phone motion (DeviceOrientation) + touch/mouse drag, as an offset on top of the tour camera ----------
 // Device quaternion = the main Live Geometry app's math (index.html setCam / three DeviceOrientationControls): Euler(beta, alpha, -gamma, 'YXZ')

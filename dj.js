@@ -51,7 +51,10 @@ function ui(c) { if (window.EEAR_DJ_NOUI) return; let d = document.getElementByI
 // ---- audio element
 function el() { if (S.el) return S.el; const a = S.el = new Audio(); a.preload = 'auto'; a.playsInline = true; a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
   a.addEventListener('loadedmetadata', () => { S.pend = true }); a.addEventListener('ended', () => tick()); return a }
-export function attach(ctx) { if (S.ctx === ctx && S.node) return S.node; S.ctx = ctx; const a = el(); try { const src = ctx.createMediaElementSource(a); S.node = ctx.createGain(); S.node.gain.value = 1; src.connect(S.node) } catch (e) { S.err = 'attach: ' + (e.message || e) } return S.node }
+export function attach(ctx, opts) { if (S.ctx === ctx && S.node) return S.node; S.ctx = ctx; const a = el();
+  /* dry: desktop element-output path (d50b/d56). No MediaElementSource — a.volume is audible. S.node is a silent stub so tick()/duck still have a GainNode. */
+  if (opts && opts.dry) { S.dry = true; S.node = ctx.createGain(); S.node.gain.value = 0; try { S.node.connect(ctx.destination) } catch (e) { } return S.node }
+  try { const src = ctx.createMediaElementSource(a); S.node = ctx.createGain(); S.node.gain.value = 1; src.connect(S.node); S.dry = false } catch (e) { S.err = 'attach: ' + (e.message || e) } return S.node }
 /** call inside a user tap (iOS): starts the element once so later play() calls are allowed */
 export function unlock() { const a = el(), c = at(); if (!a.src && c.item) { a.src = resolve(c.item.url); S.url = a.src; S.pend = false } try { const p = a.play(); p && p.catch(() => { }) } catch (e) { } setTimeout(tick, 50) }
 export function want(who, v) { const b = !!v; if (S.wants[who] !== b) { S.wants[who] = b; tick() } }
@@ -68,5 +71,5 @@ setInterval(tick, 500); setInterval(changed, 1000);
 let polls = 0; setInterval(() => { polls++; if (S.src !== 'live' || polls % 2 === 0) fetchState(); if (S.src === 'live' && (!S.es || S.es.readyState === 2)) stream() }, 30000);
 fetchState().then(ok => { if (ok) stream() });
 addEventListener('visibilitychange', () => { if (!document.hidden) fetchState() });
-export const DJ = { at, now, attach, unlock, want, label: () => label(), get node() { return S.node }, get el() { return S.el }, get state() { return S.st }, get source() { return S.src }, get err() { return S.err }, get offsetMs() { return S.off }, get current() { return at().item }, base: BASE, fetchState, on, gm };
+export const DJ = { at, now, attach, unlock, want, label: () => label(), get node() { return S.node }, get el() { return S.el }, get state() { return S.st }, get source() { return S.src }, get err() { return S.err }, get offsetMs() { return S.off }, get dry() { return !!S.dry }, get current() { return at().item }, base: BASE, fetchState, on, gm };
 window.EEAR_DJ = DJ;
