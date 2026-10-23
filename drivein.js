@@ -32,8 +32,9 @@ const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 
 const fmtD = m => m < 1000 ? Math.round(m) + ' m' : (m / MI).toFixed(m < 16 * MI ? 1 : 0) + ' mi · ' + (m / 1000).toFixed(m < 1e4 ? 1 : 0) + ' km';
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g, w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.userData.c = c; return t }
 export function initDriveIn(parent, toLocal, cam, opts = {}) {
-  /* opts.wM / opts.hM: tour-only size override (d57); main AR omits them and keeps the full 10 x 5.625 km screen */
-  const C = Object.assign({}, DRIVEIN); if (opts.wM != null) C.wM = +opts.wM; if (opts.hM != null) C.hM = +opts.hM;
+  /* opts.wM/hM (d57) + opts.lat/lon/faceBrg/altM (d58): tour-only overrides; main AR omits them and keeps the full giant over the Quimper peninsula */
+  const C = Object.assign({}, DRIVEIN);
+  for (const k of ['wM', 'hM', 'lat', 'lon', 'faceBrg', 'altM']) if (opts[k] != null) C[k] = +opts[k];
   const lite = !!opts.lite, enabled = opts.enabled || (() => true), soundWanted = () => localStorage.eearScreenSound === '1';
   const S = { cfg: null, err: null, d: null, dGps: null, gain: 0, playing: false, far: false, clip: null, lastSeek: 0, src: null, ctxOwn: null };
   const root = new THREE.Group(); root.name = 'drivein'; root.userData.layer = 'drivein'; parent.add(root);

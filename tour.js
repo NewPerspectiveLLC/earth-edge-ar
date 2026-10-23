@@ -1,4 +1,4 @@
-// tour.js (d54): "Matt's 3D World" - automatic drone tour over Port Townsend (tour.html). Plain 3D (no camera / GPS / compass / AR).
+// tour.js (d58): "Matt's 3D World" - automatic drone tour over Port Townsend (tour.html). Plain 3D (no camera / GPS / compass / AR).
 // Minimal layers: continents (Natural Earth) + Port Townsend shoreline (OSM) outlines, a green low-relief terrain over the land (tour-terrain.json, real
 // elevation), c.1850s dirt roads (tour-roads.json), a few small 3D details (downtown, Freemason Hall, Keohans Tree, Ready Athletics, Cappy's, Fort Worden)
 // and the giant drive-in screen (drivein.js). Sound: Matt Ready Radio = the Master DJ loop + live voice/announcements (dj.js / djvoice.js), played FROM the
@@ -7,10 +7,11 @@ import * as THREE from 'three';
 import { DJ } from './dj.js?v=1792470000056';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
-import { initDriveIn } from './drivein.js?v=1792470000057';
+import { initDriveIn } from './drivein.js?v=1792470000058';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
 const V = '?v=' + (window.EEAR_V || '1792455290575');
+const TV = '?v=1792470000058';   // d58: bust tour-terrain.json / tour-roads without a global build bump
 const MOBILE = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const D = Math.PI / 180, RE = 6371000, $ = id => document.getElementById(id);
 // ---------- frame: exact ENU on a sphere around downtown-ish origin; three: x = east, y = up, z = -north ----------
@@ -25,7 +26,7 @@ const toLocal = (lat, lon) => enu(lat, lon, 0);
 const canvas = $('c'), ren = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 ren.setPixelRatio(Math.min(devicePixelRatio || 1, MOBILE ? 2 : 1.75)); ren.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x02030a);
-const cam = new THREE.PerspectiveCamera(MOBILE ? 68 : 60, 1, 1, 1e5); scene.add(cam);
+const cam = new THREE.PerspectiveCamera(MOBILE ? 68 : 60, 1, 1, 2.5e5); scene.add(cam);
 const world = new THREE.Group(); scene.add(world);
 function fit() { const w = innerWidth, h = innerHeight; ren.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix() }
 addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 300)); if (window.visualViewport) visualViewport.addEventListener('resize', fit); fit();
@@ -39,20 +40,22 @@ function lineSet(rings, h, color, opacity = 1, close = false) { const P = [];
     for (let i = 0; i < n; i++) { const [a, l] = R[i % R.length]; const v = enu(a, l, h); if (prev) P.push(prev.x, prev.y, prev.z, v.x, v.y, v.z); prev = v } }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
   const m = new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity }); const o = new THREE.LineSegments(g, m); o.frustumCulled = false; world.add(o); return o }
-const J = u => fetch(u + V).then(r => r.json());
+const J = u => fetch(u + (u.startsWith('tour-') ? TV : V)).then(r => r.json());
 J('continents.json').then(j => { for (const k in j.continents) lineSet(j.continents[k].rings, 0, 0x5fd3ff, .85, true) }).catch(e => console.warn('continents', e));
 J('landmass.json').then(j => { for (const k in j.rings) lineSet([j.rings[k]], 0, 0x5fd3ff, .85, true) }).catch(() => { });
 J('coast.json').then(j => lineSet(j.lines, 1.5, 0x7fe8ff, 1)).catch(() => { });
 J('shore.json').then(j => { lineSet(j.harbor, 1.5, 0xa8f0ff, .8); lineSet(j.lagoon, 1.5, 0x7fe8ff, .8) }).catch(() => { });
 // ---------- terrain (green, real elevation, land only) ----------
-const VEX = 1.6; let TER = null;
+const VEX = 2.8; let TER = null;   // d58: enough for Olympic ridges to read from tour altitudes (Olympus ~2.2 km DEM → ~6.1 km visual), not cartoonish
 function hRaw(lat, lon) { const T = TER; if (!T) return 0; const [S, W, N, E] = T.bbox; const fx = (lon - W) / (E - W) * (T.nx - 1), fy = (N - lat) / (N - S) * (T.ny - 1);
   if (fx < 0 || fy < 0 || fx > T.nx - 1 || fy > T.ny - 1) return 0; const i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j, i1 = Math.min(i + 1, T.nx - 1), j1 = Math.min(j + 1, T.ny - 1);
   const g = (a, b) => Math.max(0, T.h[b * T.nx + a]); return (g(i, j) * (1 - u) + g(i1, j) * u) * (1 - v) + (g(i, j1) * (1 - u) + g(i1, j1) * u) * v }
 const ground = (lat, lon) => hRaw(lat, lon) * VEX;
 const terrReady = J('tour-terrain.json').then(T => { TER = T; const [S, W, N, E] = T.bbox, nx = T.nx, ny = T.ny, pos = [], col = [], idx = [], c = new THREE.Color();
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const la = N - (N - S) * j / (ny - 1), lo = W + (E - W) * i / (nx - 1), h = Math.max(0, T.h[j * nx + i]); const v = enu(la, lo, h * VEX); pos.push(v.x, v.y, v.z);
-    const k = Math.min(1, h / 120); c.setRGB(.16 + .16 * k, .42 + .2 * k - .1 * k * k, .14 + .06 * k); col.push(c.r, c.g, c.b) }
+    /* green lowlands → olive foothills → rock gray → light summit; scaled for ~0-2200 m Olympic DEM */
+    const k = Math.min(1, h / 2000), snow = Math.max(0, (h - 1400) / 900);
+    c.setRGB(.14 + .18 * k + .45 * snow, .40 + .12 * k - .18 * k * k + .35 * snow, .12 + .05 * k + .40 * snow); col.push(c.r, c.g, c.b) }
   const L = (i, j) => T.h[j * nx + i] >= 0;
   for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) { const a = j * nx + i, b = a + 1, cc = a + nx, d = cc + 1;
     if (L(i, j) && L(i + 1, j) && L(i, j + 1)) idx.push(a, cc, b); if (L(i + 1, j) && L(i, j + 1) && L(i + 1, j + 1)) idx.push(b, cc, d);
@@ -85,7 +88,7 @@ const STOPS = {
   ra: { name: 'Ready Athletics', sub: 'the vortex centre', lat: 48.1062, lon: -122.8057 },
   cappy: { name: "Cappy's Trails", sub: 'garden + trails', lat: 48.13165, lon: -122.79921 },
   worden: { name: 'Fort Worden', sub: "Memory's Vault", lat: 48.1384642, lon: -122.7647029 },
-  drivein: { name: 'Matt Ready Drive-In', sub: 'the giant screen over Port Townsend', lat: 48.12395, lon: -122.81995 },
+  drivein: { name: 'Matt Ready Drive-In', sub: 'offshore over Admiralty Inlet', lat: 48.138, lon: -122.665 },
 };
 const anchor = (lat, lon, dy = 0) => { const g = new THREE.Group(); g.position.copy(enu(lat, lon, ground(lat, lon) + dy)); world.add(g); return g };
 const std = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, ...o });
@@ -120,8 +123,8 @@ const landmarksReady = Promise.all([terrReady, roadsReady]).then(([, R]) => {
     const lb = label(S.name, S.sub, css); lb.position.y = 90; g.add(lb); S.g = g }
 });
 // ---------- drive-in (reused module; muted unless 'Screen sound' is on) ----------
-/* d57: tour-only half screen (5.0 x 2.8125 km, same centre/bearing); main Live Geometry keeps full 10 x 5.625 km */
-const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5 });
+/* d57 half size + d58 offshore over Admiralty Inlet (tour-only lat/lon/faceBrg); main AR keeps full Quimper giant */
+const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5, lat: 48.138, lon: -122.665, faceBrg: 250 });
 // ---------- tour path: keyframes (position + look target), cubic Hermite in time ----------
 const off = (S, brg, dist, agl) => { const lat = S.lat + dist * Math.cos(brg * D) / 111320, lon = S.lon + dist * Math.sin(brg * D) / (111320 * Math.cos(S.lat * D)); return enu(lat, lon, ground(lat, lon) + agl) };
 const at = (S, agl = 0) => enu(S.lat, S.lon, ground(S.lat, S.lon) + agl);
@@ -149,10 +152,10 @@ function buildTour() { const S = STOPS, K = [], C = drive.C;
   k(off(S.ra, 180, 110, 50), at(S.ra), { stop: 'ra' });
   k(off(S.ra, 260, 140, 70), at(S.ra), { stop: 'ra' });
   // drive-in: rise to the front view, fly up and OVER the giant screen, look back at the mirrored side
-  k(front(9500).setY(2100), scrC.clone(), { stop: 'drivein', dur: 22 });
-  k(front(4200).setY(3600), scrC.clone(), { stop: 'drivein', dur: 14 });
+  k(front(8200).setY(2400), scrC.clone(), { stop: 'drivein', dur: 22 });
+  k(front(3800).setY(3200), scrC.clone(), { stop: 'drivein', dur: 14 });
   k(scrC.clone().setY(C.altM + C.hM / 2 + 900), back(3000).setY(1500), { stop: 'drivein', dur: 14 });
-  k(back(4500).setY(2600), scrC.clone(), { stop: 'drivein', dur: 12, sub2: 'the back shows the mirror image' });
+  k(back(5000).setY(2800), scrC.clone(), { stop: 'drivein', dur: 12, sub2: 'the back shows the mirror image' });
   k(off(S.cappy, 330, 700, 220), at(S.cappy), { stop: 'cappy', dur: 18 });
   k(off(S.cappy, 20, 120, 55), at(S.cappy), { stop: 'cappy', slow: 1 });
   k(off(S.cappy, 120, 120, 55), at(S.cappy), { stop: 'cappy' });

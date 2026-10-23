@@ -1,6 +1,6 @@
-# tour_data.py (d54): builds tour-terrain.json (green land surface for tour.html) + tour-roads.json (c.1850s dirt roads).
-# Terrain: AWS Terrain Tiles (Terrarium, z13; Mapzen/USGS 3DEP-derived, public) resampled to ~100 m, land = ocean-mask.png (OSM coastline) == 0,
-#          only the land component connected to downtown Port Townsend (Quimper Peninsula and south), lightly smoothed. Heights in metres (int).
+# tour_data.py (d54 roads / legacy PT terrain): tour-roads.json (c.1850s dirt roads).
+# Terrain: as of d58 use tools/tour_terrain_olympic.py → tour-terrain.json (Olympic Peninsula + Quimper, Terrarium z11 ~650 m).
+# Legacy PT-only block below kept for reference; do not run it over the d58 file without meaning to.
 # Roads:   OSM (ODbL) via Overpass, modern alignments used as stand-ins for streets/roads documented in the 1856 plat and the 1858 Port Discovery road.
 import json, math, sys, numpy as np
 from PIL import Image
