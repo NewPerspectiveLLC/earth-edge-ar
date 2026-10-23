@@ -1,17 +1,19 @@
-// tour.js (d58): "Matt's 3D World" - automatic drone tour over Port Townsend (tour.html). Plain 3D (no camera / GPS / compass / AR).
+// tour.js (d59): "Matt's 3D World" - automatic drone tour over Port Townsend (tour.html). Plain 3D (no camera / GPS / compass / AR).
 // Minimal layers: continents (Natural Earth) + Port Townsend shoreline (OSM) outlines, a green low-relief terrain over the land (tour-terrain.json, real
 // elevation), c.1850s dirt roads (tour-roads.json), a few small 3D details (downtown, Freemason Hall, Keohans Tree, Ready Athletics, Cappy's, Fort Worden)
 // and the giant drive-in screen (drivein.js). Sound: Matt Ready Radio = the Master DJ loop + live voice/announcements (dj.js / djvoice.js), played FROM the
 // orb (orbball.js + orbit.js: wanders 25-34 m around the camera, so it stays loud), HRTF-panned. The entry tap unlocks audio (iOS + desktop).
+// d59: live broadcaster orbs (liveorbs.js + /api/live-orbs) on the surface; tour route inserts flyovers for current live orbs (rebuild on loop wrap).
 import * as THREE from 'three';
 import { DJ } from './dj.js?v=1792470000056';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
 import { initDriveIn } from './drivein.js?v=1792470000058';
+import { initLiveOrbs } from './liveorbs.js?v=1792470000059';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
 const V = '?v=' + (window.EEAR_V || '1792455290575');
-const TV = '?v=1792470000058';   // d58: bust tour-terrain.json / tour-roads without a global build bump
+const TV = '?v=1792470000059';   // d59: tour assets + liveorbs cachebust without a global build bump
 const MOBILE = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const D = Math.PI / 180, RE = 6371000, $ = id => document.getElementById(id);
 // ---------- frame: exact ENU on a sphere around downtown-ish origin; three: x = east, y = up, z = -north ----------
@@ -125,6 +127,13 @@ const landmarksReady = Promise.all([terrReady, roadsReady]).then(([, R]) => {
 // ---------- drive-in (reused module; muted unless 'Screen sound' is on) ----------
 /* d57 half size + d58 offshore over Admiralty Inlet (tour-only lat/lon/faceBrg); main AR keeps full Quimper giant */
 const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5, lat: 48.138, lon: -122.665, faceBrg: 250 });
+// ---------- live broadcaster orbs (d59) ----------
+let LIVE_ORBS = [], livePending = false, liveSig = '';
+const liveOrbs = initLiveOrbs(world, {
+  toWorld: (lat, lon, agl) => enu(lat, lon, agl),
+  getCam: () => cam, ground, agl: 32, unitPerM: 1, pollMs: 4000,
+  onChange: (L) => { LIVE_ORBS = L; const s = L.map(o => o.id).sort().join('|'); if (s !== liveSig) { liveSig = s; livePending = true } }
+});
 // ---------- tour path: keyframes (position + look target), cubic Hermite in time ----------
 const off = (S, brg, dist, agl) => { const lat = S.lat + dist * Math.cos(brg * D) / 111320, lon = S.lon + dist * Math.sin(brg * D) / (111320 * Math.cos(S.lat * D)); return enu(lat, lon, ground(lat, lon) + agl) };
 const at = (S, agl = 0) => enu(S.lat, S.lon, ground(S.lat, S.lon) + agl);
@@ -162,6 +171,15 @@ function buildTour() { const S = STOPS, K = [], C = drive.C;
   k(off(S.worden, 260, 500, 170), at(S.worden), { stop: 'worden' });
   k(off(S.worden, 200, 120, 55), at(S.worden), { stop: 'worden', slow: 1 });
   k(off(S.worden, 120, 140, 60), at(S.worden), { stop: 'worden' });
+  // d59: dynamic live-orb flyovers (PT town + Egypt / anywhere). Approach altitude scales with great-circle span so distant orbs get a high look-in.
+  for (const o of LIVE_ORBS) {
+    const L = { lat: o.lat, lon: o.lon }, dM = enu(O[0], O[1], 0, new THREE.Vector3()).distanceTo(enu(o.lat, o.lon, 0, new THREE.Vector3()));
+    const far = dM > 5e5, brg0 = 40, distA = far ? Math.min(1.2e5, Math.max(8000, dM * .012)) : 900, altA = far ? Math.min(4e4, Math.max(2500, dM * .004)) : 220;
+    const distB = far ? distA * .35 : 200, altB = far ? altA * .45 : 70;
+    k(off(L, brg0, distA, altA), at(L, 40), { stop: 'live:' + o.id, live: 1, name: (o.name || 'Live') + ' (live orb)', sub: o.lat.toFixed(3) + ', ' + o.lon.toFixed(3), dur: far ? 28 : 14 });
+    k(off(L, brg0 + 70, distB, altB), at(L, 28), { stop: 'live:' + o.id, live: 1, slow: 1, name: (o.name || 'Live') + ' (live orb)', sub: 'broadcasting now' });
+    k(off(L, brg0 + 160, distB * 1.15, altB * 1.1), at(L, 24), { stop: 'live:' + o.id, live: 1, dur: far ? 16 : 8 });
+  }
   k(off(S.downtown, 320, 900, 300), at(S.downtown), { stop: 'downtown', dur: 16 });
   k(K[LOOP0].p.clone(), K[LOOP0].look.clone(), { stop: 'downtown', dur: 12 });   // == loop start
   // timing: distance / altitude-scaled speed
@@ -172,7 +190,7 @@ function buildTour() { const S = STOPS, K = [], C = drive.C;
   for (let i = 0; i < K.length; i++) { const a = K[i - 1] || K[i], b = K[i + 1] || K[i];   // tangents (time-scaled Catmull-Rom); zero on hover holds
     if (K[i].hold || (K[i + 1] && K[i + 1].hold && K[i + 1].p.equals(K[i].p))) { K[i].m = new THREE.Vector3(); K[i].ml = new THREE.Vector3(); continue }
     const dt = (b.t - a.t) || 1; K[i].m = b.p.clone().sub(a.p).divideScalar(dt); K[i].ml = b.look.clone().sub(a.look).divideScalar(dt) }
-  K[0].m.set(0, 0, 0); KEYS = K }
+  K[0].m.set(0, 0, 0); KEYS = K; livePending = false }
 function herm(a, b, ma, mb, dt, u, out) { const u2 = u * u, u3 = u2 * u, h00 = 2 * u3 - 3 * u2 + 1, h10 = u3 - 2 * u2 + u, h01 = -2 * u3 + 3 * u2, h11 = u3 - u2;
   return out.set(0, 0, 0).addScaledVector(a, h00).addScaledVector(ma, h10 * dt).addScaledVector(b, h01).addScaledVector(mb, h11 * dt) }
 let camAlt = 2.6e6; const P = new THREE.Vector3(), LK = new THREE.Vector3();
@@ -283,24 +301,26 @@ function loop(now) { requestAnimationFrame(loop); const dt = Math.min(.1, (now -
   if (built && running && !paused) {
     let s;
     if (intro < INTRO) { intro += dt; introAt(Math.min(1, intro / INTRO), P, LK); }
-    else { tT += dt; if (tT > TOTAL) tT = KEYS[LOOP0].t + (tT - TOTAL); s = sample(tT); }
+    else { tT += dt; if (tT > TOTAL) { if (livePending) buildTour(); tT = KEYS[LOOP0].t + (tT - TOTAL) } s = sample(tT); }
     cam.position.copy(P); mtx.lookAt(P, LK, tmp.set(0, 1, 0)); qT.setFromRotationMatrix(mtx);
     if (intro < INTRO && intro < dt * 2) baseQ.copy(qT); else baseQ.slerp(qT, 1 - Math.exp(-dt * (intro < INTRO ? 6 : 2.6)));
     if (s) { const k = s.key, st = k.stop && STOPS[k.stop]; if (st) setStop(st.name, k.sub2 || st.sub); else if (k.name) setStop(k.name, k.sub);
-      if (k.stop !== lastStop) { lastStop = k.stop; if (k.stop === 'drivein') caption('Flying over the giant drive-in screen', 4500) }
+      if (k.stop !== lastStop) { lastStop = k.stop; if (k.stop === 'drivein') caption('Flying over the giant drive-in screen', 4500); else if (k.live) caption('Flying over live broadcaster: ' + (k.name || 'orb'), 4500) }
       const quiet = s.seg.quiet && s.seg.hold; if (quiet && A.quiet === 1) caption('A quiet moment at Keohans Tree', 6000); A.quiet = quiet ? .45 : 1 }
     else if (intro >= INTRO * .55) setStop('Arriving over Port Townsend', 'Quimper Peninsula · Admiralty Inlet') }
   lookFrame(dt); cam.quaternion.copy(qYaw).multiply(baseQ).multiply(LOOK.q);   // d55: look-around offset (phone motion and/or drag) on top of the tour direction
   // near/far for the altitude (orb is always 25-34 m away; continents from space)
   const alt = toLL(cam.position).alt; camAlt = alt; const agl = Math.max(1, cam.position.y - (TER ? 0 : 0)); const space = alt > 20000;
-  cam.near = space ? alt * .003 : Math.min(8, Math.max(.5, alt * .02)); cam.far = space ? alt * 4 + 2e6 : Math.max(9e4, alt * 45); cam.updateProjectionMatrix();
+  cam.near = space ? alt * .003 : Math.min(8, Math.max(.5, alt * .02)); cam.far = space ? alt * 4 + 2e6 : Math.max(9e4, alt * 45);
+  try { const fd = liveOrbs.farthestDist(); if (fd > 0) cam.far = Math.max(cam.far, fd * 1.25 + 5e4) } catch (e) { }
+  cam.updateProjectionMatrix();
   globe.scale.setScalar(1); globe.position.y = -RE - (space ? alt * .002 : 0);
   const ll = toLL(cam.position); listener.lat = ll.lat; listener.lon = ll.lon; listener.alt = alt; cam.getWorldDirection(fw); listener.hdg = (Math.atan2(fw.x, -fw.z) / D + 360) % 360; listener.pitch = Math.asin(Math.max(-1, Math.min(1, fw.y))) / D;
   try { orb.update(dt) } catch (e) { if (!orb.err) { orb.err = 1; console.warn('orb', e) } } if (space) orb.root.visible = false; orb.spawn.visible = false;
-  drive.update(); audioFrame();
+  drive.update(); try { liveOrbs.update(now) } catch (e) { if (!liveOrbs._err) { liveOrbs._err = 1; console.warn('liveOrbs', e) } } audioFrame();
   const K = STOPS.keohan; if (K.ring) K.ring.material.opacity = .25 + .15 * Math.sin(now / 700);
   for (const k of ['ra', 'cappy', 'worden']) if (STOPS[k].ring) STOPS[k].ring.rotation.y = now / 3000;
   for (const s of labels) { s.getWorldPosition(tmp); const d = tmp.distanceTo(cam.position); s.visible = d < 6000 && !space; s.material.opacity = Math.min(1, (6000 - d) / 1500) }
   ren.render(scene, cam) }
 requestAnimationFrame(loop);
-window.TOUR = { LOOK, recenter, baseQ, get t() { return tT }, get intro() { return intro }, get keys() { return KEYS }, get total() { return TOTAL }, STOPS, orb, drive, A, DJ, cam, seek(t) { intro = INTRO; tT = t }, keyTime(stop) { const k = KEYS.find(k => k.stop === stop && k.slow || k.stop === stop && k.hold); return k ? k.t : null }, get stop() { return HUD.stop }, enu, toLL, ground, get downtownBlocks() { return downtownBuilt } };
+window.TOUR = { LOOK, recenter, baseQ, get t() { return tT }, get intro() { return intro }, get keys() { return KEYS }, get total() { return TOTAL }, STOPS, orb, drive, liveOrbs, A, DJ, cam, seek(t) { intro = INTRO; tT = t }, keyTime(stop) { const k = KEYS.find(k => k.stop === stop && k.slow || k.stop === stop && k.hold); return k ? k.t : null }, get stop() { return HUD.stop }, enu, toLL, ground, get downtownBlocks() { return downtownBuilt }, rebuildTour: () => buildTour() };

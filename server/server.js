@@ -277,7 +277,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -348,6 +348,11 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    return L?{...o,lat:s.lat,lon:s.lon,target:{lat:s.tlat,lon:s.tlon,place:s.place}}:{...o,private:true,note:'parked at a custom (non-landmark) spot; position not published'}});
   const HP=all('select id,device,mode from gplayers where live=1 and seen>?',cut).filter(p=>!isGhost(p.id)&&!isBot(p.id));const byDev={};for(const p of HP)byDev[p.device||'unknown']=(byDev[p.device||'unknown']||0)+1;
   return send(r,{t:now,pillars:pillarsPub(),edge:{lat:EDGE.lat,lon:EDGE.lon,r:EDGE.r,name:EDGE.name},bots,ghosts,players:{live:HP.length,byDevice:byDev,windowMs:LIVE_MS},renDances:Object.keys(REND)})}
+ case'/api/live-orbs':{/* d59: public non-stealth live broadcaster positions for map + tour orbs (no GM key; stealth never listed) */
+  if(q.method!=='GET')return send(r,{error:'GET only'},405);if(limited('lo:'+ip,120,60000))return send(r,{error:'rate limited'},429);
+  const cut=now-LIVE_MS;const rows=all("select * from gplayers where live=1 and mode!='stealth' and seen>?",cut).filter(p=>!isGhost(p.id)&&!isBot(p.id));
+  const orbs=[];for(const p of rows){const f=lastFix(p.id);if(!f)continue;orbs.push({id:p.id,name:p.name,lat:+f.lat,lon:+f.lon,hdg:f.hdg==null?null:+f.hdg,device:p.device||null,t:f.t,kind:'player'})}
+  return send(r,{t:now,windowMs:LIVE_MS,orbs})}
 // ---- d45 Master DJ: public read + SSE; writes need the GM key
  case'/api/dj':{if(q.method==='GET'){if(limited('dj:'+ip,240,60000))return send(r,{error:'rate limited'},429);return send(r,djView(now))}
   if(q.method!=='POST')return send(r,{error:'GET or POST'},405);if(limited('djw:'+ip,120,60000))return send(r,{error:'rate limited'},429);
