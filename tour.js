@@ -9,11 +9,11 @@ import { DJ } from './dj.js?v=1792470000056';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
 import { initDriveIn } from './drivein.js?v=1792470000058';
-import { initLiveOrbs } from './liveorbs.js?v=1792470000059';
+import { initLiveOrbs } from './liveorbs.js?v=1792470000060';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
 const V = '?v=' + (window.EEAR_V || '1792455290575');
-const TV = '?v=1792470000059';   // d59: tour assets + liveorbs cachebust without a global build bump
+const TV = '?v=1792470000060';   // d59: tour assets + liveorbs cachebust without a global build bump
 const MOBILE = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const D = Math.PI / 180, RE = 6371000, $ = id => document.getElementById(id);
 // ---------- frame: exact ENU on a sphere around downtown-ish origin; three: x = east, y = up, z = -north ----------

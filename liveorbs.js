@@ -133,23 +133,30 @@ export function initLiveOrbs(parent, opts) {
     return p;
   }
 
+  const _fwd = new THREE.Vector3(), _to = new THREE.Vector3();
   function update(t) {
     const on = O.enabled();
     root.visible = on;
     if (!on) return;
     const cam = O.getCam(); if (!cam) return;
     const now = t != null ? t : performance.now();
+    cam.getWorldDirection(_fwd);
+    const farGate = 25000 * O.unitPerM;   // beyond town scale: only draw if looking toward the orb
     for (const e of byId.values()) {
       const p = place(e); if (!p) continue;
-      const d = cam.position.distanceTo(p);
-      // angular size so Egypt (millions of m / thousands of km) still reads; minR covers town close-ups
+      const d = Math.max(1e-3, cam.position.distanceTo(p));
+      _to.copy(p).sub(cam.position).normalize();
+      const facing = _to.dot(_fwd);
+      // "visible from anywhere if looking towards them": hide far orbs behind / beside the view so a
+      // planet-scale additive sphere does not wash out the scene when you are not aimed at it
+      if (d > farGate && facing < 0.12) { e.g.visible = false; continue }
+      // angular size so Egypt still reads; minR covers town close-ups / z-fight clearance
       const r = Math.max(O.minR * O.unitPerM, d * Math.tan(O.ang));
       e.g.scale.setScalar(r);
       e.g.visible = true;
       const pulse = 0.75 + 0.25 * Math.sin(now / 1000 * Math.PI * 2 * 1.4);
       for (const m of e.g.userData.pulse) if (m.material) m.material.opacity = (m === e.g.userData.pulse[0] ? 0.95 : m === e.g.userData.pulse[1] ? 0.28 : 0.55) * pulse;
-      // billboard label in screen space (sizeAttenuation false already)
-      if (e.g.userData.label) e.g.userData.label.visible = d > 40 * O.unitPerM;
+      if (e.g.userData.label) e.g.userData.label.visible = d > 40 * O.unitPerM && (d < farGate || facing > 0.25);
     }
   }
 
