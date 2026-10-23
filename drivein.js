@@ -25,14 +25,16 @@ const D = Math.PI / 180, MI = 1609.344;
 /** spatial gain (d = distance to the NEAREST point of the screen): 1 within fullM (5 mi), raised-cosine S-curve to 0 at silentM (10 mi): 1 mi 1.00, 5 mi 1.00, 7 mi 0.65, 8 mi 0.35, 10 mi 0.00 */
 export const driveinGain = d => { if (d <= DRIVEIN.fullM) return 1; if (d >= DRIVEIN.silentM) return 0; return .5 * (1 + Math.cos(Math.PI * (d - DRIVEIN.fullM) / (DRIVEIN.silentM - DRIVEIN.fullM))) };
 /** distance from an ENU offset (e, n, u metres, viewer -> screen centre) to the nearest point of the screen rectangle (width along the base line, height vertical) */
-export function nearestD(e, n, u) { const b = DRIVEIN.faceBrg * D, wx = Math.cos(b), wy = -Math.sin(b), nx = Math.sin(b), ny = Math.cos(b);
-  const pw = -(e * wx + n * wy), pn = -(e * nx + n * ny), pu = -u, W2 = DRIVEIN.wM / 2 + 8, H2 = DRIVEIN.hM / 2 + 8;
+export function nearestD(e, n, u, size) { const C = size || DRIVEIN, b = C.faceBrg * D, wx = Math.cos(b), wy = -Math.sin(b), nx = Math.sin(b), ny = Math.cos(b);
+  const pw = -(e * wx + n * wy), pn = -(e * nx + n * ny), pu = -u, W2 = C.wM / 2 + 8, H2 = C.hM / 2 + 8;
   return Math.hypot(pw - Math.max(-W2, Math.min(W2, pw)), pu - Math.max(-H2, Math.min(H2, pu)), pn) }
 const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 * Math.cos(a * D); return Math.hypot(x, y) };
 const fmtD = m => m < 1000 ? Math.round(m) + ' m' : (m / MI).toFixed(m < 16 * MI ? 1 : 0) + ' mi · ' + (m / 1000).toFixed(m < 1e4 ? 1 : 0) + ' km';
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g, w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.userData.c = c; return t }
 export function initDriveIn(parent, toLocal, cam, opts = {}) {
-  const C = DRIVEIN, lite = !!opts.lite, enabled = opts.enabled || (() => true), soundWanted = () => localStorage.eearScreenSound === '1';
+  /* opts.wM / opts.hM: tour-only size override (d57); main AR omits them and keeps the full 10 x 5.625 km screen */
+  const C = Object.assign({}, DRIVEIN); if (opts.wM != null) C.wM = +opts.wM; if (opts.hM != null) C.hM = +opts.hM;
+  const lite = !!opts.lite, enabled = opts.enabled || (() => true), soundWanted = () => localStorage.eearScreenSound === '1';
   const S = { cfg: null, err: null, d: null, dGps: null, gain: 0, playing: false, far: false, clip: null, lastSeek: 0, src: null, ctxOwn: null };
   const root = new THREE.Group(); root.name = 'drivein'; root.userData.layer = 'drivein'; parent.add(root);
   const scr = new THREE.Group(); root.add(scr); scr.rotation.y = Math.PI - C.faceBrg * D;   // +Z (plane normal) -> bearing faceBrg
@@ -110,7 +112,7 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
     const now = performance.now(), on = !!enabled(); root.visible = on;
     if (!on) { if (!v.paused) v.pause(); S.want = false; if (edge) edge.style.display = 'none'; if (g) g.gain.value = 0; return }
     if (now - lastP > 500) { lastP = now; const o = toLocal(C.lat, C.lon); if (o) scr.position.set(o.x, o.y + C.altM, o.z) }
-    cam.getWorldPosition(camW); parent.worldToLocal(camW); const d3 = nearestD(scr.position.x - camW.x, -(scr.position.z - camW.z), scr.position.y - camW.y); S.d = d3;
+    cam.getWorldPosition(camW); parent.worldToLocal(camW); const d3 = nearestD(scr.position.x - camW.x, -(scr.position.z - camW.z), scr.position.y - camW.y, C); S.d = d3;
     // far marker (fixed angular size, always in the screen's direction)
     const far = d3 > C.markerM - C.markerFadeM; S.far = d3 > C.markerM; mk.visible = far; pic.visible = d3 < 400000;
     if (far) { const R = C.markerR, k = Math.min(1, (d3 - (C.markerM - C.markerFadeM)) / C.markerFadeM); mkM.opacity = k;
@@ -129,7 +131,7 @@ export function initDriveIn(parent, toLocal, cam, opts = {}) {
     // spatial sound (throttled 10 Hz)
     if (now - lastA > 100) { lastA = now; const AU = window.EEAR_AUDIO, L = AU && AU.listener; let dd = d3, e = scr.position.x - camW.x, n = -(scr.position.z - camW.z), u = scr.position.y - camW.y;
       if (L && L.lat != null && !(window.FLY && FLY.alt > .5)) { e = (C.lon - L.lon) * 111320 * Math.cos(L.lat * D); n = (C.lat - L.lat) * 111320; u = C.altM - (L.alt || 0) - 1.6 }
-      dd = nearestD(e, n, u); S.dGps = dd;
+      dd = nearestD(e, n, u, C); S.dGps = dd;
       const sw = soundWanted(); S.gain = sw ? driveinGain(dd) : 0;
       if (!IOS && sw && !v.muted) { const vv = Math.min(1, S.gain * (opts.level || .9)); if (Math.abs(v.volume - vv) > .005) v.volume = vv }
       if (g && ctx) { const tt = ctx.currentTime; g.gain.setTargetAtTime(S.gain * (opts.level || .9), tt, .25);

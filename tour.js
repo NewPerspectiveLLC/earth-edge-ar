@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { DJ } from './dj.js?v=1792470000056';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
-import { initDriveIn } from './drivein.js?v=1792455290575';
+import { initDriveIn } from './drivein.js?v=1792470000057';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
 const V = '?v=' + (window.EEAR_V || '1792455290575');
@@ -120,7 +120,8 @@ const landmarksReady = Promise.all([terrReady, roadsReady]).then(([, R]) => {
     const lb = label(S.name, S.sub, css); lb.position.y = 90; g.add(lb); S.g = g }
 });
 // ---------- drive-in (reused module; muted unless 'Screen sound' is on) ----------
-const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000 });
+/* d57: tour-only half screen (5.0 x 2.8125 km, same centre/bearing); main Live Geometry keeps full 10 x 5.625 km */
+const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5 });
 // ---------- tour path: keyframes (position + look target), cubic Hermite in time ----------
 const off = (S, brg, dist, agl) => { const lat = S.lat + dist * Math.cos(brg * D) / 111320, lon = S.lon + dist * Math.sin(brg * D) / (111320 * Math.cos(S.lat * D)); return enu(lat, lon, ground(lat, lon) + agl) };
 const at = (S, agl = 0) => enu(S.lat, S.lon, ground(S.lat, S.lon) + agl);
