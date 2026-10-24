@@ -209,6 +209,8 @@ async function ghGeo(qs){const l=qs.toLowerCase(),hit=GH_LOCAL.find(x=>l.include
  const f=b=>fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&viewbox=-122.95,48.20,-122.60,47.95'+(b?'&bounded=1':'')+'&q='+encodeURIComponent(qs),{headers:{'user-agent':'EarthEdgeAR/1 (GM ghost test fixtures)','accept-language':'en'},signal:AbortSignal.timeout(10000)}).then(x=>x.json()).then(a=>a&&a[0]);
  const h=await f(1)||await f(0);return h?{lat:+h.lat,lon:+h.lon,name:h.display_name}:null}
 const ghState=()=>({ghosts:Object.entries(GHOSTS).map(([n,d])=>{const s=GS[n];return{id:n,pid:d.pid,dummy:true,lat:s.lat,lon:s.lon,heading:s.wander?s.hdg:null,wander:s.wander,target:{lat:s.tlat,lon:s.tlon,place:s.place},updated:s.updated}})});
+/* d62: daily movement replay cache (server/cache/replay-YYYY-MM-DD.json); auto every 3h */
+const REPLAY=require('./replay.js')({root,all,one,isGhost,isBot,botName,BS});REPLAY.startAuto();
 /* ---- d45 Master DJ: ONE global queue that plays to everyone in Matt's Reality (pillars + in-app music player). Library = <webroot>/audio/dj/library.json
    (static, freely licensed only). State in sqlite kv 'djState' (not data.json). Public read: GET /api/dj, SSE /api/dj/stream. Writes: POST /api/dj {op,...} with the GM key (X-GM-Key).
    Clock = server time: queue[index] started at startedAt (ms); tracks auto-advance and the queue loops at the end (normalised every second + on every read). */
@@ -312,7 +314,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/stats/visits'||u.pathname==='/api/activity'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/stats/visits'||u.pathname==='/api/activity'||u.pathname==='/api/replay'||u.pathname.startsWith('/api/replay/')||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -481,4 +483,12 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   let G=U.role==='gm'?all('select * from games'):all('select * from games where owner=?',U.id);if(gid)G=G.filter(g=>g.id===gid);const ids=G.map(g=>g.id);
   const L=all('select * from gplayers where live=1 and seen>?',now-LIVE_MS).filter(p=>ids.includes(p.game_id));
   return send(r,{games:G.map(g=>({id:g.id,name:g.name,code:g.code})),players:L.map(p=>({...pubP(p),track:u.searchParams.get('trails')?all('select lat,lon,acc,t from gfixes where pid=? order by t desc limit 500',p.id).reverse():undefined}))})}
+ case'/api/replay':{if(limited('rpl:'+ip,60,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method==='GET'){const day=u.searchParams.get('day');if(day){const data=REPLAY.getDay(day);if(!data)return send(r,{error:'no data'},404);return send(r,data)}
+   if(u.searchParams.get('refresh')==='1'){try{REPLAY.build(u.searchParams.get('day')||undefined)}catch(e){return send(r,{error:e.message},500)}}
+   return send(r,REPLAY.meta())}
+  return send(r,{error:'GET'},405)}
+ case'/api/replay/rebuild':{if(limited('rplb:'+ip,20,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
+  if(q.method!=='POST'&&q.method!=='GET')return send(r,{error:'POST or GET'},405);
+  try{const day=j.day||u.searchParams.get('day')||undefined;const info=REPLAY.build(day);alog('replay-rebuild',{day:info.day,players:info.counts.players,points:info.counts.points});return send(r,{ok:1,...info})}catch(e){return send(r,{error:e.message||'build failed'},500)}}
  default:send(r,{error:'no'},404)}}catch(e){console.error(e);send(r,{error:'server'},500)}})}).listen(+port,'0.0.0.0',()=>console.log("Live Geometry — Matt's Reality server listening",port));

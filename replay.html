@@ -1,0 +1,184 @@
+<!doctype html><html lang=en><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name=theme-color content="#0b0618">
+<title>Movement Replay · Live Geometry</title>
+<link rel=stylesheet href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#0b0618;--card:#12102ae8;--fg:#f3eeff;--mut:#9a8fb8;--acc:#a45cff;--ok:#41d18b;--warn:#ffc800}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:14px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+#map{position:fixed;inset:0;background:#0a0814}
+#lock{position:fixed;inset:0;z-index:3000;background:#000e;display:none;align-items:center;justify-content:center;padding:20px}
+#lock .box{background:var(--card);border:1px solid #7a2fe055;border-radius:16px;padding:22px;max-width:400px;width:100%}
+#lock input{width:100%;padding:12px;border-radius:10px;border:1px solid #3a2d66;background:#0f0a1c;color:var(--fg);font-size:16px;margin-top:8px}
+#lock button,.btn{padding:10px 14px;border:0;border-radius:10px;background:linear-gradient(135deg,#a45cff,#7a2fe0);color:#fff;font-weight:700;cursor:pointer;font-size:14px}
+.btn.ghost{background:#1d0d38;border:1px solid #a45cff66}
+#bar{position:fixed;z-index:1000;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none}
+#bar > *{pointer-events:auto}
+#bar h1{font-size:15px;margin:0 8px 0 0;font-weight:800;text-shadow:0 1px 4px #000;background:#0b0618cc;padding:6px 10px;border-radius:999px;border:1px solid #7a2fe055}
+#panel{position:fixed;z-index:1000;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));background:var(--card);border:1px solid #7a2fe055;border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 10px 40px #000a}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row + .row{margin-top:8px}
+#scrub{flex:1;min-width:140px;accent-color:var(--acc)}
+.mut{color:var(--mut);font-size:12px}
+#clock{font:700 14px/1 ui-monospace,Menlo,monospace;color:var(--warn);min-width:7.5em}
+label.tog{display:inline-flex;gap:6px;align-items:center;background:#1d0d38;border:1px solid #a45cff44;padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer}
+.mk{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #0008}
+.mk.bot{border-style:dashed;opacity:.85}
+.mk.stealth{opacity:.55;border-color:#aaa}
+#status{font-size:12px;color:var(--mut)}
+a{color:#d9c2ff}
+@media (max-width:520px){#bar h1{font-size:13px}#panel{padding:8px 10px}}
+</style></head><body>
+<div id=map></div>
+<div id=bar>
+  <h1>▶ Movement Replay</h1>
+  <button class=btn id=play>Play</button>
+  <button class="btn ghost" id=zoomIn title="Zoom in">＋</button>
+  <button class="btn ghost" id=zoomOut title="Zoom out">－</button>
+  <button class="btn ghost" id=fit>Fit PT</button>
+  <button class="btn ghost" id=rebuild title="Rebuild today's tracks now">Refresh data</button>
+  <a class="btn ghost" href=stats.html style="text-decoration:none">Dashboard</a>
+  <a class="btn ghost" href=gm.html style="text-decoration:none">GM map</a>
+</div>
+<div id=panel>
+  <div class=row>
+    <button class=btn id=back title="−1 min">⏪</button>
+    <input id=scrub type=range min=0 max=1000 value=0>
+    <button class=btn id=fwd title="+1 min">⏩</button>
+    <span id=clock>—</span>
+  </div>
+  <div class=row>
+    <label class=tog><input type=checkbox id=hideBots> Hide bots / ghosts</label>
+    <label class=tog>Speed
+      <select id=speed style="background:#0f0a1c;color:#fff;border:0;font-weight:700">
+        <option value=1>1×</option><option value=5 selected>5×</option><option value=20>20×</option><option value=60>60×</option><option value=300>300×</option>
+      </select>
+    </label>
+    <span id=status class=mut>Loading…</span>
+  </div>
+</div>
+<div id=lock><div class=box>
+  <b>Movement Replay</b>
+  <div class=mut style=margin-top:6px>GM key required — includes stealth tracks (same as GM map). Not public.</div>
+  <input id=key type=password autocomplete=current-password placeholder="GM key">
+  <div style=margin-top:10px><button id=go>Open replay</button></div>
+  <div id=lerr class=mut style=color:#ff5a6a;margin-top:8px></div>
+</div></div>
+<script>
+const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://verse-concerning-summit-equipped.trycloudflare.com':'');
+const PT=[48.1173,-122.7605], $=id=>document.getElementById(id);
+const tz={timeZone:'America/Los_Angeles'};
+const fmt=t=>new Date(t).toLocaleString('en-US',{...tz,month:'short',day:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit'})+' PT';
+let KEY=localStorage.eearGM||'', data=null, markers={}, trails={}, playing=false, curT=0, t0=0, t1=0, raf=0, lastTs=0;
+
+const map=L.map('map',{zoomControl:false, maxZoom:19}).setView(PT,13);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+const trailG=L.layerGroup().addTo(map), mkG=L.layerGroup().addTo(map);
+
+function icon(p){
+  const c=p.color||'#a45cff';
+  return L.divIcon({className:'',iconSize:[14,14],iconAnchor:[7,7],
+    html:`<div class="mk${p.bot||p.dummy?' bot':''}${p.stealth?' stealth':''}" style="background:${c}"></div>`});
+}
+function visiblePlayers(){
+  if(!data)return[];
+  const hide=$('hideBots').checked;
+  return data.players.filter(p=>!(hide&&(p.bot||p.dummy)));
+}
+function posAt(track, t){
+  if(!track||!track.length)return null;
+  if(t<=track[0].t)return track[0].t===t||t>=track[0].t-60000?track[0]:null;
+  if(t>=track[track.length-1].t){
+    const last=track[track.length-1];
+    return t-last.t<=120000?last:null; // linger 2 min after last fix
+  }
+  let lo=0,hi=track.length-1;
+  while(hi-lo>1){const m=(lo+hi)>>1;if(track[m].t<=t)lo=m;else hi=m}
+  const a=track[lo],b=track[hi];
+  if(b.t===a.t)return a;
+  const u=(t-a.t)/(b.t-a.t);
+  return{lat:a.lat+(b.lat-a.lat)*u,lon:a.lon+(b.lon-a.lon)*u,t};
+}
+function rebuildLayers(){
+  trailG.clearLayers();mkG.clearLayers();markers={};trails={};
+  for(const p of visiblePlayers()){
+    if(p.track&&p.track.length>1){
+      const line=L.polyline(p.track.map(f=>[f.lat,f.lon]),{color:p.color||'#a45cff',weight:2,opacity:.35,dashArray:(p.bot||p.dummy)?'4 4':null,interactive:false}).addTo(trailG);
+      trails[p.id]=line;
+    }
+    const m=L.marker(PT,{icon:icon(p),title:p.name+(p.tag?' · '+p.tag:'')}).addTo(mkG);
+    markers[p.id]={m,p};m.setOpacity(0);
+  }
+  paint(curT);
+}
+function paint(t){
+  curT=t;$('scrub').value=t1>t0?Math.round((t-t0)/(t1-t0)*1000):0;
+  $('clock').textContent=fmt(t);
+  let on=0;
+  for(const id of Object.keys(markers)){
+    const {m,p}=markers[id];
+    const pos=posAt(p.track,t);
+    if(!pos){m.setOpacity(0);continue}
+    m.setLatLng([pos.lat,pos.lon]);m.setOpacity(1);on++;
+  }
+  const V=visiblePlayers();
+  $('status').textContent=`${on} moving · ${V.length} shown · ${data?data.counts.points:0} pts · built ${data?fmt(data.builtAt):'—'}`;
+}
+function tick(now){
+  if(!playing)return;
+  const dt=lastTs?now-lastTs:0;lastTs=now;
+  const sp=+$('speed').value||5;
+  curT=Math.min(t1,curT+dt*sp);
+  paint(curT);
+  if(curT>=t1){playing=false;$('play').textContent='Play';return}
+  raf=requestAnimationFrame(tick);
+}
+function setPlaying(on){
+  playing=on;$('play').textContent=on?'Pause':'Play';
+  if(on){lastTs=0;raf=requestAnimationFrame(tick)} else cancelAnimationFrame(raf);
+}
+async function loadDay(force){
+  $('status').textContent='Loading tracks…';
+  if(force){
+    const rb=await fetch(BASE+'/api/replay/rebuild',{method:'POST',headers:{'x-gm-key':KEY,'content-type':'application/json'},body:'{}'});
+    if(rb.status===403){logout('bad key');return}
+    if(!rb.ok)throw new Error('rebuild HTTP '+rb.status);
+  }
+  const m=await fetch(BASE+'/api/replay',{headers:{'x-gm-key':KEY},cache:'no-store'});
+  if(m.status===403){logout('bad key');return}
+  if(!m.ok)throw new Error('meta HTTP '+m.status);
+  const meta=await m.json();
+  const day=meta.today;
+  const d=await fetch(BASE+'/api/replay?day='+encodeURIComponent(day),{headers:{'x-gm-key':KEY},cache:'no-store'});
+  if(d.status===403){logout('bad key');return}
+  if(!d.ok)throw new Error('day HTTP '+d.status);
+  data=await d.json();
+  t0=data.range.t0;t1=data.range.t1;if(!(t1>t0))t1=t0+1;
+  curT=t0;
+  rebuildLayers();
+  map.setView([data.center.lat,data.center.lon],data.center.zoom||13);
+  $('status').textContent=data.day+' · '+data.counts.humans+' people · '+data.counts.bots+' bots · '+data.counts.points+' pts';
+}
+function logout(msg){KEY='';localStorage.removeItem('eearGM');$('lock').style.display='flex';$('lerr').textContent=msg||'';}
+$('play').onclick=()=>setPlaying(!playing);
+$('zoomIn').onclick=()=>map.zoomIn();
+$('zoomOut').onclick=()=>map.zoomOut();
+$('fit').onclick=()=>map.setView(PT,13);
+$('hideBots').onchange=()=>{rebuildLayers()};
+$('scrub').oninput=()=>{setPlaying(false);paint(t0+(+$('scrub').value/1000)*(t1-t0))};
+$('back').onclick=()=>{setPlaying(false);paint(Math.max(t0,curT-60000))};
+$('fwd').onclick=()=>{setPlaying(false);paint(Math.min(t1,curT+60000))};
+$('rebuild').onclick=async()=>{try{setPlaying(false);await loadDay(true)}catch(e){$('status').textContent='Refresh failed · '+e.message}};
+$('go').onclick=async()=>{KEY=$('key').value.trim();if(KEY)localStorage.eearGM=KEY;$('lerr').textContent='';
+  try{await loadDay(new URLSearchParams(location.search).has('refresh'));$('lock').style.display='none'}catch(e){$('lerr').textContent=e.message}};
+$('key').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+
+(async()=>{
+  if(!KEY){$('lock').style.display='flex';return}
+  try{await loadDay(new URLSearchParams(location.search).has('refresh'));$('lock').style.display='none'}
+  catch(e){logout(e.message)}
+})();
+</script>
+</body></html>
