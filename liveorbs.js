@@ -8,7 +8,7 @@
 //  - units: caller supplies toWorld(lat,lon,aglM)->Vector3 (meters on tour, km*SC on index globe)
 import * as THREE from 'three';
 
-const TUNNEL = 'https://verse-concerning-summit-equipped.trycloudflare.com';
+const TUNNEL = 'https://humor-communist-air-take.trycloudflare.com';
 const BASE = () => window.EEAR_API || (location.hostname.endsWith('github.io') ? TUNNEL : '');
 const D = Math.PI / 180;
 

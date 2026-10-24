@@ -3,7 +3,7 @@
 // Updates: SSE /api/dj/stream + 30 s poll. Pages copy: API on the live tunnel; if unreachable, the library's seeded order on a fixed epoch (all offline clients agree).
 // Audio: one streaming <audio> element -> MediaElementSource on the app AudioContext -> DJ.node; audio.js (beacon) and pillars.js (proximity voices) connect to DJ.node.
 // Paused / empty queue = silence. The element plays only while a consumer wants it (Music on + beacon on Master DJ, or a pillar in earshot).
-const TUNNEL = 'https://verse-concerning-summit-equipped.trycloudflare.com';
+const TUNNEL = 'https://humor-communist-air-take.trycloudflare.com';
 const BASE = window.EEAR_API || (location.hostname.endsWith('github.io') ? TUNNEL : '');
 const EPOCH = Date.UTC(2026, 9, 17, 22, 0, 0);   // offline fallback clock (Pages without the API)
 const S = { st: null, off: 0, src: 'none', lib: null, el: null, node: null, ctx: null, wants: {}, lastSeek: 0, pend: false, url: null, key: '', es: null, err: null };

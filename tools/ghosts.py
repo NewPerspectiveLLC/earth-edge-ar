@@ -12,7 +12,7 @@ Key: read from /home/box/agent-data/secrets/earth-edge-ar-gm-key.txt (or $EEAR_G
 import argparse, json, os, re, sys, ssl, urllib.request, urllib.error, datetime, math
 
 KEYFILE = os.environ.get('EEAR_GM_KEY_FILE', '/home/box/agent-data/secrets/earth-edge-ar-gm-key.txt')
-DEFAULT_URL = os.environ.get('EEAR_URL', 'https://verse-concerning-summit-equipped.trycloudflare.com')
+DEFAULT_URL = os.environ.get('EEAR_URL', 'https://humor-communist-air-take.trycloudflare.com')
 RA = (48.1062, -122.8057)
 PT_TZ = datetime.timezone(datetime.timedelta(hours=-7), 'PT')
 

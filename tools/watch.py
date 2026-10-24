@@ -11,7 +11,7 @@ Key: read from /home/box/agent-data/secrets/earth-edge-ar-gm-key.txt (or $EEAR_G
 import argparse, json, math, os, sys, time, io, datetime, urllib.request, ssl
 
 KEYFILE = os.environ.get('EEAR_GM_KEY_FILE', '/home/box/agent-data/secrets/earth-edge-ar-gm-key.txt')
-DEFAULT_URL = os.environ.get('EEAR_URL', 'https://verse-concerning-summit-equipped.trycloudflare.com')
+DEFAULT_URL = os.environ.get('EEAR_URL', 'https://humor-communist-air-take.trycloudflare.com')
 RA = (48.1062, -122.8057)
 LANDMARKS = [("Ready Athletics", 48.1062, -122.8057), ("Cappy's Trails garden", 48.13165, -122.79921),
              ("Matt's Meditation Garden", 48.1316475, -122.7992293), ("Memory's Vault, Fort Worden", 48.1384642, -122.7647029),

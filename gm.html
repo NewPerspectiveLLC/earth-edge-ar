@@ -55,7 +55,7 @@ html,body{margin:0;height:100%;font:13px system-ui,-apple-system,sans-serif;back
 <input id=k type=password autocomplete=off placeholder="GM key"><button class=btn id=go style="width:100%">Unlock</button><div id=err></div></div></div>
 <script>
 // API: same origin on Monster/tunnel/LAN; from the GitHub Pages copy, call the live tunnel (server allows that origin for /api/gm only)
-const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://verse-concerning-summit-equipped.trycloudflare.com':'');
+const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://humor-communist-air-take.trycloudflare.com':'');
 const API=BASE+'/api/gm',POLL_MS=1500,TRAIL_MS=10000;let KEY=localStorage.eearGM||'';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const map=L.map('map',{zoomControl:true,maxZoom:21}).setView([48.122,-122.785],14);
