@@ -6,8 +6,10 @@
      Over a cap (or AI switched off) Ren answers with canned non-AI replies, resuming automatically next PT day / month. 80% of daily cap -> warning alert.
    - Alerts (warn / over-cap / kill switch / notifier errors) go to sqlite ren_alerts + the JSONL log, and GET /api/ren-usage.
    - First contact: first Ren message of a visitor (dedupe per pid, 30 min idle) -> ren_first + notify() per ~/.eear-secrets/ren-notify.json
-     {"enabled":true,"mode":"imessage","to":"+1..."} or {"enabled":true,"mode":"webhook","url":"https://...","authorization":"Bearer ..."} (+ optional "alerts":true).
-     Disabled while that file is absent. Non-blocking; max 1 per visitor session, 30/hour global; errors only logged. */
+     Multi-channel (d63): {"enabled":true,"alerts":true,"to":"+13604771447","mode":"multi","channels":["imessage","sms","whatsapp"],
+       "whatsapp":{"provider":"callmebot","apikey":"<from bot>","bot":"+34623786449"}}
+     Channels: imessage/sms via macOS Messages.app; whatsapp via CallMeBot (apikey required); webhook still supported as mode.
+     Also accepts legacy mode imessage|webhook. Disabled while file absent. Non-blocking; 30/hour global. */
 const fs = require('fs'), path = require('path'), os = require('os'), crypto = require('crypto'), { execFile } = require('child_process');
 const SEC = path.join(os.homedir(), '.eear-secrets'), LIM_F = path.join(SEC, 'ren-limits.json'), NOT_F = path.join(SEC, 'ren-notify.json'), SALT_F = path.join(SEC, 'ren-salt');
 const LOGD = path.join(__dirname, '..', 'logs'), LOG_F = path.join(LOGD, 'ren-usage.jsonl');
@@ -70,16 +72,72 @@ create table if not exists ren_alerts(t int,kind text,msg text);create table if 
       if (S.d.usd >= L.dailyUSD) alert('over-cap', `Daily AI cap $${L.dailyUSD} reached ($${r6(S.d.usd)}) — Ren on canned replies until tomorrow (PT)`, 'd:' + row.day);
       if (S.m.usd >= L.monthlyUSD) alert('over-cap', `Monthly AI cap $${L.monthlyUSD} reached ($${r6(S.m.usd)})`, 'm:' + row.month) } return row }
   // ---- notifier
-  function notifyCfg() { try { const st = fs.statSync(NOT_F); if (st.mode & 0o077) try { fs.chmodSync(NOT_F, 0o600) } catch (e) { } const j = JSON.parse(fs.readFileSync(NOT_F, 'utf8')); return j && j.enabled !== false && (j.mode === 'imessage' && j.to || j.mode === 'webhook' && j.url) ? j : null } catch (e) { return null } }
-  const NS = { last: null, lastOk: null, lastErr: null, sent: 0, failed: 0, skipped: 0 }, NG = [];
-  const OSA = 'on run argv\ntell application "Messages"\nset s to 1st account whose service type = iMessage\nsend (item 2 of argv) to participant (item 1 of argv) of s\nend tell\nend run';
-  function notify(o, isAlert) { const N = notifyCfg(), t = Date.now(); if (!N) { NS.skipped++; return Promise.resolve({ ok: false, why: 'disabled (no ~/.eear-secrets/ren-notify.json)' }) }
-    while (NG.length && t - NG[0] > 3600e3) NG.shift(); if (NG.length >= (+N.maxPerHour || 30)) { NS.skipped++; return Promise.resolve({ ok: false, why: 'global notify limit reached (per hour)' }) } NG.push(t);
-    const text = o.alert ? `Live Geometry alert: ${o.text}` : `Live Geometry: ${o.who} (${o.device}) is talking to Ren — ${o.time}${o.message ? ': “' + o.message + '”' : ''}`;
-    const done = (ok, err) => { NS.last = { t, ok, mode: N.mode, err: err || null, alert: !!isAlert }; if (ok) { NS.sent++; NS.lastOk = t } else { NS.failed++; NS.lastErr = t; console.error('ren notify', N.mode, err); jl({ t, type: 'notify-error', mode: N.mode, err }); if (!isAlert) sq.prepare('insert into ren_alerts values(?,?,?)').run(t, 'notify-error', String(err).slice(0, 200)) } return { ok, err: err || undefined, mode: N.mode } };
-    if (N.mode === 'imessage') return new Promise(res => execFile('/usr/bin/osascript', ['-e', OSA, String(N.to), text], { timeout: 20000 }, (e, so, se) => res(done(!e, e ? (String(se || e.message).trim().slice(0, 200)) : null))));
+  function notifyCfg() {
+    try {
+      const st = fs.statSync(NOT_F); if (st.mode & 0o077) try { fs.chmodSync(NOT_F, 0o600) } catch (e) { }
+      const j = JSON.parse(fs.readFileSync(NOT_F, 'utf8')); if (!j || j.enabled === false) return null;
+      const to = String(j.to || '').trim();
+      const mode = j.mode || (j.channels ? 'multi' : '');
+      if (mode === 'webhook' && j.url) return j;
+      if (mode === 'imessage' && to) return j;
+      if (mode === 'multi' && to && Array.isArray(j.channels) && j.channels.length) return j;
+      if (mode === 'whatsapp' && to) return j;
+      if (mode === 'sms' && to) return j;
+      return null;
+    } catch (e) { return null }
+  }
+  const NS = { last: null, lastOk: null, lastErr: null, sent: 0, failed: 0, skipped: 0, channels: null }, NG = [];
+  const OSA_IM = 'on run argv\ntell application "Messages"\nset s to 1st account whose service type = iMessage\nsend (item 2 of argv) to participant (item 1 of argv) of s\nend tell\nend run';
+  const OSA_SMS = 'on run argv\ntell application "Messages"\ntry\nset s to 1st account whose service type = SMS\nsend (item 2 of argv) to participant (item 1 of argv) of s\non error errMsg\nerror errMsg\nend try\nend tell\nend run';
+  function sendViaMessages(kind, to, text) {
+    const script = kind === 'sms' ? OSA_SMS : OSA_IM;
+    return new Promise(res => execFile('/usr/bin/osascript', ['-e', script, String(to), text], { timeout: 25000 }, (e, so, se) => {
+      if (!e) return res({ ok: true, channel: kind });
+      res({ ok: false, channel: kind, err: String(se || e.message || e).trim().slice(0, 220) });
+    }));
+  }
+  function sendViaCallMeBot(to, text, wa) {
+    const key = String((wa && wa.apikey) || '').trim();
+    if (!key) return Promise.resolve({ ok: false, channel: 'whatsapp', err: 'CallMeBot apikey missing — Matt must allow the bot once and put apikey in ren-notify.json whatsapp.apikey' });
+    const phone = String(to).replace(/[^\d+]/g, '');
+    const url = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(phone) + '&text=' + encodeURIComponent(text) + '&apikey=' + encodeURIComponent(key);
+    return fetch(url, { method: 'GET', signal: AbortSignal.timeout(15000) })
+      .then(async r => { const body = (await r.text().catch(() => '')).slice(0, 240); const ok = r.ok && /queued|sent|success|Message/i.test(body) && !/invalid|error|denied|APIKey/i.test(body); return { ok, channel: 'whatsapp', err: ok ? null : ('CallMeBot HTTP ' + r.status + ' ' + body), raw: body }; })
+      .catch(e => ({ ok: false, channel: 'whatsapp', err: e.message || String(e) }));
+  }
+  function sendViaWebhook(N, o, text) {
     return fetch(N.url, { method: 'POST', headers: { 'content-type': 'application/json', ...(N.authorization ? { authorization: N.authorization } : {}) }, body: JSON.stringify({ ...o, text, source: 'live-geometry' }), signal: AbortSignal.timeout(8000) })
-      .then(r => done(r.ok, r.ok ? null : 'HTTP ' + r.status)).catch(e => done(false, e.message || String(e))) }
+      .then(r => ({ ok: r.ok, channel: 'webhook', err: r.ok ? null : 'HTTP ' + r.status }))
+      .catch(e => ({ ok: false, channel: 'webhook', err: e.message || String(e) }));
+  }
+  async function notify(o, isAlert) {
+    const N = notifyCfg(), t = Date.now();
+    if (!N) { NS.skipped++; return { ok: false, why: 'disabled (no ~/.eear-secrets/ren-notify.json)' } }
+    while (NG.length && t - NG[0] > 3600e3) NG.shift();
+    if (NG.length >= (+N.maxPerHour || 30)) { NS.skipped++; return { ok: false, why: 'global notify limit reached (per hour)' } }
+    NG.push(t);
+    const text = o.alert ? `Live Geometry alert: ${o.text}` : `Live Geometry: ${o.who} (${o.device}) is talking to Ren — ${o.time}${o.message ? ': “' + o.message + '”' : ''}`;
+    let channels = [];
+    if (N.mode === 'multi') channels = (N.channels || []).map(String);
+    else if (N.mode === 'imessage') channels = ['imessage'];
+    else if (N.mode === 'sms') channels = ['sms'];
+    else if (N.mode === 'whatsapp') channels = ['whatsapp'];
+    else if (N.mode === 'webhook') channels = ['webhook'];
+    else channels = ['imessage'];
+    const results = [];
+    for (const ch of channels) {
+      if (ch === 'imessage') results.push(await sendViaMessages('imessage', N.to, text));
+      else if (ch === 'sms') results.push(await sendViaMessages('sms', N.to, text));
+      else if (ch === 'whatsapp') results.push(await sendViaCallMeBot(N.to, text, N.whatsapp || {}));
+      else if (ch === 'webhook') results.push(await sendViaWebhook(N, o, text));
+      else results.push({ ok: false, channel: ch, err: 'unknown channel' });
+    }
+    const ok = results.some(r => r.ok);
+    const errParts = results.filter(r => !r.ok).map(r => r.channel + ': ' + (r.err || 'fail'));
+    NS.channels = results; NS.last = { t, ok, mode: N.mode, alert: !!isAlert, results: results.map(r => ({ channel: r.channel, ok: r.ok, err: r.err || null })) };
+    if (ok) { NS.sent++; NS.lastOk = t } else { NS.failed++; NS.lastErr = t; console.error('ren notify', N.mode, errParts.join(' | ')); jl({ t, type: 'notify-error', mode: N.mode, err: errParts.join(' | ') }); if (!isAlert) sq.prepare('insert into ren_alerts values(?,?,?)').run(t, 'notify-error', errParts.join(' | ').slice(0, 200)) }
+    return { ok, mode: N.mode, results: NS.last.results, err: ok ? undefined : errParts.join(' | ') };
+  }
   const FC = new Map();   // pid -> last Ren message time (session = 30 min idle)
   function firstContact(pid, name, device, msg) { const t = Date.now(), last = FC.get(pid); FC.set(pid, t); if (FC.size > 5000) FC.delete(FC.keys().next().value); if (last && t - last < 30 * 60e3) return;
     const cl = v => String(v || '').replace(/[\u0000-\u001f]/g, ' ').trim(), who = cl(name).slice(0, 40) || 'new/unknown visitor', dev = /^(phone|quest|desktop|tablet)$/.test(device) ? device : 'unknown device', m = cl(msg).slice(0, 80);
@@ -95,7 +153,7 @@ create table if not exists ren_alerts(t int,kind text,msg text);create table if 
       recent: all('select t,pid,model,status,pt,ct,tt,usd,ms from ren_usage order by t desc limit 30'),
       perHour: one("select count(*) n from ren_usage where t>?", now - 3600e3).n, rateLimitHits: { renSinceStart: RLH, cannedToday: S.d.canned },
       firstContacts: all('select t,who,device,msg,notified from ren_first order by t desc limit 20'),
-      notifier: { configured: !!N, mode: N ? N.mode : null, file: '~/.eear-secrets/ren-notify.json', alerts: !!(N && N.alerts), ...NS } } }
+      notifier: { configured: !!N, mode: N ? N.mode : null, channels: N && N.channels || null, toSet: !!(N && N.to), whatsappKeySet: !!(N && N.whatsapp && N.whatsapp.apikey), file: '~/.eear-secrets/ren-notify.json', alerts: !!(N && N.alerts), ...NS } } }
   function edit(b) { const L = { ...limits() }, num = (k, lo, hi) => { if (b[k] != null) { const v = +b[k]; if (!isFinite(v) || v < lo || v > hi) throw new Error(`${k} must be ${lo}-${hi}`); L[k] = v } };
     num('dailyUSD', 0, 1000); num('monthlyUSD', 0, 10000); num('warnPct', 1, 100); num('perPlayerHour', 0, 10000); num('perPlayerDay', 0, 100000); num('globalPerMin', 0, 10000); num('maxTokens', 16, 2000);
     if (b.ai != null) { L.ai = !!b.ai; alert('kill-switch', 'Ren AI switched ' + (L.ai ? 'ON' : 'OFF') + ' by GM') }
