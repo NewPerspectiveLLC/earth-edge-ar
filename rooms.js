@@ -12,7 +12,20 @@ export const QRA_PRESET = { vxRA: 1, vxLocal: 1, vxWorld: 1, parcelRA: 1, colsRA
 export const QMR_DEFAULTS = { raTrail: 0, orbTours: 1 };
 export const qlKey = r => r === 'ra-master-map' ? 'eearQLayers_ra' : 'eearQLayers';
 export const MR_DEFAULTS = { raTrail: 0, bots: 1, orbTours: 1 };
-export function current() { const u = new URLSearchParams(location.search).get('room'); if (u && ROOMS[u]) { localStorage.eearRoom = u; return u } return ROOMS[localStorage.eearRoom] ? localStorage.eearRoom : 'matts-reality' }
+
+function alogRoom(room, why) {
+  try {
+    const k = 'eearAlogRoom:' + room;
+    if (sessionStorage[k] === '1' && why !== 'switch') return;
+    sessionStorage[k] = '1';
+    const BASE = (typeof location !== 'undefined' && location.hostname.endsWith('github.io'))
+      ? 'https://verse-concerning-summit-equipped.trycloudflare.com' : '';
+    fetch(BASE + '/api/activity', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ev: 'room', room, page: 'index', why: why || 'enter' }), keepalive: true }).catch(() => {});
+  } catch (e) {}
+}
+export function current() { const u = new URLSearchParams(location.search).get('room'); let r; if (u && ROOMS[u]) { localStorage.eearRoom = u; r = u } else r = ROOMS[localStorage.eearRoom] ? localStorage.eearRoom : 'matts-reality'; alogRoom(r, 'enter'); return r }
+export function select(room) { if (!ROOMS[room]) return current(); localStorage.eearRoom = room; alogRoom(room, 'switch'); return room }
 export const layKey = r => r === 'ra-master-map' ? 'eearLayers_ra' : 'eearLayers';
 /** layer state for a room (stored, else that room's defaults) */
 export function layersFor(r, base) { let st = {}; try { st = JSON.parse(localStorage[layKey(r)] || '{}') } catch (e) { }

@@ -1,3 +1,6 @@
 server/gm-key.txt
 server/*.sqlite*
 server/data.json
+
+server/logs/*.jsonl
+server/logs/activity-*.jsonl

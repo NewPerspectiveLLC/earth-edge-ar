@@ -17,12 +17,25 @@ create table if not exists teams(id text primary key,game_id text,name text,colo
 create table if not exists gplayers(id text primary key,game_id text,user_id text,token text,name text,mode text,entrance text,team_id text,joined int,live int,seen int);
 create table if not exists gfixes(pid text,lat real,lon real,acc real,t int);create index if not exists gfx on gfixes(pid,t);`);
 const RG=require('./renguard.js')(sq);const T0=Date.now();// d48 Ren usage guard + first-contact notifier (see renguard.js)
+setTimeout(()=>{try{alog('server-start',{port:+port||null,node:process.version})}catch(e){}},0);
 try{sq.exec('alter table gfixes add column hdg real')}catch(e){}try{sq.exec('alter table gplayers add column device text')}catch(e){}// device: phone|quest|desktop (shown as a tag to other players)// heading (deg true, from client camera) - optional
 // default public game so the plain link still works
 if(!sq.prepare("select 1 from games where id='public'").get())sq.prepare("insert into games values('public','Open game','gm','OPEN','{}',?)").run(Date.now());
 const H=s=>crypto.createHash('sha256').update(String(s)).digest('hex'),rid=n=>crypto.randomBytes(n).toString('hex');
 const one=(s,...a)=>sq.prepare(s).get(...a),all=(s,...a)=>sq.prepare(s).all(...a),run=(s,...a)=>sq.prepare(s).run(...a);
 const LIVE_MS=60000;
+/* d60: append-only activity log (sibling of eear.sqlite; never touches data.json). JSONL under server/logs/. */
+const ALOG_DIR=path.join(__dirname,'logs'),ALOG_FILE=path.join(ALOG_DIR,'activity.jsonl'),ALOG_MAX=8*1024*1024,ALOG_KEEP=5;
+try{fs.mkdirSync(ALOG_DIR,{recursive:true})}catch(e){}
+function alogRotate(){try{const st=fs.statSync(ALOG_FILE);if(st.size<ALOG_MAX)return;const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+ fs.renameSync(ALOG_FILE,path.join(ALOG_DIR,'activity-'+stamp+'.jsonl'));
+ const old=fs.readdirSync(ALOG_DIR).filter(x=>/^activity-.+\.jsonl$/.test(x)).sort();
+ for(const x of old.slice(0,-ALOG_KEEP))try{fs.unlinkSync(path.join(ALOG_DIR,x))}catch(e){}}catch(e){}}
+function alog(ev,detail){try{alogRotate();const row={t:Date.now(),ev:String(ev||'event').slice(0,48),...(detail&&typeof detail==='object'?detail:{})};
+ fs.appendFileSync(ALOG_FILE,JSON.stringify(row)+'\n')}catch(e){console.error('alog',e.message)}}
+function alogTail(n){n=Math.max(1,Math.min(200,n|0||80));try{const d=fs.readFileSync(ALOG_FILE,'utf8');const L=d.trim()?d.trim().split('\n'):[];
+ return L.slice(-n).map(l=>{try{return JSON.parse(l)}catch(e){return{t:0,ev:'parse',raw:l.slice(0,120)}}})}catch(e){return[]}}
+
 const send=(r,o,c=200,h={})=>{r.writeHead(c,{'content-type':'application/json','cache-control':'no-store',...h});r.end(JSON.stringify(o))};
 // --- rate limit: sliding window per key
 /* ---- Ren (3dguru) chat: live Grok via xAI (OpenAI-compatible chat completions). Key ONLY server-side: env XAI_API_KEY or file ~/.eear-secrets/xai_api_key (chmod 600). Never logged/returned. */
@@ -257,7 +270,12 @@ function statsView(now){const real=p=>!isGhost(p.id)&&!isBot(p.id),act=all('sele
  return{now,day:R.day,active:{count:A.length,devices:dev,stealth:A.filter(p=>p.mode==='stealth').length,bots:act.length-A.length},today:{visitors:T.length,devices:dT},
   ren:{status:R.status,ai:R.caps.ai,keySet:!!xaiKey(),today:R.today,month:R.month,caps:R.caps,perHour:R.perHour,firstContacts:R.firstContacts.slice(0,10),notifier:R.notifier,alerts:R.alerts.slice(0,8)},
   rateLimitHitsLastHour:hits,dj:{playing:!!(DJ.playing&&c),title:c?c.title||c.id:null,artist:c&&c.artist||null,listeners:{sse:DJC.size,poll:PULLC.size,total:DJC.size+PULLC.size},live:DJ.live?{since:DJ.live.since}:null,ann:djView(now).ann?{repeats:DJ.ann.repeats,startsAt:DJ.ann.startsAt}:null,lastBc:DJ.lastBc||null},
-  server:{uptimeS:Math.round((now-T0)/1000),startedAt:T0,version:ver,node:process.version}}}
+  server:{uptimeS:Math.round((now-T0)/1000),startedAt:T0,version:ver,node:process.version},
+  liveOrbs:{count:A.filter(p=>p.mode!=='stealth').length,windowMs:LIVE_MS},
+  games:all('select id,name,code from games').map(g=>{const n=A.filter(p=>p.game_id===g.id).length;return{id:g.id,name:g.name,code:g.code,live:n}}),
+  rooms:[{id:'matts-reality',name:"Matt's Reality"},{id:'ra-master-map',name:'Ready Athletics Master Map'}],
+  activity:alogTail(100),
+  invite:{entry:'/enter.html',openGameCode:'OPEN',tunnelHint:'https://verse-concerning-summit-equipped.trycloudflare.com/enter.html'}}}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.mp4':'video/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
@@ -277,7 +295,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/activity'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -327,6 +345,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   const dev=devOf(j.device,q.headers['user-agent']),wantS=j.mode==='stealth',okS=wantS&&stealthOk(dev);
   const id=rid(6),token=rid(24);run('insert into gplayers(id,game_id,user_id,token,name,mode,entrance,team_id,joined,live,seen) values(?,?,?,?,?,?,?,?,?,1,?)',id,g.id,U&&U.id!=='gm'?U.id:null,token,String(j.name||U?.display_name||'Player').slice(0,24),okS?'stealth':'regular',['walk','jump','dance','run'].includes(j.entrance)?j.entrance:'walk',null,now,now);
   run('update gplayers set device=? where id=?',dev,id);
+  alog('join',{pid:id,name:String(j.name||U?.display_name||'Player').slice(0,24),device:dev,mode:okS?'stealth':'regular',game:g.id,code:g.code,room:j.room?String(j.room).slice(0,40):null,stealthDenied:!!(wantS&&!okS)});
   return send(r,{id,token,device:dev,mode:okS?'stealth':'regular',...(wantS&&!okS?{stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop}:{}),policy:getPol(),game:{id:g.id,name:g.name,code:g.code}})}
  case'/api/pos':{if(!P||!P.live)return send(r,{error:'not joined'},401);const lat=+j.lat,lon=+j.lon,acc=+j.acc||0;if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90)return send(r,{error:'bad'},400);
   if(limited('p:'+P.id,150,60000))return send(r,{error:'slow down'},429);/* >=1/s ping + 3 s tick */const hdg=isFinite(+j.hdg)&&j.hdg!==null&&j.hdg!==''?((+j.hdg%360)+360)%360:null;run('insert into gfixes(pid,lat,lon,acc,t,hdg) values(?,?,?,?,?,?)',P.id,lat,lon,acc,now,hdg);run('update gplayers set seen=? where id=?',now,P.id);return send(r,{ok:1,t:now,team:teamOf(P.team_id)})}
@@ -335,7 +354,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   let L=all('select * from gplayers where game_id=? and live=1 and id<>? and seen>?',P.game_id,P.id,now-LIVE_MS).filter(o=>o.mode!=='stealth'||see);
   if(s.teamOnly)L=L.filter(o=>P.team_id&&o.team_id===P.team_id);// team-only: only teammates; no team => see nobody
   return send(r,{me:{team:teamOf(P.team_id),device:P.device,mode:P.mode},seeStealth:see,policy:pol,teamOnly:!!s.teamOnly,players:L.map(pubP)})}
- case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);let m=j.mode==='stealth'?'stealth':'regular';const dev=P.device||devOf(j.device,q.headers['user-agent']);if(m==='stealth'&&!stealthOk(dev)){run("update gplayers set mode='regular' where id=?",P.id);return send(r,{ok:0,mode:'regular',stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop})}run('update gplayers set mode=? where id=?',m,P.id);return send(r,{ok:1,mode:m})}
+ case'/api/mode':{if(!P||!P.live)return send(r,{error:'not joined'},401);let m=j.mode==='stealth'?'stealth':'regular';const dev=P.device||devOf(j.device,q.headers['user-agent']);if(m==='stealth'&&!stealthOk(dev)){run("update gplayers set mode='regular' where id=?",P.id);alog('stealth-denied',{pid:P.id,name:P.name,device:dev});return send(r,{ok:0,mode:'regular',stealthDenied:true,warning:STEALTH_WARN[dev]||STEALTH_WARN.desktop})}run('update gplayers set mode=? where id=?',m,P.id);alog(m==='stealth'?'stealth-on':'stealth-off',{pid:P.id,name:P.name,device:dev});return send(r,{ok:1,mode:m})}
  case'/api/policy':return send(r,{policy:getPol()})
  /* public read-only figure feed for figures.html: server-side bots + TEST ghosts + a COUNT of live human players (never their positions).
     Matt's Shadow follows Matt's real fix, so only its status is published; ghosts parked at a non-landmark (custom) target are hidden too. */
@@ -360,7 +379,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   const e=djOp(j,now);if(e)return send(r,{error:e,state:djView(now)},400);audit(ip,'dj-'+j.op,{id:j.id,qid:j.qid,to:j.to});return send(r,djView(now))}
  case'/api/dj/live':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(limited('djl:'+ip,600,60000))return send(r,{error:'rate limited'},429);
   if(!isKeyGM(U)){audit(ip,'djlive-denied',{op:j.op});return send(r,{error:'GM key required (X-GM-Key)'},403)}
-  const e=liveOp(j,now);if(e)return send(r,{error:e},400);if(j.op!=='chunk')audit(ip,'djlive-'+j.op,{id:j.id||null,repeats:j.repeats||null});return send(r,j.op==='chunk'?{ok:1,t:now}:djView(now))}
+  const e=liveOp(j,now);if(e)return send(r,{error:e},400);if(j.op!=='chunk'){audit(ip,'djlive-'+j.op,{id:j.id||null,repeats:j.repeats||null});alog(j.op==='start'||j.op==='begin'?'broadcast-start':j.op==='stop'||j.op==='end'?'broadcast-stop':'broadcast-'+j.op,{id:j.id||null,op:j.op})}return send(r,j.op==='chunk'?{ok:1,t:now}:djView(now))}
  case'/api/orb':{/* d49: Matt's shared orb flight settings (GM) -> DJ state .orb; every client follows unless it opts out. Manual steering never comes here. */
   if(q.method!=='POST')return send(r,{orb:DJ.orb||null});if(limited('orb:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);
   const c=j&&j.cfg;let o=null;if(c&&typeof c==='object'){const n=(v,a,b,d)=>{v=+v;return isFinite(v)?Math.max(a,Math.min(b,v)):d};o={mode:['auto','goto','tour'].includes(c.mode)?c.mode:'auto',tour:['alt','ra','cappy','off'].includes(c.tour)?c.tour:'alt',radius:n(c.radius,25,150,30),lingerF:n(c.lingerF,0,3,1),speed:n(c.speed,.2,3,1),hold:!!c.hold,tourReq:n(c.tourReq,0,1e15,0)};
@@ -381,6 +400,13 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   if(q.method==='POST'){try{const v=RG.edit(j||{});audit(ip,'ren-usage-edit',{ai:j.ai,dailyUSD:j.dailyUSD,monthlyUSD:j.monthlyUSD});return send(r,v)}catch(e){return send(r,{error:e.message},400)}}return send(r,RG.view(now))}
  case'/api/ren-usage/test-notify':{if(q.method!=='POST')return send(r,{error:'POST'},405);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);if(limited('rtn:'+ip,5,600000))return send(r,{error:'rate limited (5 per 10 min)'},429);
   const x=await RG.notify({who:'Test notification',device:'GM page',time:RG.ptTime(now),event:'talking to Ren',message:'This is a test from the Live Geometry GM page.'});audit(ip,'ren-test-notify',{ok:x.ok});return send(r,x)}
+ case'/api/activity':{/* d60: client room-enter beacon (public, rate-limited) OR GM recent-log read */
+  if(q.method==='GET'){if(limited('ag:'+ip,60,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,{t:now,events:alogTail(+u.searchParams.get('n')||100)})}
+  if(q.method!=='POST')return send(r,{error:'GET or POST'},405);if(limited('ap:'+ip,60,60000))return send(r,{error:'rate limited'},429);
+  const ev=String(j.ev||j.event||'').slice(0,48);if(!ev)return send(r,{error:'ev required'},400);
+  const allow=new Set(['room','enter','error','invite-open']);if(!allow.has(ev))return send(r,{error:'ev not allowed'},400);
+  alog(ev,{room:j.room?String(j.room).slice(0,40):null,page:j.page?String(j.page).slice(0,80):null,msg:j.msg?String(j.msg).slice(0,200):null,device:devOf(j.device,q.headers['user-agent'])});
+  return send(r,{ok:1})}
  case'/api/stats':{if(limited('gmst:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,statsView(now))}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);
@@ -404,8 +430,8 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
    REND[tid]={choreo:c,t:Date.now(),ip:crypto.createHash('sha256').update(ip).digest('hex').slice(0,8)};renSave();return send(r,{ok:1,trackId:tid,saved:REND[tid].t})}
   return send(r,{error:'GET, POST or DELETE'},405)}
  case'/api/gm/ren-dances':{if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,{dances:Object.entries(REND).map(([k,v])=>({trackId:k,saved:v.t,bytes:Buffer.byteLength(JSON.stringify(v.choreo))}))})}
- case'/api/leave':{if(P)run('update gplayers set live=0 where id=?',P.id);return send(r,{ok:1})}
- case'/api/delete':{if(P){run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
+ case'/api/leave':{if(P){run('update gplayers set live=0 where id=?',P.id);alog('leave',{pid:P.id,name:P.name,device:P.device,game:P.game_id})}return send(r,{ok:1})}
+ case'/api/delete':{if(P){alog('delete-data',{pid:P.id,name:P.name,device:P.device,game:P.game_id});run('delete from gfixes where pid=?',P.id);run('delete from gplayers where id=?',P.id)}return send(r,{ok:1})}
  // ---- read-only GM watcher (GM key header only; watcher never joins, so it never appears as a player)
  case'/api/gm/snapshot':{if(q.method!=='GET')return send(r,{error:'GET only'},405);if(limited('gw:'+ip,240,60000))return send(r,{error:'rate limited'},429);
   if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,gmSnap(u))}

@@ -1,0 +1,53 @@
+<!doctype html><html lang=en><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name=theme-color content="#0b0618">
+<meta name=description content="Live Geometry — open honest space. Port Townsend dance floor.">
+<title>Enter · Live Geometry</title>
+<link rel=icon type=image/png sizes=192x192 href=icon-192.png>
+<style>
+:root{--bg:#070412;--fg:#f6f0ff;--mut:#b9a8d8;--acc:#ffc800;--line:#7a2fe088}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:
+ radial-gradient(900px 500px at 50% -5%,#2a1258 0%,transparent 55%),
+ radial-gradient(700px 400px at 80% 100%,#1a0840 0%,transparent 50%),
+ var(--bg);color:var(--fg);font:17px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
+.card{width:min(520px,100%);background:#0b0618e8;border:1px solid var(--line);border-radius:22px;padding:28px 24px 22px;box-shadow:0 20px 60px #000a,0 0 0 1px #ffffff08 inset;text-align:center}
+.brand{font:800 28px/1.05 system-ui,-apple-system,sans-serif;letter-spacing:.4px}
+.sub{color:#d9c2ff;font-weight:600;margin-top:6px;font-size:16px}
+.msg{margin:22px 0 8px;color:var(--fg);font-size:18px;line-height:1.55;text-align:left;background:#140a28aa;border-radius:14px;padding:16px 16px 14px;border:1px solid #a45cff33}
+.msg p{margin:0 0 10px}.msg p:last-child{margin:0;color:#ffc800;font-weight:700}
+.enter{display:inline-block;margin-top:18px;width:100%;max-width:320px;padding:18px 22px;border:0;border-radius:16px;background:linear-gradient(135deg,#ffc800,#ff9a1a);color:#1a0a00;font:800 20px/1 system-ui;cursor:pointer;text-decoration:none;box-shadow:0 8px 28px #ffc80055}
+.enter:active{transform:scale(.98)}
+.qr{margin:22px auto 0;width:160px;height:160px;border-radius:12px;background:#fff;padding:8px;border:1px solid #fff3}
+.qr img{width:100%;height:100%;display:block;border-radius:6px}
+.foot{margin-top:14px;font-size:12px;color:var(--mut)}
+.foot a{color:#d9c2ff}
+</style></head><body>
+<div class=wrap><div class=card>
+  <div class=brand>Live Geometry</div>
+  <div class=sub>Matt&#39;s Reality · Port Townsend</div>
+  <div class=msg>
+    <p>If you enter, you will be recorded and seen by all. This is an open honest space. Please be nice. Please dance. Communicate clearly.</p>
+    <p>Meet us on the dance floor in Port Townsend.</p>
+  </div>
+  <a class=enter id=go href="index.html?room=matts-reality">Enter</a>
+  <div class=qr title="Scan to open this entry page"><img src=assets/enter-qr.png alt="QR code to enter Live Geometry"></div>
+  <div class=foot>Scan the QR to share this door · <a href=enter-print.html>print-friendly QR</a></div>
+</div></div>
+<script>
+(function(){
+  var T='https://verse-concerning-summit-equipped.trycloudflare.com';
+  var go=document.getElementById('go');
+  // Prefer stable tunnel when serving from Pages or odd hosts
+  if(location.hostname.endsWith('github.io')||location.protocol==='file:'){
+    go.href=T+'/index.html?room=matts-reality';
+  }
+  try{fetch((location.hostname.endsWith('github.io')?T:'')+'/api/activity',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ev:'invite-open',page:'enter.html',room:'matts-reality'})}).catch(function(){})}catch(e){}
+  go.addEventListener('click',function(){
+    try{fetch((location.hostname.endsWith('github.io')?T:'')+'/api/activity',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ev:'enter',page:'enter.html',room:'matts-reality'})}).catch(function(){})}catch(e){}
+  });
+})();
+</script>
+</body></html>

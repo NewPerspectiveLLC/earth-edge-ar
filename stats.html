@@ -1,44 +1,59 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792455290575><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792455290575></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792470000061><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792470000061></script>
 <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Room Stats · Live Geometry</title>
-<meta name=theme-color content="#0b0d1a"><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes>
-<meta name=apple-mobile-web-app-title content="Room Stats"><meta name=apple-mobile-web-app-status-bar-style content=black-translucent>
+<title>Live Dashboard · Live Geometry</title>
+<meta name=theme-color content="#0b0618"><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes>
+<meta name=apple-mobile-web-app-title content="Live Dashboard"><meta name=apple-mobile-web-app-status-bar-style content=black-translucent>
 <link rel=manifest href=stats.webmanifest>
-<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792455290575>
-<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792455290575>
+<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792470000061>
+<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792470000061>
 <style>
-:root{--bg:#0b0d1a;--card:#161a2e;--mut:#8b93b8;--fg:#eef0ff;--ok:#41d18b;--warn:#ffb340;--bad:#ff5a6a;--acc:#8d7bff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom))}
-h1{font-size:20px;margin:2px 0 8px;display:flex;align-items:center;gap:8px}h1 small{font-size:12px;color:var(--mut);font-weight:400;margin-left:auto}
-.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-.c{background:var(--card);border-radius:14px;padding:12px}.c.w{grid-column:1/-1}
-.k{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}.v{font-size:28px;font-weight:700;margin-top:2px}.s{font-size:13px;color:var(--mut);margin-top:3px}
-.bar{height:10px;border-radius:6px;background:#262b48;overflow:hidden;margin:6px 0 2px}.bar i{display:block;height:100%;background:var(--ok);width:0}
+:root{--bg:#0b0618;--card:#16102a;--mut:#9a8fb8;--fg:#f3eeff;--ok:#41d18b;--warn:#ffb340;--bad:#ff5a6a;--acc:#a45cff;--line:#2a2148}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1d0d38 0%,var(--bg) 55%);color:var(--fg);font:15px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));min-height:100vh}
+h1{font-size:22px;margin:2px 0 10px;display:flex;align-items:center;gap:8px;letter-spacing:.2px}h1 small{font-size:12px;color:var(--mut);font-weight:400;margin-left:auto}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
+.c{background:var(--card);border:1px solid #7a2fe033;border-radius:14px;padding:12px;box-shadow:0 8px 24px #0005}.c.w{grid-column:1/-1}
+.k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}.v{font-size:28px;font-weight:800;margin-top:2px;letter-spacing:-.02em}.s{font-size:13px;color:var(--mut);margin-top:3px}
+.bar{height:10px;border-radius:6px;background:#262048;overflow:hidden;margin:6px 0 2px}.bar i{display:block;height:100%;background:var(--ok);width:0}
 .bar.warn i{background:var(--warn)}.bar.bad i{background:var(--bad)}
-.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;font-size:14px}.on{background:#123a28;color:var(--ok)}.rest{background:#3d2c0c;color:var(--warn)}.off{background:#3d1218;color:var(--bad)}
-ul{list-style:none;margin:6px 0 0;padding:0}li{padding:6px 0;border-top:1px solid #23284a;font-size:14px}li:first-child{border-top:0}li .t{color:var(--mut);font-size:12px}
-#login{max-width:420px;margin:30px auto}input{width:100%;padding:12px;border-radius:10px;border:1px solid #333a66;background:#0f1224;color:var(--fg);font-size:16px}
-button{padding:11px 16px;border-radius:10px;border:0;background:var(--acc);color:#fff;font-weight:700;font-size:15px;margin-top:8px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;font-size:13px}.on{background:#123a28;color:var(--ok)}.rest{background:#3d2c0c;color:var(--warn)}.off{background:#3d1218;color:var(--bad)}
+ul{list-style:none;margin:6px 0 0;padding:0}li{padding:7px 0;border-top:1px solid var(--line);font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}li:first-child{border-top:0}li .t{color:var(--mut);font-size:12px;margin-left:auto}
+#login{max-width:420px;margin:40px auto}input{width:100%;padding:12px;border-radius:10px;border:1px solid #3a2d66;background:#0f0a1c;color:var(--fg);font-size:16px}
+button{padding:11px 16px;border-radius:10px;border:0;background:linear-gradient(135deg,#a45cff,#7a2fe0);color:#fff;font-weight:700;font-size:15px;margin-top:8px;cursor:pointer}
 .err{color:var(--bad);font-size:13px;margin-top:6px}.warnb{background:#3d2c0c;color:var(--warn);border-radius:10px;padding:8px 10px;margin-bottom:10px;display:none}
-a{color:#a99cff}
+a{color:#d9c2ff}.ev{font-weight:700;color:#ffc800;min-width:7.5em}.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);display:inline-block;margin-right:6px;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.45}}.nav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:13px}
+.nav a{background:#1d0d38;border:1px solid #a45cff66;padding:6px 10px;border-radius:999px;text-decoration:none}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:6px 4px;border-top:1px solid var(--line)}th{color:var(--mut);font-weight:600}
 </style></head><body>
-<h1>📊 Room Stats <small id=upd>—</small></h1>
-<div id=login style=display:none><div class=c><div class=k>GM key</div><p class=s>Enter the GM key once; it's stored on this device only.</p><input id=key type=password autocomplete=current-password placeholder="GM key"><button id=go>Open stats</button><div id=lerr class=err></div></div></div>
+<h1><span class=dot></span>Live Dashboard <small id=upd>—</small></h1>
+<div class=nav>
+ <a href=enter.html>Entry page</a>
+ <a href=enter-print.html>QR print</a>
+ <a href=gm.html>GM</a>
+ <a href=index.html>?room=matts-reality>Matt's Reality</a>
+</div>
+<div id=login style=display:none><div class=c><div class=k>GM key</div><p class=s>Enter the GM key once; stored on this device only. Dashboard is not public.</p><input id=key type=password autocomplete=current-password placeholder="GM key"><button id=go>Open dashboard</button><div id=lerr class=err></div></div></div>
 <div id=main style=display:none>
 <div id=wb class=warnb></div>
 <div class=g>
- <div class=c><div class=k>Visitors now</div><div class=v id=act>–</div><div class=s id=actd></div></div>
+ <div class=c><div class=k>Live now</div><div class=v id=act>–</div><div class=s id=actd></div></div>
+ <div class=c><div class=k>Live orbs</div><div class=v id=orbs>–</div><div class=s>non-stealth · 60s window</div></div>
  <div class=c><div class=k>Visitors today</div><div class=v id=vt>–</div><div class=s id=vtd></div></div>
- <div class=c><div class=k>Bots / Shadow</div><div class=v id=bots>–</div><div class=s>shown separately, not counted</div></div>
+ <div class=c><div class=k>Bots / Shadow</div><div class=v id=bots>–</div><div class=s>not counted as visitors</div></div>
  <div class=c><div class=k>Ren messages</div><div class=v id=rm>–</div><div class=s id=rmm></div></div>
+ <div class=c><div class=k>Games live</div><div class=v id=gl>–</div><div class=s id=gld></div></div>
  <div class="c w"><div class=k>Ren AI</div><div style="margin:6px 0"><span id=ais class=pill>–</span> <span class=s id=aik></span></div>
   <div class=s>Today <b id=cd></b></div><div class=bar id=bd><i></i></div>
   <div class=s>Month <b id=cm></b></div><div class=bar id=bm><i></i></div>
   <div class=s id=tok></div></div>
+ <div class="c w"><div class=k>Public rooms (client)</div><div class=s id=rooms></div></div>
+ <div class="c w"><div class=k>Games</div><table><thead><tr><th>Name</th><th>Code</th><th>Live</th></tr></thead><tbody id=games></tbody></table></div>
+ <div class="c w"><div class=k>Recent activity</div><ul id=actf></ul></div>
  <div class="c w"><div class=k>Entrances (first message to Ren)</div><div class=s id=nst></div><ul id=fc></ul></div>
  <div class="c w"><div class=k>Master DJ</div><div class=v style=font-size:18px id=dj>–</div><div class=s id=djl></div></div>
  <div class="c w"><div class=k>Alerts</div><ul id=al></ul></div>
- <div class="c w"><div class=k>Server</div><div class=s id=srv></div><div class=s><a href=gm.html>GM page</a></div></div>
+ <div class="c w"><div class=k>Invite readiness</div><div class=s id=inv></div></div>
+ <div class="c w"><div class=k>Server</div><div class=s id=srv></div></div>
 </div></div>
 <script>
 const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://verse-concerning-summit-equipped.trycloudflare.com':'');
@@ -46,7 +61,7 @@ const $=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/[&<
 const tz={timeZone:'America/Los_Angeles'},tm=t=>new Date(t).toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'})+' PT',
  dt=t=>{const d=new Date(t),n=new Date();return (d.toLocaleDateString('en-US',tz)===n.toLocaleDateString('en-US',tz)?'':d.toLocaleDateString('en-US',{...tz,month:'short',day:'numeric'})+' ')+tm(t)},
  usd=v=>'$'+(+v||0).toFixed(v<1?3:2),devs=o=>Object.entries(o||{}).map(([k,v])=>v+' '+k).join(' · ')||'none';
-let KEY=localStorage.eearGM||'',busy=0,timer;
+let KEY=localStorage.eearGM||'',busy=0;
 function bar(el,v,cap,warn){const p=cap>0?Math.min(100,v/cap*100):0;el.firstChild.style.width=p+'%';el.className='bar'+(p>=100?' bad':p>=warn?' warn':'');return p}
 function up(s){const days=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return (days?days+'d ':'')+h+'h '+m+'m'}
 async function load(){if(!KEY){$('login').style.display='';$('main').style.display='none';return}if(busy)return;busy=1;
@@ -57,8 +72,12 @@ async function load(){if(!KEY){$('login').style.display='';$('main').style.displ
  catch(e){$('upd').textContent='offline · '+e.message}finally{busy=0}}
 function render(j){const R=j.ren||{},C=R.caps||{},T=R.today||{},M=R.month||{};
  $('act').textContent=j.active.count;$('actd').textContent=devs(j.active.devices)+(j.active.stealth?' · '+j.active.stealth+' stealth':'');
+ $('orbs').textContent=(j.liveOrbs&&j.liveOrbs.count!=null)?j.liveOrbs.count:j.active.count;
  $('vt').textContent=j.today.visitors;$('vtd').textContent=devs(j.today.devices);$('bots').textContent=j.active.bots;
  $('rm').textContent=T.requests||0;$('rmm').textContent=(M.requests||0)+' this month · '+(R.perHour||0)+' in last hour';
+ const Gs=j.games||[];$('gl').textContent=Gs.filter(g=>g.live>0).length;$('gld').textContent=Gs.map(g=>g.name+': '+g.live).join(' · ')||'—';
+ $('games').innerHTML=Gs.map(g=>`<tr><td>${esc(g.name)}</td><td><code>${esc(g.code)}</code></td><td>${g.live}</td></tr>`).join('')||'<tr><td colspan=3 class=t>none</td></tr>';
+ $('rooms').textContent=(j.rooms||[]).map(r=>r.name+' ('+r.id+')').join(' · ')||"Matt's Reality · Ready Athletics Master Map";
  const st=!C.ai?['off','Kill switch OFF (canned replies)']:/capped/.test(R.status)?['rest','Resting — non-AI (cap reached)']:!R.keySet?['rest','Non-AI — no xAI key set']:R.status==='warning'?['rest','ON — ≥'+C.warnPct+'% of daily cap']:['on','AI ON'];
  $('ais').className='pill '+st[0];$('ais').textContent=st[1];$('aik').textContent='max '+C.maxTokens+' tokens/reply';
  $('cd').textContent=usd(T.usd)+' of '+usd(C.dailyUSD);$('cm').textContent=usd(M.usd)+' of '+usd(C.monthlyUSD);
@@ -71,9 +90,12 @@ function render(j){const R=j.ren||{},C=R.caps||{},T=R.today||{},M=R.month||{};
  const D=j.dj||{},L=D.listeners||{};$('dj').textContent=D.playing?'▶ '+(D.title||'')+(D.artist?' — '+D.artist:''):'⏸ not playing';
  $('djl').textContent=(L.total||0)+' listeners ('+(L.sse||0)+' stream, '+(L.poll||0)+' poll)'+(D.live?' · 🔴 LIVE voice since '+tm(D.live.since):' · broadcast off')+(D.ann?' · announcement queued':'')+(D.lastBc?' · last broadcast '+dt(D.lastBc.t||D.lastBc.at||0):'');
  $('al').innerHTML=(R.alerts||[]).map(a=>`<li>${esc(a.msg)} <span class=t>· ${esc(a.kind)} · ${dt(a.t)}</span></li>`).join('')||'<li class=t>none</li>';
+ const A=(j.activity||[]).slice().reverse();
+ $('actf').innerHTML=A.map(e=>`<li><span class=ev>${esc(e.ev)}</span> ${esc(e.name||e.room||e.page||e.op||e.msg||'')} <span class=t>${e.device?esc(e.device)+' · ':''}${dt(e.t)}</span></li>`).join('')||'<li class=t>no events yet — joins, leaves, rooms, broadcasts will appear here</li>';
+ const I=j.invite||{};$('inv').innerHTML=`Entry <a href="${esc(I.entry||'/enter.html')}">${esc(I.entry||'/enter.html')}</a> · open game code <code>${esc(I.openGameCode||'OPEN')}</code> · tunnel <a href="${esc(I.tunnelHint||'#')}">enter via tunnel</a>. Auth still gated; invites not blasted. Stealth policy + GM key still required for admin.`;
  const S=j.server||{};$('srv').textContent='Up '+up(S.uptimeS||0)+' · build '+(S.version&&S.version.v||'?')+' · node '+(S.node||'?')}
 $('go').onclick=()=>{KEY=$('key').value.trim();if(KEY)localStorage.eearGM=KEY;$('lerr').textContent='';load()};
 $('key').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});addEventListener('focus',load);addEventListener('pageshow',load);
-setInterval(()=>{if(!document.hidden)load()},10000);load();
+setInterval(()=>{if(!document.hidden)load()},8000);load();
 </script></body></html>
