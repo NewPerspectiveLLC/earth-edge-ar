@@ -35,6 +35,22 @@ function alog(ev,detail){try{alogRotate();const row={t:Date.now(),ev:String(ev||
  fs.appendFileSync(ALOG_FILE,JSON.stringify(row)+'\n')}catch(e){console.error('alog',e.message)}}
 function alogTail(n){n=Math.max(1,Math.min(200,n|0||80));try{const d=fs.readFileSync(ALOG_FILE,'utf8');const L=d.trim()?d.trim().split('\n'):[];
  return L.slice(-n).map(l=>{try{return JSON.parse(l)}catch(e){return{t:0,ev:'parse',raw:l.slice(0,120)}}})}catch(e){return[]}}
+/* d61: visit chart aggregates from activity.jsonl (+ recent rotates). Visit = join | enter | invite-open. No raw PII beyond counts. */
+const VISIT_EV=new Set(['join','enter','invite-open']);
+function alogFiles(){const out=[];try{if(fs.existsSync(ALOG_FILE))out.push(ALOG_FILE);const old=fs.readdirSync(ALOG_DIR).filter(x=>/^activity-.+\.jsonl$/.test(x)).sort().slice(-ALOG_KEEP);
+ for(const x of old)out.push(path.join(ALOG_DIR,x))}catch(e){}return out}
+function alogVisitTimes(since){const ts=[];for(const f of alogFiles()){let d;try{d=fs.readFileSync(f,'utf8')}catch(e){continue}
+ for(const line of d.split('\n')){if(!line)continue;let o;try{o=JSON.parse(line)}catch(e){continue}
+  if(!VISIT_EV.has(o.ev)||!(+o.t>=since))continue;ts.push(+o.t)}}return ts.sort((a,b)=>a-b)}
+function ptParts(t){const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false});
+ const p={};for(const x of fmt.formatToParts(new Date(t)))if(x.type!=='literal')p[x.type]=x.value;const h=p.hour==='24'?'00':p.hour;return{day:`${p.year}-${p.month}-${p.day}`,hour:h,labelHour:h}}
+function visitChart(now){const since7=now-7*86400000,since24=now-24*3600000,ts=alogVisitTimes(since7);
+ const byH=Object.create(null),byD=Object.create(null);for(const t of ts){const p=ptParts(t);byD[p.day]=(byD[p.day]|0)+1;if(t>=since24){const k=p.day+'T'+p.hour;byH[k]=(byH[k]|0)+1}}
+ const h24=[];for(let i=23;i>=0;i--){const t=now-i*3600000,p=ptParts(t),k=p.day+'T'+p.hour;h24.push({t:t-t%3600000,key:k,label:((+p.hour)%12||12)+( +p.hour<12?'a':'p'),hour:+p.hour,count:byH[k]|0})}
+ const d7=[];for(let i=6;i>=0;i--){const t=now-i*86400000,p=ptParts(t);d7.push({t,key:p.day,label:p.day.slice(5),count:byD[p.day]|0})}
+ const total7=ts.length,total24=ts.filter(t=>t>=since24).length;
+ return{definition:['join','enter','invite-open'],tz:'America/Los_Angeles',total24,total7,h24,d7,empty:!total7}}
+
 
 const send=(r,o,c=200,h={})=>{r.writeHead(c,{'content-type':'application/json','cache-control':'no-store',...h});r.end(JSON.stringify(o))};
 // --- rate limit: sliding window per key
@@ -275,6 +291,7 @@ function statsView(now){const real=p=>!isGhost(p.id)&&!isBot(p.id),act=all('sele
   games:all('select id,name,code from games').map(g=>{const n=A.filter(p=>p.game_id===g.id).length;return{id:g.id,name:g.name,code:g.code,live:n}}),
   rooms:[{id:'matts-reality',name:"Matt's Reality"},{id:'ra-master-map',name:'Ready Athletics Master Map'}],
   activity:alogTail(100),
+  visits:visitChart(now),
   invite:{entry:'/enter.html',openGameCode:'OPEN',tunnelHint:'https://verse-concerning-summit-equipped.trycloudflare.com/enter.html'}}}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.mp4':'video/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
@@ -295,7 +312,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/activity'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/stats/visits'||u.pathname==='/api/activity'||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
@@ -407,6 +424,7 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
   const allow=new Set(['room','enter','error','invite-open']);if(!allow.has(ev))return send(r,{error:'ev not allowed'},400);
   alog(ev,{room:j.room?String(j.room).slice(0,40):null,page:j.page?String(j.page).slice(0,80):null,msg:j.msg?String(j.msg).slice(0,200):null,device:devOf(j.device,q.headers['user-agent'])});
   return send(r,{ok:1})}
+ case'/api/stats/visits':{if(limited('gmstv:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,{t:now,...visitChart(now)})}
  case'/api/stats':{if(limited('gmst:'+ip,120,60000))return send(r,{error:'rate limited'},429);if(!isKeyGM(U))return send(r,{error:'GM key required (X-GM-Key)'},403);return send(r,statsView(now))}
  case'/api/ren':{if(q.method!=='POST')return send(r,{error:'POST {message, history?}'},405);
   if(limited('ren:'+ip,10,60000)||limited('rend:'+ip,200,86400000))return send(r,{error:'Ren needs a breather: too many messages, try again in a minute.'},429);

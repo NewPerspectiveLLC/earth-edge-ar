@@ -1,11 +1,11 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792470000061><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792470000061></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792470000062><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792470000062></script>
 <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Live Dashboard · Live Geometry</title>
 <meta name=theme-color content="#0b0618"><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes>
 <meta name=apple-mobile-web-app-title content="Live Dashboard"><meta name=apple-mobile-web-app-status-bar-style content=black-translucent>
 <link rel=manifest href=stats.webmanifest>
-<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792470000061>
-<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792470000061>
+<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792470000062>
+<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792470000062>
 <style>
 :root{--bg:#0b0618;--card:#16102a;--mut:#9a8fb8;--fg:#f3eeff;--ok:#41d18b;--warn:#ffb340;--bad:#ff5a6a;--acc:#a45cff;--line:#2a2148}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1d0d38 0%,var(--bg) 55%);color:var(--fg);font:15px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));min-height:100vh}
@@ -24,6 +24,20 @@ a{color:#d9c2ff}.ev{font-weight:700;color:#ffc800;min-width:7.5em}.dot{width:8px
 @keyframes pulse{50%{opacity:.45}}.nav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:13px}
 .nav a{background:#1d0d38;border:1px solid #a45cff66;padding:6px 10px;border-radius:999px;text-decoration:none}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:6px 4px;border-top:1px solid var(--line)}th{color:var(--mut);font-weight:600}
+
+.seg{display:inline-flex;gap:4px;margin:6px 0 10px;background:#0f0a1c;padding:3px;border-radius:999px;border:1px solid var(--line)}
+.seg button{margin:0;padding:7px 14px;border-radius:999px;background:transparent;color:var(--mut);font-size:13px;font-weight:700}
+.seg button.on{background:linear-gradient(135deg,#a45cff,#7a2fe0);color:#fff}
+.chart{display:flex;align-items:flex-end;gap:3px;height:160px;padding:8px 2px 0;border-bottom:1px solid var(--line)}
+.chart .col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;gap:4px}
+.chart .col b{display:block;width:100%;max-width:28px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#d9c2ff,#a45cff);box-shadow:0 0 12px #a45cff44;min-height:2px}
+.chart .col span{font-size:9px;color:var(--mut);line-height:1;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:clip}
+.chart .col em{font-size:10px;font-style:normal;color:#ffc800;font-weight:700;height:12px}
+.chart.empty{align-items:center;justify-content:center;color:var(--mut);font-size:14px}
+.vtots{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:13px;color:var(--mut)}
+.vtots b{color:var(--fg);font-size:16px}
+@media (max-width:520px){.chart{height:140px;gap:2px}.chart .col span{font-size:8px}.chart .col b{max-width:18px}}
+
 </style></head><body>
 <h1><span class=dot></span>Live Dashboard <small id=upd>—</small></h1>
 <div class=nav>
@@ -42,6 +56,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
  <div class=c><div class=k>Bots / Shadow</div><div class=v id=bots>–</div><div class=s>not counted as visitors</div></div>
  <div class=c><div class=k>Ren messages</div><div class=v id=rm>–</div><div class=s id=rmm></div></div>
  <div class=c><div class=k>Games live</div><div class=v id=gl>–</div><div class=s id=gld></div></div>
+ <div class="c w" id=visitCard>
+  <div class=k>Visits</div>
+  <div class=s id=vdef>join · enter · invite-open · America/Los_Angeles</div>
+  <div class=seg><button type=button id=vh24 class=on>Last 24 hours</button><button type=button id=vd7>Last 7 days</button></div>
+  <div class=chart id=vchart></div>
+  <div class=vtots><span>24h <b id=vt24>–</b></span><span>7d <b id=vt7>–</b></span><span id=vnote></span></div>
+ </div>
  <div class="c w"><div class=k>Ren AI</div><div style="margin:6px 0"><span id=ais class=pill>–</span> <span class=s id=aik></span></div>
   <div class=s>Today <b id=cd></b></div><div class=bar id=bd><i></i></div>
   <div class=s>Month <b id=cm></b></div><div class=bar id=bm><i></i></div>
@@ -62,6 +83,26 @@ const tz={timeZone:'America/Los_Angeles'},tm=t=>new Date(t).toLocaleTimeString('
  dt=t=>{const d=new Date(t),n=new Date();return (d.toLocaleDateString('en-US',tz)===n.toLocaleDateString('en-US',tz)?'':d.toLocaleDateString('en-US',{...tz,month:'short',day:'numeric'})+' ')+tm(t)},
  usd=v=>'$'+(+v||0).toFixed(v<1?3:2),devs=o=>Object.entries(o||{}).map(([k,v])=>v+' '+k).join(' · ')||'none';
 let KEY=localStorage.eearGM||'',busy=0;
+let visitMode='h24',lastVisits=null;
+function drawVisits(V){lastVisits=V||lastVisits;const W=lastVisits;if(!W){return}
+ $('vt24').textContent=W.total24|0;$('vt7').textContent=W.total7|0;
+ $('vdef').textContent=(W.definition||['join','enter','invite-open']).join(' · ')+' · '+(W.tz||'America/Los_Angeles');
+ const series=visitMode==='d7'?(W.d7||[]):(W.h24||[]);
+ const max=Math.max(1,...series.map(x=>x.count|0));
+ const el=$('vchart');
+ if(W.empty||!series.some(x=>x.count)){el.className='chart empty';el.textContent=W.empty?'No visits logged yet — joins, Enter taps, and invite-open will appear here.':'No visits in this window yet.';$('vnote').textContent='';return}
+ el.className='chart';
+ const sparse=visitMode==='h24';
+ el.innerHTML=series.map((x,i)=>{
+   const h=Math.max(2,Math.round((x.count/max)*130));
+   const showLab=!sparse||i%3===0||i===series.length-1;
+   return `<div class=col title="${esc(x.key)}: ${x.count}"><em>${x.count?x.count:''}</em><b style="height:${h}px"></b><span>${showLab?esc(x.label):''}</span></div>`;
+ }).join('');
+ $('vnote').textContent=visitMode==='h24'?'hourly bars · PT':'daily bars · PT';
+}
+$('vh24').onclick=()=>{visitMode='h24';$('vh24').className='on';$('vd7').className='';drawVisits()};
+$('vd7').onclick=()=>{visitMode='d7';$('vd7').className='on';$('vh24').className='';drawVisits()};
+
 function bar(el,v,cap,warn){const p=cap>0?Math.min(100,v/cap*100):0;el.firstChild.style.width=p+'%';el.className='bar'+(p>=100?' bad':p>=warn?' warn':'');return p}
 function up(s){const days=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return (days?days+'d ':'')+h+'h '+m+'m'}
 async function load(){if(!KEY){$('login').style.display='';$('main').style.display='none';return}if(busy)return;busy=1;
@@ -93,6 +134,7 @@ function render(j){const R=j.ren||{},C=R.caps||{},T=R.today||{},M=R.month||{};
  const A=(j.activity||[]).slice().reverse();
  $('actf').innerHTML=A.map(e=>`<li><span class=ev>${esc(e.ev)}</span> ${esc(e.name||e.room||e.page||e.op||e.msg||'')} <span class=t>${e.device?esc(e.device)+' · ':''}${dt(e.t)}</span></li>`).join('')||'<li class=t>no events yet — joins, leaves, rooms, broadcasts will appear here</li>';
  const I=j.invite||{};$('inv').innerHTML=`Entry <a href="${esc(I.entry||'/enter.html')}">${esc(I.entry||'/enter.html')}</a> · open game code <code>${esc(I.openGameCode||'OPEN')}</code> · tunnel <a href="${esc(I.tunnelHint||'#')}">enter via tunnel</a>. Auth still gated; invites not blasted. Stealth policy + GM key still required for admin.`;
+ drawVisits(j.visits||null);
  const S=j.server||{};$('srv').textContent='Up '+up(S.uptimeS||0)+' · build '+(S.version&&S.version.v||'?')+' · node '+(S.node||'?')}
 $('go').onclick=()=>{KEY=$('key').value.trim();if(KEY)localStorage.eearGM=KEY;$('lerr').textContent='';load()};
 $('key').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
