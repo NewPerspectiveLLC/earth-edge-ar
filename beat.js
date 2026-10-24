@@ -9,7 +9,7 @@ export const TRACK_META = {
 };
 TRACK_META['happys-trails-vortex'] = TRACK_META.vortex; TRACK_META['disco-jam'] = TRACK_META.disco;   // EEAR_AUDIO track ids
 export const KEY_SEP = '--';          // server trackId regex is [A-Za-z0-9_.-]{1,64}; '::' would be rejected (see report)
-const TUNNEL = 'https://humor-communist-air-take.trycloudflare.com';
+const TUNNEL = 'https://fiction-annotation-wash-winston.trycloudflare.com';
 export function apiBase() { if (window.EEAR_API) return window.EEAR_API; return location.hostname.endsWith('github.io') ? TUNNEL : ''; }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
 

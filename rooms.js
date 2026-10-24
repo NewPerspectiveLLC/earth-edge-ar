@@ -19,7 +19,7 @@ function alogRoom(room, why) {
     if (sessionStorage[k] === '1' && why !== 'switch') return;
     sessionStorage[k] = '1';
     const BASE = (typeof location !== 'undefined' && location.hostname.endsWith('github.io'))
-      ? 'https://humor-communist-air-take.trycloudflare.com' : '';
+      ? 'https://fiction-annotation-wash-winston.trycloudflare.com' : '';
     fetch(BASE + '/api/activity', { method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ ev: 'room', room, page: 'index', why: why || 'enter' }), keepalive: true }).catch(() => {});
   } catch (e) {}

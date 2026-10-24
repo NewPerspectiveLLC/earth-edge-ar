@@ -294,7 +294,7 @@ function statsView(now){const real=p=>!isGhost(p.id)&&!isBot(p.id),act=all('sele
   rooms:[{id:'matts-reality',name:"Matt's Reality"},{id:'ra-master-map',name:'Ready Athletics Master Map'}],
   activity:alogTail(100),
   visits:visitChart(now),
-  invite:{entry:'/enter.html',openGameCode:'OPEN',tunnelHint:'https://humor-communist-air-take.trycloudflare.com/enter.html'}}}
+  invite:{entry:'/enter.html',openGameCode:'OPEN',tunnelHint:'https://fiction-annotation-wash-winston.trycloudflare.com/enter.html'}}}
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.mp4':'video/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();

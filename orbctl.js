@@ -3,7 +3,7 @@
 // so Manual steering stays local. Matt (GM key) can 'Apply to everyone': mode / tour pick / radius / linger / speed / go-to spot go into the
 // server DJ state (.orb, POST /api/orb, GM-gated); every device follows them unless it turns off 'Follow Matt's orb settings'.
 const API = () => window.EEAR_ORBAPI;
-const BASE = () => (window.EEAR_DJ && EEAR_DJ.base) || window.EEAR_API || (location.hostname.endsWith('github.io') ? 'https://humor-communist-air-take.trycloudflare.com' : '');
+const BASE = () => (window.EEAR_DJ && EEAR_DJ.base) || window.EEAR_API || (location.hostname.endsWith('github.io') ? 'https://fiction-annotation-wash-winston.trycloudflare.com' : '');
 const isGM = () => !!localStorage.eearGM;
 const SHARE_KEYS = ['mode', 'tour', 'radius', 'lingerF', 'speed', 'hold', 'goto', 'tourReq'];
 export async function share(cfg) { const r = await fetch(BASE() + '/api/orb', { method: 'POST', headers: { 'content-type': 'application/json', 'x-gm-key': localStorage.eearGM || '' }, body: JSON.stringify({ cfg }) }); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); window.EEAR_DJ && EEAR_DJ.fetchState && EEAR_DJ.fetchState(); return j }
