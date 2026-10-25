@@ -1,15 +1,15 @@
 // tour.js (d59): "Matt's 3D World" - automatic drone tour over Port Townsend (tour.html). Plain 3D (no camera / GPS / compass / AR).
 // Minimal layers: continents (Natural Earth) + Port Townsend shoreline (OSM) outlines, a green low-relief terrain over the land (tour-terrain.json, real
 // elevation), c.1850s dirt roads (tour-roads.json), a few small 3D details (downtown, Freemason Hall, Keohans Tree, Ready Athletics, Cappy's, Fort Worden)
-// and the giant drive-in screen (drivein.js). Sound: Matt Ready Radio = the Master DJ loop + live voice/announcements (dj.js / djvoice.js), played FROM the
+// and the giant drive-in screen (drivein.js). Sound: Matt Ready Radio = the Master DJ loop + live voice/announcements (dj.js?v=1792886745171 / djvoice.js), played FROM the
 // orb (orbball.js + orbit.js: wanders 25-34 m around the camera, so it stays loud), HRTF-panned. The entry tap unlocks audio (iOS + desktop).
-// d59: live broadcaster orbs (liveorbs.js + /api/live-orbs) on the surface; tour route inserts flyovers for current live orbs (rebuild on loop wrap).
+// d59: live broadcaster orbs (liveorbs.js?v=1792886745171 + /api/live-orbs) on the surface; tour route inserts flyovers for current live orbs (rebuild on loop wrap).
 import * as THREE from 'three';
-import { DJ } from './dj.js?v=1792470000056';
+import { DJ } from './dj.js?v=1792886745171';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
 import { initDriveIn } from './drivein.js?v=1792470000058';
-import { initLiveOrbs } from './liveorbs.js?v=1792470000060';
+import { initLiveOrbs } from './liveorbs.js?v=1792886745171';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
 const V = '?v=' + (window.EEAR_V || '1792455290575');

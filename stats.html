@@ -1,11 +1,11 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792470000062><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792470000062></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=eear-v content=1792886745171><meta http-equiv=Cache-Control content=no-cache><meta http-equiv=Pragma content=no-cache><script src=updater.js?v=1792886745171></script>
 <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Live Dashboard · Live Geometry</title>
 <meta name=theme-color content="#0b0618"><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes>
 <meta name=apple-mobile-web-app-title content="Live Dashboard"><meta name=apple-mobile-web-app-status-bar-style content=black-translucent>
 <link rel=manifest href=stats.webmanifest>
-<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792470000062>
-<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792470000062>
+<link rel=icon type=image/png sizes=192x192 href=icon-192.png?v=1792886745171>
+<link rel=apple-touch-icon sizes=180x180 href=apple-touch-icon.png?v=1792886745171>
 <style>
 :root{--bg:#0b0618;--card:#16102a;--mut:#9a8fb8;--fg:#f3eeff;--ok:#41d18b;--warn:#ffb340;--bad:#ff5a6a;--acc:#a45cff;--line:#2a2148}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1d0d38 0%,var(--bg) 55%);color:var(--fg);font:15px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));min-height:100vh}
@@ -106,12 +106,17 @@ $('vd7').onclick=()=>{visitMode='d7';$('vd7').className='on';$('vh24').className
 
 function bar(el,v,cap,warn){const p=cap>0?Math.min(100,v/cap*100):0;el.firstChild.style.width=p+'%';el.className='bar'+(p>=100?' bad':p>=warn?' warn':'');return p}
 function up(s){const days=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return (days?days+'d ':'')+h+'h '+m+'m'}
-async function load(){if(!KEY){$('login').style.display='';$('main').style.display='none';return}if(busy)return;busy=1;
+async function load(){if(!KEY){$('login').style.display='';$('main').style.display='none';const off=$('off');if(off)off.style.display='none';return}if(busy)return;busy=1;
  try{const r=await fetch(BASE+'/api/stats',{headers:{'x-gm-key':KEY},cache:'no-store'});
-  if(r.status===403){$('lerr').textContent='That key was not accepted.';localStorage.removeItem('eearGM');KEY='';$('login').style.display='';$('main').style.display='none';return}
-  if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();render(j);$('login').style.display='none';$('main').style.display='';
+  if(r.status===403){$('lerr').textContent='That key was not accepted.';localStorage.removeItem('eearGM');KEY='';$('login').style.display='';$('main').style.display='none';const off=$('off');if(off)off.style.display='none';return}
+  if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();render(j);$('login').style.display='none';$('main').style.display='';const off=$('off');if(off)off.style.display='none';
   $('upd').textContent='updated '+new Date().toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit',second:'2-digit'})+' PT'}
- catch(e){$('upd').textContent='offline · '+e.message}finally{busy=0}}
+ catch(e){$('upd').textContent='offline · '+e.message;
+  /* Phone/PWA: key present but tunnel/Pages API unreachable used to hide login+main → blank "gone" dashboard */
+  if($('main').style.display==='none'){let off=$('off');if(!off){off=document.createElement('div');off.id='off';off.className='c';off.style.maxWidth='420px';off.style.margin='20px auto';off.innerHTML='<div class=k>Dashboard offline</div><p class=s>Live API unreachable (often an old trycloudflare bookmark after a tunnel rename). Use the stable phone link, re-open the current tunnel, or re-enter the GM key.</p><p class=s><a href="https://newperspectivellc.github.io/earth-edge-ar/stats.html">Stable: GitHub Pages dashboard</a><br><a id=offTun href="#">Current tunnel dashboard</a></p><button type=button id=offRetry>Retry</button> <button type=button id=offKey>Re-enter GM key</button>';document.body.appendChild(off);$('offRetry').onclick=()=>load();$('offKey').onclick=()=>{localStorage.removeItem('eearGM');KEY='';off.style.display='none';$('login').style.display='';$('main').style.display='none'};}
+  const tun='https://fiction-annotation-wash-winston.trycloudflare.com/stats.html';const a=$('offTun');if(a){a.href=tun;a.textContent=tun.replace(/^https:\/\//,'')}
+  off.style.display='block'}
+ }finally{busy=0}}
 function render(j){const R=j.ren||{},C=R.caps||{},T=R.today||{},M=R.month||{};
  $('act').textContent=j.active.count;$('actd').textContent=devs(j.active.devices)+(j.active.stealth?' · '+j.active.stealth+' stealth':'');
  $('orbs').textContent=(j.liveOrbs&&j.liveOrbs.count!=null)?j.liveOrbs.count:j.active.count;

@@ -15,7 +15,7 @@ const fbm = (n, x) => .65 * n(x) + .35 * n(x * 2.3 + 17);
 const nSpd = noise1(), nDir = noise1(), nEl = noise1(), nR = noise1();
 const S = { t: 0, az: Math.random() * 6.283, azv: 0, r: 28, u: 16, mode: 'wander', mt: 0, mdur: 0, nextL: rnd(8, 20), nextX: rnd(30, 60), xr: 45, linger: 0, boost: 1, gain: .8, e: 0, n: 13, lingers: 0, excursions: 0, tours: 0, tourSkips: 0, tourSite: '', tourW: 0, nextT: rnd(...ORB.tour.firstS), flying: true };
 export const state = S;
-// d49 ORB CONTROLS (orbctl.js?v=1792455290575 UI; localStorage.eearOrbCfg; GM 'Apply to everyone' -> server DJ state .orb, followed unless the device opts out).
+// d49 ORB CONTROLS (orbctl.js?v=1792886745171 UI; localStorage.eearOrbCfg; GM 'Apply to everyone' -> server DJ state .orb, followed unless the device opts out).
 // mode: auto | manual (joystick: window.EEAR_ORBSTEER {x:east,y:north,h:up} -1..1, local only) | goto ({lat,lon,id}: smooth arc there, linger, then Auto unless hold) | tour (start one now)
 // tour: alt | ra | cappy | off · radius m (wander centre, hard min 25 m stays) · lingerF x (0 = never) · speed x
 export const ORB_DEFAULTS = { mode: 'auto', tour: 'alt', radius: 30, lingerF: 1, speed: 1, hold: false, goto: null, tourReq: 0, follow: true };

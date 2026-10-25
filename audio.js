@@ -5,7 +5,7 @@
 // or the user's own file (saved in IndexedDB) / URL. Audio starts only from a tap (iOS unlock). navigator.audioSession='playback' where supported.
 import * as ORBIT from './orbit.js?v=1792455290575';
 import './djvoice.js?v=1792455290575';/* d47: Master DJ live voice + broadcasts (listener side runs for everyone) */
-import * as DJM from './dj.js?v=1792455290575';
+import * as DJM from './dj.js?v=1792886745171';
 /* d45: track 'dj' = the Master DJ queue (dj.js, server /api/dj): the current DJ track, synced to server time, auto-advancing; paused/empty = silence. Default track; one-time migration moves saved built-in/Disco Jam choices to it. */
 export const SRC={lat:48.1316475,lon:-122.7992293,name:"Matt's Meditation Garden"};
 export const SONG="Happy's Trails Vortex";

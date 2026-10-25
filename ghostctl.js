@@ -87,7 +87,7 @@ function render() { const c = S, fx = (k, v) => { const st = CONTROLS.find(x => 
   <label><input type=checkbox id=gcT${c.trail ? ' checked' : ''}> Trail <small>leaves a glowing purple trail behind it</small></label>
   ${CONTROLS.map(([k, l, mn, mx, stp, h]) => `<label><span>${l}<b id=gcv_${k}>${fx(k, c[k])}</b></span><input type=range data-k=${k} min=${mn} max=${mx} step=${stp} value=${c[k]}><small>${h}</small></label>`).join('')}
   <small style="margin-top:10px">Settings are saved on this device and apply instantly. The ghost exists only on your screen; nothing about it is sent to the server.</small><div id=gcOrb></div></div>`;
-  import('./orbctl.js?v=1792455290575').then(M => M.render(panel.querySelector('#gcOrb'))).catch(e => { const o = panel.querySelector('#gcOrb'); if (o) o.textContent = 'Orb controls failed: ' + e.message });
+  import('./orbctl.js?v=1792886745171').then(M => M.render(panel.querySelector('#gcOrb'))).catch(e => { const o = panel.querySelector('#gcOrb'); if (o) o.textContent = 'Orb controls failed: ' + e.message });
   const q = s => panel.querySelector(s); if (q('#gcX')) q('#gcX').onclick = close;
   panel.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { preset(b.dataset.p); render() }); q('#gcR').onclick = () => { reset(); render() };
   q('#gcM').onchange = e => set({ mode: e.target.value }); q('#gcD').onchange = e => set({ dir: e.target.value }); q('#gcT').onchange = e => set({ trail: e.target.checked });

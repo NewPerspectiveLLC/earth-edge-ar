@@ -11,7 +11,7 @@ footer{padding:8px 12px;color:#aaa;font-size:12px}a{color:#c9a0ff}</style></head
 <div class=wrap><h3 style="margin:10px 12px 4px">Matt Ready pillars (<span id=pc>…</span>) <button id=vP>Show all pillars</button> <a href=pillars.json?v=1792455290575>pillars.json</a></h3><table><thead><tr><th>ID</th><th>Name / nearest spot</th><th>Kind</th><th>Area</th><th>Lat, Lon</th></tr></thead><tbody id=pt></tbody></table></div>
 <footer>Positions come from figures-registry.js (the same constants ren.js, performers.js, circle.js and pillars.js use), pillars.json plus the server's public <code>/api/figures</code> feed (bots, test ghosts, live human player COUNT only). Real players' positions are never shown here. <span id=cred></span></footer>
 <script type=module>
-import * as R from './figures-registry.js?v=1792455290575';import{GHOST_LOOK}from'./extras.js?v=1792455290575';import{TRACKS}from'./audio.js?v=1792455290575';import{ESRI,SAT_CREDIT}from'./sat.js?v=1792455290575';
+import * as R from './figures-registry.js?v=1792886745171';import{GHOST_LOOK}from'./extras.js?v=1792455290575';import{TRACKS}from'./audio.js?v=1792455290575';import{ESRI,SAT_CREDIT}from'./sat.js?v=1792455290575';
 const BASE=window.EEAR_API||(location.hostname.endsWith('github.io')?'https://fiction-annotation-wash-winston.trycloudflare.com':'');// same origin on tunnel + LAN
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),f6=x=>x==null?'—':(+x).toFixed(6),f1=x=>(Math.round(x*10)/10).toFixed(1);
 $('src').textContent='API: '+(BASE||location.origin);$('cred').textContent=SAT_CREDIT;
