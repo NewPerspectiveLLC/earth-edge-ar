@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { DJ } from './dj.js?v=1792886745171';
 import './djvoice.js?v=1792455290575';
 import { initOrb } from './orbball.js?v=1792455290575';
-import { initDriveIn } from './drivein.js?v=1792470000058';
+import { initDriveIn } from './drivein.js?v=1792887000060';
 import { initLiveOrbs } from './liveorbs.js?v=1792886745171';
 window.EEAR_DJ_NOUI = true;
 window.EEAR = window.EEAR || {}; EEAR.LAY = { orbTours: 0 };   // orbit.js: no 1-6 km trail tours here, the orb stays with the visitor
@@ -90,7 +90,7 @@ const STOPS = {
   ra: { name: 'Ready Athletics', sub: 'the vortex centre', lat: 48.1062, lon: -122.8057 },
   cappy: { name: "Cappy's Trails", sub: 'garden + trails', lat: 48.13165, lon: -122.79921 },
   worden: { name: 'Fort Worden', sub: "Memory's Vault", lat: 48.1384642, lon: -122.7647029 },
-  drivein: { name: 'Matt Ready Drive-In', sub: 'offshore over Admiralty Inlet', lat: 48.138, lon: -122.665 },
+  drivein: { name: 'Matt Ready Drive-In', sub: 'over Hood Canal Bridge · facing Seattle', lat: 47.8593, lon: -122.6232 },
 };
 const anchor = (lat, lon, dy = 0) => { const g = new THREE.Group(); g.position.copy(enu(lat, lon, ground(lat, lon) + dy)); world.add(g); return g };
 const std = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, ...o });
@@ -125,8 +125,8 @@ const landmarksReady = Promise.all([terrReady, roadsReady]).then(([, R]) => {
     const lb = label(S.name, S.sub, css); lb.position.y = 90; g.add(lb); S.g = g }
 });
 // ---------- drive-in (reused module; muted unless 'Screen sound' is on) ----------
-/* d57 half size + d58 offshore over Admiralty Inlet (tour-only lat/lon/faceBrg); main AR keeps full Quimper giant */
-const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5, lat: 48.138, lon: -122.665, faceBrg: 250 });
+/* d60: same Hood Canal Bridge screen as main (half-size, face Seattle); tour still passes explicit lat/lon/size */
+const drive = initDriveIn(world, toLocal, cam, { lite: MOBILE, edge: false, enabled: () => camAlt < 60000, wM: 5000, hM: 2812.5, lat: 47.8593, lon: -122.6232, faceBrg: 142.0, altM: 1706.25 });
 // ---------- live broadcaster orbs (d59) ----------
 let LIVE_ORBS = [], livePending = false, liveSig = '';
 const liveOrbs = initLiveOrbs(world, {

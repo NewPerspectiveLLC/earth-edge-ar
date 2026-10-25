@@ -1,5 +1,5 @@
-// drivein.js (d50): Matt Ready DRIVE-IN - a giant double-sided outdoor movie screen floating over the Port Townsend peninsula,
-// north of downtown, looping Matt's Drive folder 'Matt Ready Library/videos on loop' (reel built by tools/video_sync.py -> video/drivein/screen.json).
+// drivein.js (d50): Matt Ready DRIVE-IN - a giant double-sided outdoor movie screen floating over the Hood Canal Bridge,
+// facing Seattle, looping Matt's Drive folder 'Matt Ready Library/videos on loop' (reel built by tools/video_sync.py -> video/drivein/screen.json).
 // Sync: everyone sees the same frame: pos = ((serverNow - epoch)/1000) mod duration, serverNow = Date.now() + Master DJ clock offset (dj.js?v=1792886745171).
 // Picture: ONE <video> (muted + playsinline + loop: iOS autoplay) -> VideoTexture on a DoubleSide plane, so people behind it (north side) see the
 //   same picture mirrored, never a black back. Frame/marquee/glow look right from both sides (marquee text = two back-to-back planes).
@@ -11,14 +11,14 @@
 // Lite (Quest Lite): 640x360 reel, no glow plane, cheaper texture filtering.
 import * as THREE from 'three';
 export const DRIVEIN = {
-  /* d51: GIANT - the base runs almost from Cape George (48.1037,-122.8846) to Fort Worden / Point Wilson (48.1442,-122.7553), 307 m inside each:
-     base ends A 48.10487,-122.88086 -> B 48.14303,-122.75904 (line bearing 64.9°), centre 48.12395,-122.81995 over the Quimper peninsula */
-  lat: 48.12395, lon: -122.81995,
-  altM: 3112.5,                   // centre height; bottom edge 300 m, top edge 5925 m above the ground
-  wM: 10000, hM: 5625,            // 16:9 picture, 10.0 x 5.63 km (6.21 x 3.50 mi); frame/sign scale with wM
-  faceBrg: 154.9,                 // front faces the town (SSE, perpendicular to the Cape George - Fort Worden line); mirrored back faces 334.9° (NNW)
+  /* d60: over Hood Canal Bridge facing Seattle (Matt 2026-10-24). Was Quimper giant 10×5.625 km @ 48.12395,-122.81995 face 154.9°.
+     Now 5.0 × 2.81 km (half) centred on the bridge, front faces ~142° toward Elliott Bay / downtown Seattle; mirrored back ~322°. */
+  lat: 47.8593, lon: -122.6232,
+  altM: 1706.25,                   // centre height; bottom edge 300 m, top edge 3112.5 m above the water
+  wM: 5000, hM: 2812.5,            // 16:9 picture, 5.0 x 2.81 km (3.11 x 1.75 mi); frame/sign scale with wM
+  faceBrg: 142.0,                 // front faces Seattle (ESE); mirrored back faces 322.0°
   fullM: 8047, silentM: 16093,    // sound: full within 5 mi of the NEAREST point of the screen, raised-cosine S-curve to silence at 10 mi
-  markerM: 60000, markerFadeM: 10000, markerDeg: 4, markerR: 600,   // marker by distance to the NEAREST point (the giant screen itself stays readable to ~60 km)
+  markerM: 60000, markerFadeM: 10000, markerDeg: 4, markerR: 600,   // marker by distance to the NEAREST point (readable from PT ~35 km away)
   url: 'video/drivein/screen' + '.json',   // fetched no-cache WITHOUT ?v= (the service worker would pin it per build); reel names carry a content hash
 };
 const D = Math.PI / 180, MI = 1609.344;
@@ -32,7 +32,7 @@ const dist = (a, b, c, d) => { const y = (c - a) * 111320, x = (d - b) * 111320 
 const fmtD = m => m < 1000 ? Math.round(m) + ' m' : (m / MI).toFixed(m < 16 * MI ? 1 : 0) + ' mi · ' + (m / 1000).toFixed(m < 1e4 ? 1 : 0) + ' km';
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); draw(g, w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.userData.c = c; return t }
 export function initDriveIn(parent, toLocal, cam, opts = {}) {
-  /* opts.wM/hM (d57) + opts.lat/lon/faceBrg/altM (d58): tour-only overrides; main AR omits them and keeps the full giant over the Quimper peninsula */
+  /* opts.wM/hM/lat/lon/faceBrg/altM: optional overrides (tour may pass them); main AR uses DRIVEIN defaults (Hood Canal Bridge, half-size) */
   const C = Object.assign({}, DRIVEIN);
   for (const k of ['wM', 'hM', 'lat', 'lon', 'faceBrg', 'altM']) if (opts[k] != null) C[k] = +opts[k];
   const lite = !!opts.lite, enabled = opts.enabled || (() => true), soundWanted = () => localStorage.eearScreenSound === '1';

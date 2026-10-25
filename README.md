@@ -82,7 +82,7 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
 - **dj-help.html:** "How to talk to everyone (Live DJ voice)", linked from dj.html and gm.html.
 
 ## d50 (2026-10-19): Matt Ready Drive-in screen (Videos on Loop)
-- `drivein.js` (index.html + quest.html): a giant double-sided outdoor movie screen floating over the Port Townsend peninsula north of
+- `drivein.js` (index.html + quest.html): a giant double-sided outdoor movie screen floating over the Hood Canal Bridge (facing Seattle); was formerly over the Port Townsend peninsula north of
   downtown. Centre **48.1300, -122.7650**, **340 m** above ground, picture **480 x 270 m** (16:9) in an 8 m dark frame with gold trim,
   a "MATT READY DRIVE-IN" marquee (readable from both sides) and a soft glow (glow skipped in Quest Lite). Front faces bearing 190° (SSW,
   between downtown and Ready Athletics); the north side shows the same picture mirrored (DoubleSide video plane), never a black back.
@@ -111,4 +111,4 @@ The orb's center never comes closer than **25 m (3D) to the camera** in any phas
   - 🎬 MOVIE THEATER: a camera-layer-5 room with seats and a 24×13.5 m screen playing the synced reel (lite copy in Lite mode) with sound. Walking in or the trigger counts as the gesture. Exit through the EXIT portal behind the seats.
   - 🌀 READY ATHLETICS: teleports to 48.1062,-122.8057, with a ↩ BACK portal.
   - Y panel → Portals has the same actions.
-- Drive-in (index): the screen is 10 × 5.625 km, centred at 48.12395,-122.81995, with its base from about Cape George to about Fort Worden. Bottom 300 m, top 5925 m. It faces 154.9° (back 334.9°). Audio distance is to the nearest point of the screen. The far marker shows beyond 60 km.
+- Drive-in (index + tour): the screen is 5.0 × 2.81 km (half the old Quimper giant), centred at 47.8593,-122.6232 over the Hood Canal Bridge. Bottom 300 m, top 3112.5 m. It faces 142° toward Seattle / Elliott Bay (back 322°). Audio distance is to the nearest point of the screen. The far marker shows beyond 60 km.
