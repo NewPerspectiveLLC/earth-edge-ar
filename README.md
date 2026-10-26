@@ -12,7 +12,7 @@ Repo, Pages path and server folder keep the historical id `earth-edge-ar` (URLs,
 - Every pillar plays the Disco Jam from its spot (HRTF), full volume within 3 m, raised-cosine fade to silence at 55 m; only the nearest 2 pillars get a voice; one shared decoded buffer and one loop clock; the Garden beacon ducks by 80% while a pillar is audible. Needs Music on (tap), like the beacon.
 
 ## d45: Master DJ
-- One global queue for everyone (server `/api/dj`, SSE `/api/dj/stream`; GM-key writes from `dj.html`). Library `audio/dj/library.json` (24 Kevin MacLeod CC BY 4.0 + Disco Jam). `dj.js` streams the current track synced to server time; pillars + the in-app music player (track "Master DJ", default) play it.
+- One global queue for everyone (server `/api/dj`, SSE `/api/dj/stream`; GM-key writes from `dj.html`). Library `audio/dj/library.json` (Matt Ready original songs only). `dj.js` streams the current track synced to server time; pillars + the in-app music player (track "Master DJ", default) play it.
 
 ## d46: Flying sound + orb
 - `orbit.js`: the Master DJ in the music player orbits the listener (HRTF, world-anchored): wander 10-16 m out / 11-14 m up, lingers (3-15 s, closer, +5 dB), excursions to 30-60 m; distance law (12/r)^0.8, floor 0.22. Toggle "🌀 Flying sound" in the music panel (⋯); off = plain playback via the Garden beacon chain.
