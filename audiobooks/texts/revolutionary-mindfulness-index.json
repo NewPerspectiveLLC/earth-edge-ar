@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cw-07",
+    "title": "Subject 2 — Books: Revolutionary Mindfulness and The Incomplete Works (2014–2016)",
+    "source": "/workspace/complete-works-compiled/cw.txt",
+    "start": 17252,
+    "end": 20713,
+    "approx_words": 48149
+  },
+  {
+    "id": "cw-08",
+    "title": "Revolutionary Mindfulness — Part II: Applying Mindfulness To Relationships",
+    "source": "/workspace/complete-works-compiled/cw.txt",
+    "start": 20713,
+    "end": 22306,
+    "approx_words": 23002
+  },
+  {
+    "id": "cw-09",
+    "title": "Revolutionary Mindfulness — Part III: Applying Mindfulness to Political Action",
+    "source": "/workspace/complete-works-compiled/cw.txt",
+    "start": 22306,
+    "end": 27318,
+    "approx_words": 60395
+  }
+]

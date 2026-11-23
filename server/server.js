@@ -53,6 +53,8 @@ function visitChart(now){const since7=now-7*86400000,since24=now-24*3600000,ts=a
 
 
 const send=(r,o,c=200,h={})=>{r.writeHead(c,{'content-type':'application/json','cache-control':'no-store',...h});r.end(JSON.stringify(o))};
+const Audiobooks=require('./audiobooks.js');
+
 // --- rate limit: sliding window per key
 /* ---- Ren (3dguru) chat: live Grok via xAI (OpenAI-compatible chat completions). Key ONLY server-side: env XAI_API_KEY or file ~/.eear-secrets/xai_api_key (chmod 600). Never logged/returned. */
 const os=require('os');
@@ -298,6 +300,7 @@ function statsView(now){const real=p=>!isGhost(p.id)&&!isBot(p.id),act=all('sele
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.css':'text/css','.mp3':'audio/mpeg','.m4a':'audio/mp4','.mp4':'video/mp4','.wav':'audio/wav','.jpg':'image/jpeg','.svg':'image/svg+xml','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.geojson':'application/geo+json','.webp':'image/webp','.txt':'text/plain; charset=utf-8'};
 https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.readFileSync(path.join(certDir,'cert.pem'))},(q,r)=>{
  const u=new URL(q.url,'https://x'),ip=(q.headers['cf-connecting-ip']||q.socket.remoteAddress||'').toString();
+ if(u.pathname.startsWith('/audiobooks/audio/')){if(Audiobooks.handle({root,u,q,r,send,limited,ip})!==false)return;}
  if(!u.pathname.startsWith('/api/')){let dp;try{dp=decodeURIComponent(u.pathname)}catch(e){return r.writeHead(400),r.end()}
   // static allowlist: decoded + normalized + case-insensitive (macOS FS is case-insensitive). Never serve server/, cert/, logs/, dotfiles, db/key/log files.
   const rel=path.posix.normalize('/'+dp.replace(/\\/g,'/')).toLowerCase();
@@ -314,11 +317,12 @@ https.createServer({key:fs.readFileSync(path.join(certDir,'key.pem')),cert:fs.re
     r.writeHead(206,{...h,'content-range':`bytes ${a}-${z}/${stt.size}`,'content-length':z-a+1});if(q.method==='HEAD')return r.end();return fs.createReadStream(f,{start:a,end:z}).on('error',()=>r.end()).pipe(r)}
    fs.readFile(f,(e2,d)=>{if(e2){r.writeHead(404);return r.end('not found')}r.writeHead(200,{...h,'content-length':d.length});r.end(q.method==='HEAD'?undefined:d)})})}
  // CORS only for the GitHub Pages copy of gm.html -> /api/gm (still needs the X-GM-Key header)
- if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/stats/visits'||u.pathname==='/api/activity'||u.pathname==='/api/replay'||u.pathname.startsWith('/api/replay/')||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
+ if(q.headers.origin==='https://newperspectivellc.github.io'&&(u.pathname==='/api/gm'||u.pathname.startsWith('/api/gm/')||u.pathname==='/api/policy'||u.pathname==='/api/figures'||u.pathname==='/api/live-orbs'||u.pathname==='/api/dj'||u.pathname==='/api/dj/stream'||u.pathname==='/api/dj/live'||u.pathname==='/api/dj/bc'||u.pathname==='/api/dj/pull'||u.pathname==='/api/ren-usage'||u.pathname==='/api/ren-usage/test-notify'||u.pathname==='/api/stats'||u.pathname==='/api/stats/visits'||u.pathname==='/api/activity'||u.pathname==='/api/replay'||u.pathname.startsWith('/api/replay/')||u.pathname==='/api/ren'||u.pathname.startsWith('/api/ren/')||u.pathname.startsWith('/api/audiobooks'))){r.setHeader('access-control-allow-origin',q.headers.origin);r.setHeader('vary','Origin');
   if(q.method==='OPTIONS'){r.writeHead(204,{'access-control-allow-headers':'x-gm-key,content-type','access-control-allow-methods':'GET,POST,DELETE','access-control-max-age':'600'});return r.end()}}
  let b='';q.on('data',c=>{b+=c;if(b.length>1e5)q.destroy()});q.on('end',async()=>{let j={};try{j=b?JSON.parse(b):{}}catch(e){}
  try{const now=Date.now(),U=me(q),tok=(q.headers.authorization||'').replace('Bearer ',''),P=tok?one('select * from gplayers where token=?',tok):null;
  if(u.pathname.startsWith('/api/registry')){if(await registry(u,q,r,j,b,U,ip)!==false)return}
+ if(u.pathname.startsWith('/api/audiobooks')||u.pathname==='/api/catalog'){if(Audiobooks.handle({root,u,q,r,send,limited,ip})!==false)return;}
  switch(u.pathname){
  // ---- accounts / magic links
  case'/api/auth/request':{const email=(j.email||'').trim().toLowerCase(),phone=(j.phone||'').replace(/[^\d+]/g,'');const addr=email||phone;

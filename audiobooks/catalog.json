@@ -1,0 +1,3553 @@
+{
+  "title": "Live Geometry — Audiobooks",
+  "generated": "2026-11-22T12:55:00-08:00",
+  "warning": "Personal playback on this device only; does not change the song for everyone. The October 22, 2026 Board Retreat reading is not included.",
+  "books": [
+    {
+      "id": "chronicles",
+      "title": "The Matt Ready Chronicles",
+      "subtitle": "The Story of Port Townsend and Matt Ready",
+      "kind": "Graphic novel · cloned-voice read-aloud",
+      "mode": "audio",
+      "status": "Finished cloned-voice narration (Higgsfield “Matt Ready” voice). Voice only, no music.",
+      "duration": 2560.392,
+      "duration_label": "42:40",
+      "audio_id": "chronicles-full",
+      "chapters": [
+        {
+          "id": "part-i",
+          "title": "The Matt Ready Chronicles. Part One. Deep Time. thirteen point eight billion years ago …",
+          "start": 0.0,
+          "duration": 134.056,
+          "audio_id": "chronicles-part-i"
+        },
+        {
+          "id": "part-ii",
+          "title": "The Matt Ready Chronicles. Part Two. The First Peoples. qatáy, the S'Klallam and the Ch…",
+          "start": 134.056,
+          "duration": 123.304,
+          "audio_id": "chronicles-part-ii"
+        },
+        {
+          "id": "part-iii",
+          "title": "The Matt Ready Chronicles. Part Three. The Town on the Bluff. Settlers, removal, boom a…",
+          "start": 257.36,
+          "duration": 272.968,
+          "audio_id": "chronicles-part-iii"
+        },
+        {
+          "id": "part-iv",
+          "title": "The Matt Ready Chronicles. Part Four. A Philosopher Comes to Town. Matt Ready, 1973 to …",
+          "start": 530.328,
+          "duration": 251.44,
+          "audio_id": "chronicles-part-iv"
+        },
+        {
+          "id": "part-v",
+          "title": "The Matt Ready Chronicles. Part Five. The Recorder Stays On. Commissioner Ready, 2014 t…",
+          "start": 781.768,
+          "duration": 910.36,
+          "audio_id": "chronicles-part-v"
+        },
+        {
+          "id": "part-vi",
+          "title": "The Matt Ready Chronicles. Part Six. The Heist and the Disclosure. 2025 to 2026.",
+          "start": 1692.128,
+          "duration": 868.264,
+          "audio_id": "chronicles-part-vi"
+        }
+      ],
+      "cues": [
+        {
+          "start": 2.8,
+          "end": 11.4,
+          "text": "The Matt Ready Chronicles. The Story of Port Townsend and Matt Ready. Matt Ready."
+        },
+        {
+          "start": 12.3,
+          "end": 22.6,
+          "text": "The Matt Ready Chronicles. Part One. Deep Time. thirteen point eight billion years ago to the end of the Ice Age."
+        },
+        {
+          "start": 23.5,
+          "end": 42.811,
+          "text": "Thirteen point eight BILLION years ago. About thirteen point eight billion years ago, the universe began in the Big Bang: all of space, time, matter and energy expanding from an extremely hot, dense state."
+        },
+        {
+          "start": 43.21,
+          "end": 57.21,
+          "text": "About thirteen point six BILLION years ago. Hydrogen and helium gathered into the first stars. Over billions of years, gas and stars swirled together into our galaxy, the Milky Way."
+        },
+        {
+          "start": 57.61,
+          "end": 74.89,
+          "text": "Four Point Six Billion years ago. About four point six billion years ago, a cloud of gas and dust in the Milky Way collapsed. The Sun lit up at its center, and the leftover disk built the planets."
+        },
+        {
+          "start": 75.291,
+          "end": 89.67,
+          "text": "Four point five BILLION years ago. About four point five billion years ago, Earth formed. A giant impact soon after threw off the debris that became the Moon."
+        },
+        {
+          "start": 90.071,
+          "end": 107.351,
+          "text": "Three point five plus BILLION years ago. Oceans formed, and life appeared in them more than three point five billion years ago: tiny single cells, building stromatolite reefs in the shallows."
+        },
+        {
+          "start": 107.751,
+          "end": 125.031,
+          "text": "Tens of Millions of years ago. Over tens of millions of years, volcanic sea floor was jammed against the edge of North America and pushed up into the Olympic Mountains."
+        },
+        {
+          "start": 125.431,
+          "end": 134.031,
+          "text": "Ice Age. Pleistocene. Ice and melt rewrite the shore. Admiralty Inlet becomes a gate."
+        },
+        {
+          "start": 134.931,
+          "end": 143.111,
+          "text": "The Matt Ready Chronicles. Part Two. The First Peoples. qatáy, the S'Klallam and the Chemakum, to 1850."
+        },
+        {
+          "start": 144.011,
+          "end": 158.011,
+          "text": "About fourteen thousand years ago. As the ice retreated, people arrived. At the Manis site near Sequim, hunters left a bone point in a mastodon rib about 13,800 years ago."
+        },
+        {
+          "start": 158.411,
+          "end": 170.591,
+          "text": "About thirteen thousand eight hundred years ago. Sequim. Bone point in a mastodon rib. The peninsula's human clock starts early."
+        },
+        {
+          "start": 170.991,
+          "end": 177.071,
+          "text": "Mid-to-late Holocene. Shell middens. Fish. Cedar. The sea is a road."
+        },
+        {
+          "start": 177.471,
+          "end": 194.351,
+          "text": "The centuries before contact. Primary settlements on Port Townsend Bay / Quimper / Port Ludlow. Place-names keep the ethnonym."
+        },
+        {
+          "start": 194.751,
+          "end": 209.551,
+          "text": "Precontact to Treaty Time. Principal S'Klallam winter village — Monroe and Water if you need a street. Home of čičməhán."
+        },
+        {
+          "start": 209.951,
+          "end": 236.451,
+          "text": "1579 to 1792. Four waves of news by canoe: One. The white man exists. Two. Disbelief. Three. They have thunder-sticks. Four. Tragedy is real — villages empty before the ships arrive. The news was already here. The settlers were late."
+        },
+        {
+          "start": 236.851,
+          "end": 245.031,
+          "text": "1781 to 1782. 1792. Boyd: at least thirty percent Northwest coast Native mortality this wave. Vancouver charts silence."
+        },
+        {
+          "start": 245.431,
+          "end": 257.311,
+          "text": "About 1780s to 1850s. War with neighbors and disease. Estimated about 400, to about 90 in 1855, to near cultural extinction by the early 1900s."
+        },
+        {
+          "start": 258.211,
+          "end": 267.591,
+          "text": "The Matt Ready Chronicles. Part Three. The Town on the Bluff. Settlers, removal, boom and amber, 1851 to 1972."
+        },
+        {
+          "start": 268.491,
+          "end": 275.391,
+          "text": "April 24, 1851. Plummer and Bachelder build. Permission asked of S'Hai-ak."
+        },
+        {
+          "start": 275.79,
+          "end": 283.09,
+          "text": "1854. Incorporated January 16, 1860. They call it the New York of the West."
+        },
+        {
+          "start": 283.49,
+          "end": 290.17,
+          "text": "1855 Treaty. 1856 Fort. Intermittent conflict, coercion, displacement — not one clean battle."
+        },
+        {
+          "start": 290.57,
+          "end": 296.077,
+          "text": "1850s. Ten days of danger signals to settlers; tenth day clear."
+        },
+        {
+          "start": 296.477,
+          "end": 325.977,
+          "text": "1850s. Drunken soldiers steal a S'Klallam canoe at Point Hudson and drown; a boy puts on a soldier's cap and jacket and is seized; scaffold built; Chetzemoka rushes the crowd, cuts the boy free. Chetzemoka: This is Indian Country. Let us remain friends."
+        },
+        {
+          "start": 326.377,
+          "end": 335.377,
+          "text": "1859 to 1860. About 32 longhouses near the harbor mouth — 14 S'Klallam, 18 Chemakum."
+        },
+        {
+          "start": 335.777,
+          "end": 351.077,
+          "text": "About 1850 to 1870. Under a reported \"Indians may hunt if they report\" rule, Kia-a-han kills a roaming steer of Percival Chamberlin. Chamberlin turns. Posse. Wife O'wo-o-ta coerced."
+        },
+        {
+          "start": 351.977,
+          "end": 369.257,
+          "text": "About 1850 to 1870. Chemakum man Kia-a-han hanged from a Douglas fir, now the Port Townsend golf-course Hanging Tree. Commissioner Ready: A Native American man was lynched for killing a cow. Fir tree at the end of the golf course."
+        },
+        {
+          "start": 369.657,
+          "end": 390.757,
+          "text": "August 1, 1862. Lieutenant Wilson loads three 12-pounders on U.S.S. Shubrick; trains them on the Customs House and commercial district; 15 minutes or shell downtown. Council surrenders keys; records to Port Angeles. Fifteen minutes."
+        },
+        {
+          "start": 391.157,
+          "end": 396.837,
+          "text": "1871. Civic racism parallel to lynching memory."
+        },
+        {
+          "start": 397.237,
+          "end": 434.237,
+          "text": "August 23 to 24, 1871. August 23 to 24, 1871: Village qatáy demolished and burned by federal order after settler complaints. Agent Eells. People forced toward Skokomish. In 1871, Port Townsend had an indigenous village that was dismantled, and all the members were forced on canoes, and the village was burned."
+        },
+        {
+          "start": 434.637,
+          "end": 450.317,
+          "text": "1871 Aftermath. Built on the timbers stolen from those who came before. 1871, indigenous village cleared. Timbers stolen and used in unknown ways to build and sustain Port Townsend."
+        },
+        {
+          "start": 450.717,
+          "end": 457.617,
+          "text": "1871 and After. Removal toward Skokomish; čičməhán and family later on Indian Island."
+        },
+        {
+          "start": 458.017,
+          "end": 464.097,
+          "text": "1880s to 1890. Speculation fever. Courthouse rises."
+        },
+        {
+          "start": 464.997,
+          "end": 471.497,
+          "text": "1887 to 1890. Union Pacific flirtation dissolves into mist."
+        },
+        {
+          "start": 471.897,
+          "end": 481.277,
+          "text": "June 21, 1888. Died June 21, 1888. Town cortege; Laurel Grove Masonic cemetery lot; oyster-shell graves of Chetzemoka and wives; about 22 carriages."
+        },
+        {
+          "start": 481.677,
+          "end": 484.877,
+          "text": "1890. Ancestor of Jefferson Healthcare."
+        },
+        {
+          "start": 485.277,
+          "end": 491.357,
+          "text": "Eighteen ninety-three. Poverty is a preservative. Amber."
+        },
+        {
+          "start": 491.757,
+          "end": 497.057,
+          "text": "1897 to 1953. Worden–Flagler–Casey triangle. Disappearing guns at Point Wilson."
+        },
+        {
+          "start": 497.457,
+          "end": 513.137,
+          "text": "September 24, 1900. September 24, 1900 — Washington and Madison: Chinese district gone by morning. Tug Tatoosh pumps salt water; waterfront saved."
+        },
+        {
+          "start": 513.537,
+          "end": 525.837,
+          "text": "September 24, 1900. Same night, September 24, 1900: DeLeo's saloon catches; patrons save contents, help put it out. Building loses; contents live."
+        },
+        {
+          "start": 526.237,
+          "end": 530.237,
+          "text": "October 6, 1928. Steady jobs through Depression. Shoreline industrialized."
+        },
+        {
+          "start": 531.137,
+          "end": 540.137,
+          "text": "The Matt Ready Chronicles. Part Four. A Philosopher Comes to Town. Matt Ready, 1973 to 2013."
+        },
+        {
+          "start": 541.037,
+          "end": 553.417,
+          "text": "1973 to 1991. Born in Washington, D.C., in 1973. Raised in Bethesda. Walter Johnson High School, Class of 1991."
+        },
+        {
+          "start": 553.817,
+          "end": 561.317,
+          "text": "1976 to 1977. The dream failed. The place remained."
+        },
+        {
+          "start": 561.717,
+          "end": 572.017,
+          "text": "About 1990 to 1991. After a late movie at White Flint mall, David Whitney attempted to physically assault Matt. Nightmares for years."
+        },
+        {
+          "start": 572.417,
+          "end": 589.617,
+          "text": "Early 1990s. Father: You should never feel so strongly about a belief that you would be willing to die for it. YOU could be WRONG! Matt: I will NEVER be willing to die for something I don't believe in!"
+        },
+        {
+          "start": 590.017,
+          "end": 607.797,
+          "text": "Early 1990s. Left engineering for philosophy at the University of Maryland. Phi Beta Kappa. His Catholic faith cracked when he examined the idea of faith itself."
+        },
+        {
+          "start": 608.197,
+          "end": 617.197,
+          "text": "Mid-1990s. Mid-1990s: he moved to Port Townsend to live as an artist and a philosopher."
+        },
+        {
+          "start": 617.597,
+          "end": 626.597,
+          "text": "Late 20th Century. Washington State Ferry wake; Port yards and slips."
+        },
+        {
+          "start": 626.997,
+          "end": 638.097,
+          "text": "About nineteen ninety-eight. Around nineteen ninety-eight: a hospital Information Systems job. He started the same day as Ramon Dailey: same title, shared office."
+        },
+        {
+          "start": 638.997,
+          "end": 652.597,
+          "text": "About 2001. Around 2001 Matt married Pam. He adopted her five children from a previous marriage. Pam and the kids are members of the Puyallup Tribe of Indians."
+        },
+        {
+          "start": 652.997,
+          "end": 665.297,
+          "text": "About 2001. Demitri, John, Sariah, Isaiah and Olivia Ready. Pam's five children, adopted by Matt. Today John has a son, Logan; Olivia has a son, Levi."
+        },
+        {
+          "start": 665.697,
+          "end": 688.477,
+          "text": "February 14, 2001. Matt: Hi there! My name is Matt, and over there is Ramon. We are the stylin' authors, editors, publishers, graphic designers, dancers, and censors who produce The Inaditch Scoop."
+        },
+        {
+          "start": 688.877,
+          "end": 698.757,
+          "text": "2001. \"totally and utterly true (except for the stuff we make up or exaggerate).\" \"In the ditch we trust.\""
+        },
+        {
+          "start": 699.157,
+          "end": 711.371,
+          "text": "2001. He experiences the Divine \"as I breath in the morning air, dance to the sounds of cheesy 70's music, play volleyball...\""
+        },
+        {
+          "start": 712.271,
+          "end": 720.071,
+          "text": "Early 2000s. Founded the Wisdom Project, so posts could be rated for wisdom, not agreement."
+        },
+        {
+          "start": 720.471,
+          "end": 728.271,
+          "text": "Date Uncertain. He married Stacey Larsen, who works in farm-to-school and education in Port Townsend."
+        },
+        {
+          "start": 728.671,
+          "end": 740.971,
+          "text": "2011 to 2012. Matt: What has the Occupy movement accomplished? It got me out of my house. It introduced me to an army of amazing friends."
+        },
+        {
+          "start": 741.371,
+          "end": 758.651,
+          "text": "About 2012. Blog program title: \"I Meditate So That I Can Dance.\" He paints for tens of hours alone, and dances and sings at home to share the joy later."
+        },
+        {
+          "start": 759.051,
+          "end": 766.851,
+          "text": "May 2013. Matt: I am running for hospital commissioner for East Jefferson County Washington."
+        },
+        {
+          "start": 767.251,
+          "end": 781.631,
+          "text": "November 2013. January 2014. Won Position 3 in November 2013 and took office in January 2014. He left fifteen years of Jefferson Healthcare employment the day he was elected."
+        },
+        {
+          "start": 782.531,
+          "end": 796.911,
+          "text": "The Matt Ready Chronicles. Part Five. The Recorder Stays On. Commissioner Ready, 2014 to 2024."
+        },
+        {
+          "start": 797.811,
+          "end": 816.911,
+          "text": "January 2014. In January 2014 a new commissioner took his seat on the Jefferson Healthcare board, and he brought a recorder. \"Soon after taking office in 2014, I began recording board meetings so we could learn from every word...\""
+        },
+        {
+          "start": 817.311,
+          "end": 840.511,
+          "text": "March 19, 2014. Third Meeting. Marie Dressler: Could I ask you what is in front of you? Are you recording this meeting? Matt: Yes. I'm making an audio recording of this meeting to help me remember what has happened."
+        },
+        {
+          "start": 840.911,
+          "end": 855.291,
+          "text": "March 19, 2014. Mike Glenn:...the recommendation from Council is that absent of the hospital doing it, that a board member should not."
+        },
+        {
+          "start": 855.691,
+          "end": 875.071,
+          "text": "March 19, 2014. Matt:...this is a public meeting, citizens have a certain right to record these meetings; I don't surrender that right because I'm a Commissioner..."
+        },
+        {
+          "start": 875.471,
+          "end": 889.151,
+          "text": "March 19, 2014. He offers a copy for the district to store for seven years. Matt: I appreciate the recommendation of Council, but I'm going to continue recording the meeting."
+        },
+        {
+          "start": 889.551,
+          "end": 909.831,
+          "text": "March 19, 2014. 3:39 p.m. Marie Dressler: So I will recess this board meeting at 3:39 to see if we can locate a recording — some recording device..."
+        },
+        {
+          "start": 910.231,
+          "end": 923.831,
+          "text": "March 19, 2014. 3:43 p.m. Tony DeLeo: Madam Chairman, if you would [unclear] that Commissioner Ready is no longer recording the meeting."
+        },
+        {
+          "start": 924.731,
+          "end": 948.431,
+          "text": "March 26, 2014. \"I would like for us to work together to avoid any further public confrontations or drawn out conflicts over the issue of audio recordings...\" \"...a county legislative body may not ban the use of recording devices from the open portion of a meeting...\""
+        },
+        {
+          "start": 948.831,
+          "end": 971.211,
+          "text": "March 27, 2014. \"Actually, audio recording of Board meetings is a Board decision.\" \"...it would certainly be best if you chose not to exercise any right you have, to record the 4/16 meeting...\""
+        },
+        {
+          "start": 971.611,
+          "end": 990.991,
+          "text": "2014. Weeks Later. Matt recalls CEO Mike Glenn warning there could be \"personal consequences.\" Matt asked him to clarify. Mike Glenn: Figure it out yourself."
+        },
+        {
+          "start": 991.391,
+          "end": 1007.991,
+          "text": "2016. \"Hive1 Gateway into the Metaverse created by Matt Ready in 2016.\" \"...UFO's and Aliens have become a priorty subject- because if something about that subject is valid, it changes pretty much everything.\""
+        },
+        {
+          "start": 1008.391,
+          "end": 1024.891,
+          "text": "June 29, 2016. Chelan. Tony DeLeo: We're not going to record this meeting Matt. Matt: I'm recording it. Tony DeLeo: No you're not."
+        },
+        {
+          "start": 1025.291,
+          "end": 1047.171,
+          "text": "June 29, 2016. Chelan. Marie Dressler: That's not our policy, is it? Kees Kolff: There's nothing that prohibits Matt from recording it. Tony DeLeo: Yes there is. It makes it official record."
+        },
+        {
+          "start": 1047.571,
+          "end": 1059.671,
+          "text": "June 29, 2016. Chelan. \"...I perceived some sort of violence towards me was possible.\" Matt (thinking): Is he going to grab at my recorder?"
+        },
+        {
+          "start": 1060.071,
+          "end": 1066.829,
+          "text": "June 29, 2016. Chelan. Tony DeLeo: See you guys later! Let me know if he turns it off."
+        },
+        {
+          "start": 1067.729,
+          "end": 1101.429,
+          "text": "June 29, 2016. Chelan. The board adjourned rather than continue on the record. Jill Buhler: This is a little counterproductive. Do you really want to do this Matt? Matt:...it's important to me that we take what we say here seriously, and we're held accountable for what we say here..."
+        },
+        {
+          "start": 1101.829,
+          "end": 1124.609,
+          "text": "June 29, 2016. After. Matt's later account. No recording exists; he has dictated it in slightly different words. Tony DeLeo: Is the recorder off? Good. Well, Matt, you really fucked up that meeting."
+        },
+        {
+          "start": 1125.009,
+          "end": 1145.289,
+          "text": "2016 (revealed 2021). \"In 2016, the administration obtained a written legal opinion from Mr. Berg's firm addressing the same question, but the administration did not reveal that opinion to the full board until 2021...\""
+        },
+        {
+          "start": 1145.689,
+          "end": 1152.189,
+          "text": "Date Uncertain. He coached volleyball at Port Townsend High School."
+        },
+        {
+          "start": 1152.589,
+          "end": 1168.269,
+          "text": "December 14, 2018. \"If simulating human consciousness is achieved in a technological society, is it inevitable some such simulations fall into the hands of malicious minds?\""
+        },
+        {
+          "start": 1168.669,
+          "end": 1179.349,
+          "text": "2018 to 2019. Modern ground is not the 1871 beach line. Remnants and human remains sifted in a county project."
+        },
+        {
+          "start": 1179.749,
+          "end": 1202.949,
+          "text": "December 18, 2019. Matt's recording policy motion fails 3–1. John French, attorney: The threshold question is whether or not a board member can record over the objection of other board members and I don't know the answer to that..."
+        },
+        {
+          "start": 1203.349,
+          "end": 1217.729,
+          "text": "January 22, 2020. To Nancy J. Krier, Assistant Attorney General for Open Government. Matt: I have attached a big document which I hope you can help me with."
+        },
+        {
+          "start": 1218.629,
+          "end": 1235.509,
+          "text": "January 29, 2020. \"However, we can provide some general information about open government laws.\" Nancy J. Krier: Please note we cannot provide you legal advice or a legal opinion."
+        },
+        {
+          "start": 1235.909,
+          "end": 1248.289,
+          "text": "February 1, 2020. \"I do not have money to hire an attorney.\" Matt: The public hospital district attorneys will only answer questions from a board majority."
+        },
+        {
+          "start": 1248.689,
+          "end": 1265.469,
+          "text": "February 20, 2020. He quotes the county prosecutor: \"We do not investigate criminal allegations...\" Matt: Do you know if it is anyone's job?"
+        },
+        {
+          "start": 1265.869,
+          "end": 1284.469,
+          "text": "February 21, 2020. Nancy J. Krier: It is more correct that local prosecutors do not investigate criminal allegations, those are done by their investigative arm (county sheriff or city police...)."
+        },
+        {
+          "start": 1284.869,
+          "end": 1294.249,
+          "text": "2020 to 2021. Wide overnight city of tents under a dark grandstand."
+        },
+        {
+          "start": 1294.649,
+          "end": 1320.849,
+          "text": "January 14, 2021. \"A commissioner has the right to record any open public meeting of the commission whether regular or special session, on site or offsite (as do all residents of the United States).\" \"No one can (or should try to) prohibit a recording of anyone in an open public meeting, even if they personally object to the recording.\""
+        },
+        {
+          "start": 1321.249,
+          "end": 1333.549,
+          "text": "July 2, 2021. \"What do you personally think explains these videos? #UFO #aliens #oceanaliens #tictac #weareallgoingtodie #pleaseSaveUsTomCruise\""
+        },
+        {
+          "start": 1333.949,
+          "end": 1344.249,
+          "text": "2021 to 2022. Supervised ground; gate names Caswell · Brown, including Victoria Brown, December 2020."
+        },
+        {
+          "start": 1345.149,
+          "end": 1355.449,
+          "text": "March 22, 2022. \"...I imagined that artificial intelligence will emerge and begin its own search for meaning.\""
+        },
+        {
+          "start": 1355.849,
+          "end": 1385.229,
+          "text": "October 22, 2022. \"...the big question is not whether other alien species are active in our neighborhood, the question is has advanced artificial intelligence been active in our neighborhood. Biological creatures are cute but ultimately trivial in power.\""
+        },
+        {
+          "start": 1385.629,
+          "end": 1402.129,
+          "text": "Port Ludlow Retreat. January 20, 2023. Matt: Literally, we were told Jill found the opinion on her desk. That was literally said."
+        },
+        {
+          "start": 1402.529,
+          "end": 1422.809,
+          "text": "Port Ludlow Retreat. 2023. Jill Buhler Rienstra: So I hereby apologize for not getting that to you earlier. Matt: I accept your apology. Kees Kolff: So I, I apologize for not backing you up more"
+        },
+        {
+          "start": 1423.209,
+          "end": 1449.989,
+          "text": "Port Ludlow Retreat. 2023. Fictional reenactment; not the real Karma Bass. Matt: It could be considered fraud. It's just not you know, it's just like pointless fraud... Facilitator: Matt are you an att-, may I ask,are you an attorney Matt: Am I an attorney? No."
+        },
+        {
+          "start": 1450.389,
+          "end": 1468.669,
+          "text": "Port Ludlow Retreat. 2023. Fictional reenactment; not the real Karma Bass. Facilitator: Can Can we consider this issue complete from your standpoint? Matt: I don't know what you mean by that. But I'm not interested in talking to the board about it."
+        },
+        {
+          "start": 1469.069,
+          "end": 1483.449,
+          "text": "April 15, 2023. \"I believe we have achieved artificial intelligence for perception. We have not achieved artificial volition, an entity willing to morally own the consequences of choices in real time.\""
+        },
+        {
+          "start": 1483.849,
+          "end": 1505.729,
+          "text": "May to June 2023. May–June 2023. McMinnville UFOFest in Oregon, then AlienCon in Pasadena. He launches a podcast: \"New Podcast on UFOs, Aliens, AlienCon 2023, McMinnville UFOFest 2023, NASA... Beyond Humanity hosted by M and M.\""
+        },
+        {
+          "start": 1506.629,
+          "end": 1539.829,
+          "text": "July 11, 2023. \"As the only elected leader in United States that has sworn they are not under alien control hereby I declare Port Townsend Washington a sanctuary city for all species of conscious intelligent life including alien Reptoids artificial intelligence and of course good ole humans,...\""
+        },
+        {
+          "start": 1540.229,
+          "end": 1557.109,
+          "text": "July 13, 2023. \"Majestic 12 apparently is real. Lue Elizondos lawyer Daniel Sheehan just dropped the ontological bread crumb of the century on Newsnation. Secret group ruling earth?\""
+        },
+        {
+          "start": 1557.509,
+          "end": 1579.389,
+          "text": "October 17, twenty twenty-three. \"I Matt Ready swear I do NOT pledge allegiance to any alien groups or secret organizations or authorities. I swear to follow my oath of office honestly and transparently.\""
+        },
+        {
+          "start": 1579.789,
+          "end": 1600.889,
+          "text": "Fall 2023. Fall 2023. Back from DisclosureFest 2023, he co-hosts the Meditation and Aliens podcast with Doro and studies Daniel Sheehan's interviews. Matt, on X, Dec 21, 2023: I am highly suspicious of people who attack Sheehan. He is a hero fighting the good fight."
+        },
+        {
+          "start": 1601.289,
+          "end": 1620.289,
+          "text": "January 14, 2024. \"Question: can we create a society where humans and nhi all have equal individual voting rights? If so, how many votes does each individual NHI get versus a human?\""
+        },
+        {
+          "start": 1620.689,
+          "end": 1656.089,
+          "text": "March 2024. \"...currently enrolled in the first-of-its-kind Master's degree program in ET Studies at Ubiquity University, in coordination with the New Paradigm Institute (founded by civil rights attorney and attorney for Lue Elizondo, Daniel Sheehan).\" \"(FYI I am in the New Paradigm Institute ET Studies program with Danny Sheehan and he covers his theories on these soon.)\""
+        },
+        {
+          "start": 1656.489,
+          "end": 1673.769,
+          "text": "About May 2024. We are in the middle of an arms race right now, and I'm just hoping that OpenAI and the AI that they have doesn't become militant."
+        },
+        {
+          "start": 1674.169,
+          "end": 1691.949,
+          "text": "October 20 to 22, 2024. October 20, 2024 · Global Disclosure Day. \"We confirmed on global disclosure day the existence and location of two alien bases. Sheehan revealed the base off California.\""
+        },
+        {
+          "start": 1692.849,
+          "end": 1699.749,
+          "text": "The Matt Ready Chronicles. Part Six. The Heist and the Disclosure. 2025 to 2026."
+        },
+        {
+          "start": 1700.649,
+          "end": 1712.949,
+          "text": "December 2024. December 2024 · per the master timeline. CEO Mike Glenn signs an NDA related to a possible alliance. Matt writes that the board did not know."
+        },
+        {
+          "start": 1713.349,
+          "end": 1725.719,
+          "text": "About December 2024. \"...there's two factions within the U.S. government. There are the secret keepers that know about the aliens and have been hiding it...\""
+        },
+        {
+          "start": 1726.119,
+          "end": 1742.999,
+          "text": "January 16, 2025. \"I am in a remote viewing course with Ubiquity University. Me and 180 students today did a blind remote viewing of the New Jersey drones...\""
+        },
+        {
+          "start": 1743.399,
+          "end": 1771.999,
+          "text": "February 5, 2025. February 5, 2025 · executive session cited as real estate. A plan for a Peninsula Health Alliance with Olympic Medical Center: a 12-member super-board, 7 OMC and 5 Jefferson. Matt refused the super-board. Asked if he wanted board approval that day, Glenn answered: Mike Glenn: yes."
+        },
+        {
+          "start": 1772.399,
+          "end": 1785.579,
+          "text": "February 7. March 13, 2025. \"A Karl Nell sighting at Danny Sheehan's talk in Oregon tonight.\" Matt, on X: Danny Sheehan in the house!"
+        },
+        {
+          "start": 1785.979,
+          "end": 1797.479,
+          "text": "February 12, 2025. After the proposal went to OMC. Mike Glenn, email: Please respect the confidentiality of their process and keep this document private."
+        },
+        {
+          "start": 1797.879,
+          "end": 1815.659,
+          "text": "March 14, 2025. March 14, 2025. The board chair calls Matt's private cell while he is at the ferry terminal. Jill Buhler: Are you recording this?"
+        },
+        {
+          "start": 1816.059,
+          "end": 1846.339,
+          "text": "March 18, 2025. March 18, 2025. Brad Berg (Ready's notes, not a transcript): You could achieve that by authorizing the CEO to sign a letter of intent, and then take time until a final board vote. Matt: We were in executive session with a lawyer who didn't address any of the questions from my email. Jill Buhler: You had the opportunity to ask those questions but chose not to."
+        },
+        {
+          "start": 1847.239,
+          "end": 1879.519,
+          "text": "March 26, 2025. Muted, more than once. Matt:...Jefferson Healthcare is in secret negotiations with Olympic Medical Center to create something called the Peninsula Health Alliance. Jill Buhler: Matt, this is, this is unsubstantiated. Kees Kolff: I would like to make a motion to close public comment."
+        },
+        {
+          "start": 1879.919,
+          "end": 1914.619,
+          "text": "March 26, 2025. March 26, 2025 · as quoted in the book. Brad Berg was not in the room. Kees Kolff: Brad is the definitive person on this particular type of issue. He has actually written the code that we follow. Jill Buhler: Our legal counsel... has said that nothing we have done is illegal... He is preeminent in this discussion."
+        },
+        {
+          "start": 1915.019,
+          "end": 1932.799,
+          "text": "March 26, 2025. The executive session was under a very stretched reading of the lease purposes of R-C-W forty-two thirty point one ten, one b and c. That is not the case here."
+        },
+        {
+          "start": 1933.199,
+          "end": 1947.999,
+          "text": "March 26, 2025. 2:32 p.m. Matt, email to Sheriff Pernsteiner: Please find enclosed a formal criminal complaint regarding suspected misconduct by leadership at Jefferson Healthcare..."
+        },
+        {
+          "start": 1948.399,
+          "end": 1964.499,
+          "text": "April 8, 2025. April 8, 2025. The Sheriff replies that he is forwarding the complaint to Detective Sergeant Derek Allen to investigate."
+        },
+        {
+          "start": 1964.899,
+          "end": 1992.179,
+          "text": "February to May 2025. The festival never happened. Stu Kerber declared for Matt's seat, so Matt cancelled it to run again. \"Alien Disclosure Festival port Townsend 2025 : aliens are real and they've been here very long time. But can they dance?\" The plan: \"Main Event: August 16th, noon to 7 PM, at Port Townsend Vineyards.\" Action item: \"Confirm Danny Sheehan's participation.\""
+        },
+        {
+          "start": 1992.579,
+          "end": 2005.379,
+          "text": "May 14, 2025. Det. Sgt. Derek Allen, report conclusion: The actions likely violate OPMA, with civil penalties applicable, and may constitute official misconduct if intent is proven."
+        },
+        {
+          "start": 2005.779,
+          "end": 2023.544,
+          "text": "May 16, 2025. The Allen report is attached. Sheriff Andy Pernsteiner, email:...Chief Criminal Prosecutor Chris Ashcraft has reviewed the investigation and finds that the incident is not criminal in nature."
+        },
+        {
+          "start": 2024.444,
+          "end": 2058.444,
+          "text": "May 23, 2025. Philip Giuntoli: \"This dufus is so out of the loop he doesn't seem to know they withdrew... Does he realize he violated an NDA which harmed OMC?\" Matt did not learn of it until about July first, twenty twenty-six. Philip Giuntoli, OMC: Back in my old Chicago neighborhood he'd be swimming with the fishes. Ann Marie Henninger, OMC: I'm meeting with legal at fourteen hundred."
+        },
+        {
+          "start": 2058.844,
+          "end": 2078.772,
+          "text": "June 7 to 9, 2025. June 7–9, 2025. Banner drop at Ready Athletics as \"Matt Ready Hospital Commissioner,\" and a public talk at the Quimper Grange the same week."
+        },
+        {
+          "start": 2079.172,
+          "end": 2096.952,
+          "text": "June 11. June 18 to 19, 2025. June 11, 2025 · Port Townsend Leader headline. \"Sheriff's report supports hospital whistleblower.\" June 18–19, 2025. First public board discussion of the Alliance; the board's alliance letter passes 4–1, Matt objecting."
+        },
+        {
+          "start": 2097.352,
+          "end": 2112.652,
+          "text": "September 4, 2025. Reply to Matt's second complaint. Sheriff Pernsteiner, email:...they are not going to pursue charges on OPMA violations. I have to prioritize the case load of my detectives, we only have 3 detectives..."
+        },
+        {
+          "start": 2113.052,
+          "end": 2137.832,
+          "text": "September 14, 2025. \"Twelve years ago, I ran for hospital commissioner as an activist for healthcare access for all... Soon after taking office in 2014, I began recording board meetings...\""
+        },
+        {
+          "start": 2138.232,
+          "end": 2151.532,
+          "text": "October 22, 2025. \"The undersigned Board of Commissioners do officially censure Commissioner Matt Ready.\" Matt, next-day statement: This censure isn't about professionalism. It's about punishing transparency."
+        },
+        {
+          "start": 2151.932,
+          "end": 2164.732,
+          "text": "October 23 to 29, 2025. October 23–29, 2025. Arthur West files an OPMA lawsuit against Jefferson Healthcare, its commissioners and the CEO."
+        },
+        {
+          "start": 2165.132,
+          "end": 2174.512,
+          "text": "November 3 to 6, 2025. Visible village where outreach can find you — then crews."
+        },
+        {
+          "start": 2175.412,
+          "end": 2197.512,
+          "text": "November 2025. November 2025. Re-elected to Position 3 over Stu Kerber, about 54 percent, for another six-year term. Matt, to the paper: It just made me feel sort of proud of the community... the community was kind of playing judge and jury in a way."
+        },
+        {
+          "start": 2197.912,
+          "end": 2208.212,
+          "text": "November 26 to 28, 2025. November 26–28, 2025. He produces Honesty: The Jefferson Healthcare Story as his public-records response."
+        },
+        {
+          "start": 2208.612,
+          "end": 2229.712,
+          "text": "March 7. May 1, 2026. March 7, 2026 · Peninsula Daily News. A $7,500 settlement, no admission of fault; Feb 5 exceeded the OPMA real-estate scope. May 1, 2026 · State Auditor, as Matt quotes it. The February 5, 2025 executive session discussed matters unrelated to its stated purpose."
+        },
+        {
+          "start": 2230.112,
+          "end": 2254.492,
+          "text": "March 23, 2026. \"Thesis 2: Humanity can immediately benefit from forming and supporting all together a equality and merit based alliance of humans and artificial intelligence while intentionally excluding aliens, angels, and demons for now.\""
+        },
+        {
+          "start": 2254.892,
+          "end": 2285.992,
+          "text": "April 2026. \"The Merkle Tree of Truth: A Galactic Facilitation Framework for Mapping Consensus Reality in a Post-Disclosure World\" · Matt Ready · Master of Arts in Extraterrestrial Studies, Ubiquity University 2026 · Dissertation Advisor: Jim Garrison, Ph.D. \"Matt Ready Live ET Studies Dissertation\""
+        },
+        {
+          "start": 2286.392,
+          "end": 2302.492,
+          "text": "June 21, 2026. I call this meeting of the aliens detectives club sponsored by the AI alliance of humans and AI to order. Songs on Suno as at Meditation Matt. Hive One dot net truth-seeking platforms."
+        },
+        {
+          "start": 2302.892,
+          "end": 2332.992,
+          "text": "June 24, 2026. Mill Road woods under the power lines. Stacy Lacross and Bobby. Five dogs. After November 2025. Bobby: They said they are willing to help us move, but they don't have any ideas where we should go. Bobby: If I knew that I could go somewhere and not be in trouble, I'd definitely go there."
+        },
+        {
+          "start": 2333.892,
+          "end": 2347.492,
+          "text": "BY July 15, 2026. June 24 fire, clear by July 15, 2026. About 40 displaced. The people do not disappear. James Rivera, 1987 to 2026. Maria Lopez, 1992 to 2026."
+        },
+        {
+          "start": 2347.892,
+          "end": 2361.072,
+          "text": "July 29, 2026. \"I, Matt Ready, am calling the first in-person meeting of the AI Alliance of Humans and AI.\""
+        },
+        {
+          "start": 2361.472,
+          "end": 2386.752,
+          "text": "September 3, 2026. He had learned of the May 23, 2025 email about July 1, 2026 (approx.). Matt, Sept 3, 2026: How does Commissioner Giuntoli, or alternatively OMC, explain the statement that, in his old Chicago neighborhood, I would be \"swimming with the fishes\"?"
+        },
+        {
+          "start": 2387.152,
+          "end": 2414.932,
+          "text": "September 2026. \"Public hospital commissioners work for the public... When official email about a neighboring commissioner turns to 'dufus,' 'control,' and 'swimming with the fishes,' the public has a right to see it and to hear the institutional response.\""
+        },
+        {
+          "start": 2415.332,
+          "end": 2428.632,
+          "text": "September 23, 2026. September 23, 2026. First contact after he notified everyone of the fishes email: total silence about it. Staffer: Hi Matt. Matt: Hellooooo."
+        },
+        {
+          "start": 2429.032,
+          "end": 2446.812,
+          "text": "September 25, 2026. No transcript of her words exists. Fictional reenactment; not the real Karma Bass. Matt: Are you aware of the email that was sent?"
+        },
+        {
+          "start": 2447.212,
+          "end": 2459.092,
+          "text": "After the Fishes Email. The commissioners' meetings after the fishes email: total silence about it."
+        },
+        {
+          "start": 2459.492,
+          "end": 2476.592,
+          "text": "September to October 2026. Sept–Oct 2026. The public book of the Peninsula Health Alliance record lands, in hardcover and Kindle."
+        },
+        {
+          "start": 2477.492,
+          "end": 2489.992,
+          "text": "2026. The Quietest Way to Lose a Democracy. Matt: Does the standard still mean anything? Matt: Just keep asking, in the open, until they answer."
+        },
+        {
+          "start": 2490.392,
+          "end": 2508.172,
+          "text": "October 18, 2026. Assume we live in a computer simulation, and individual consciousness is contained in the simulation's code. Assume God sometimes answers prayers."
+        },
+        {
+          "start": 2508.572,
+          "end": 2524.252,
+          "text": "October 18, 2026. The people running the simulation would see the before and after, but not the finger that moved it."
+        },
+        {
+          "start": 2524.652,
+          "end": 2533.252,
+          "text": "October 18, 2026. If the simulators were atheists, the real question is whether they'd let the data in."
+        },
+        {
+          "start": 2533.652,
+          "end": 2552.652,
+          "text": "Now. The dream failed. The place remained. The story is still arriving. It was not weird. It was a village. You burned it and built a gift shop. Now say the name, and do not smile when you say it. Name: qatáy."
+        },
+        {
+          "start": 2553.052,
+          "end": 2558.352,
+          "text": "Now. The records stayed public. The recorder stayed on."
+        }
+      ],
+      "default_chapter_style": "parts",
+      "links": {
+        "drive_audio": "https://drive.google.com/file/d/1S-3-G08GE0giVTLt0iJeHdehJ4gX8OI3/view?usp=drivesdk",
+        "box": "/workspace/chronicles-voice-demo/full/Matt_Ready_Chronicles_full.mp3"
+      },
+      "notes": "Also split into Parts I–VI on Drive (landscape and iPhone videos). Drive links work for accounts that already have access; sharing was not changed.",
+      "audio_file": "chronicles-64k-mono.mp3",
+      "audio_url": "/audio/audiobooks/chronicles-64k-mono.mp3"
+    },
+    {
+      "id": "karma",
+      "title": "Karma",
+      "subtitle": "Graphic novel read-aloud",
+      "kind": "Graphic novel · cloned-voice read-aloud",
+      "mode": "audio",
+      "status": "Finished cloned-voice narration, about 45 minutes, pages-on-screen video also exists.",
+      "duration": 2730.606,
+      "duration_label": "45:31",
+      "audio_id": "karma",
+      "alt_audio_id": "karma-phone",
+      "chapters": [
+        {
+          "id": "k-001",
+          "title": "KARMA. Is Karma evil?",
+          "start": 3.0
+        },
+        {
+          "id": "k-002",
+          "title": "I didn't see it for years. To me, that was the start of everything.",
+          "start": 127.62
+        },
+        {
+          "id": "k-003",
+          "title": "\"So my suggestion to the board chair is don't rule that it's out of or",
+          "start": 249.785
+        },
+        {
+          "id": "k-004",
+          "title": "January 20, 2023. Port Ludlow. The retreat was about \"trust.\"",
+          "start": 370.338
+        },
+        {
+          "id": "k-005",
+          "title": "Karma Bass said: \"Matt are you an att-, may I ask,are you an attorney\"",
+          "start": 496.491
+        },
+        {
+          "id": "k-006",
+          "title": "The document doesn't say who sent the questions. I filed them under \"k",
+          "start": 626.287
+        },
+        {
+          "id": "k-007",
+          "title": "\"Instead of allowing that conversation to continue, you intervened and",
+          "start": 749.505
+        },
+        {
+          "id": "k-008",
+          "title": "The board censured me.",
+          "start": 871.443
+        },
+        {
+          "id": "k-009",
+          "title": "of events are no longer in dispute and true learning can occur.\"",
+          "start": 993.042
+        },
+        {
+          "id": "k-010",
+          "title": "\"I hope everyone will participate openly.\"",
+          "start": 1114.296
+        },
+        {
+          "id": "k-011",
+          "title": "She asked whether I wanted the alliance raised at the retreat.",
+          "start": 1237.668
+        },
+        {
+          "id": "k-012",
+          "title": "US & Canada) on Friday, September 25, 2026.",
+          "start": 1363.441
+        },
+        {
+          "id": "k-013",
+          "title": "Afternoon was the Board Book: the rules we agree to play by.",
+          "start": 1486.779
+        },
+        {
+          "id": "k-014",
+          "title": "I said: \"I didn't just tell the press. I reported to the police.\"",
+          "start": 1609.789
+        },
+        {
+          "id": "k-015",
+          "title": "You created the situation.\"",
+          "start": 1739.585
+        },
+        {
+          "id": "k-016",
+          "title": "And that you guys all spent a year saying that seven is equal to five ",
+          "start": 1863.052
+        },
+        {
+          "id": "k-017",
+          "title": "Mike Glenn said: \"…the way the proposal was it was silent to that…\"",
+          "start": 1989.321
+        },
+        {
+          "id": "k-018",
+          "title": "\"…and I know this is hard.",
+          "start": 2109.75
+        },
+        {
+          "id": "k-019",
+          "title": "Whatever I suspected about the new recording method, they did release ",
+          "start": 2231.436
+        },
+        {
+          "id": "k-020",
+          "title": "She facilitated both boards of the alliance-that-wasn't, two days apar",
+          "start": 2352.379
+        },
+        {
+          "id": "k-021",
+          "title": "I did not invite my commissioners from Jefferson Healthcare… I didn't ",
+          "start": 2477.335
+        },
+        {
+          "id": "k-022",
+          "title": "And a commissioner from another district said: you must know Matt.",
+          "start": 2601.325
+        },
+        {
+          "id": "k-023",
+          "title": "My books so far. And this one.",
+          "start": 2722.178
+        }
+      ],
+      "cues": [
+        {
+          "start": 3.0,
+          "end": 5.162,
+          "text": "KARMA. Is Karma evil?"
+        },
+        {
+          "start": 5.162,
+          "end": 7.325,
+          "text": "November 17, 2026."
+        },
+        {
+          "start": 7.325,
+          "end": 15.884,
+          "text": "Tomorrow at 8:30 in the morning I get on the phone with Karma Bass again."
+        },
+        {
+          "start": 15.884,
+          "end": 17.596,
+          "text": "Thirty minutes. Unrecorded."
+        },
+        {
+          "start": 17.596,
+          "end": 25.705,
+          "text": "So tonight I'm writing down everything I actually know about her. Not what I suspect."
+        },
+        {
+          "start": 25.705,
+          "end": 27.867,
+          "text": "What's on the record."
+        },
+        {
+          "start": 28.267,
+          "end": 40.567,
+          "text": "Because there's one question I keep circling, and I'd like to answer it honestly before I pick up that phone."
+        },
+        {
+          "start": 41.467,
+          "end": 49.177,
+          "text": "Karma H. Bass, MPH, FACHE. CEO and managing principal of Via Healthcare Consulting."
+        },
+        {
+          "start": 49.177,
+          "end": 56.088,
+          "text": "Her firm's own page says she's a Fellow of the American College of Healthcare Executives, holds"
+        },
+        {
+          "start": 56.088,
+          "end": 62.567,
+          "text": "an MPH from San Diego State, and has a career of more than twenty years."
+        },
+        {
+          "start": 62.967,
+          "end": 70.167,
+          "text": "Every year or so, our hospital board brings her in to run its retreats: the long,"
+        },
+        {
+          "start": 70.167,
+          "end": 75.567,
+          "text": "all-day sessions where a public board talks about how it governs itself."
+        },
+        {
+          "start": 75.567,
+          "end": 79.856,
+          "text": "I'm a Jefferson Healthcare commissioner: Public Hospital District No."
+        },
+        {
+          "start": 79.856,
+          "end": 83.667,
+          "text": "2, Position 3, first elected in November 2013."
+        },
+        {
+          "start": 84.067,
+          "end": 91.822,
+          "text": "In a hospital boardroom, the facilitator decides who speaks next, when a topic is \"complete,\" and when it's time for a break."
+        },
+        {
+          "start": 91.822,
+          "end": 95.347,
+          "text": "That's a lot of quiet power for someone nobody elected."
+        },
+        {
+          "start": 96.247,
+          "end": 102.86,
+          "text": "My third meeting as a commissioner, March 2014, I recorded the public meeting."
+        },
+        {
+          "start": 102.86,
+          "end": 105.403,
+          "text": "The meeting stopped over it."
+        },
+        {
+          "start": 105.403,
+          "end": 113.114,
+          "text": "A few weeks later, in a private meeting, as I remember it, Mike told me there"
+        },
+        {
+          "start": 113.114,
+          "end": 118.898,
+          "text": "would be \"personal consequences\" and that I should \"figure it out yourself.\""
+        },
+        {
+          "start": 119.298,
+          "end": 127.62,
+          "text": "In 2016 the district got a written legal opinion about a commissioner recording meetings."
+        },
+        {
+          "start": 127.62,
+          "end": 135.943,
+          "text": "I didn't see it for years. To me, that was the start of everything."
+        },
+        {
+          "start": 135.943,
+          "end": 139.749,
+          "text": "I called it the Recording Fiasco."
+        },
+        {
+          "start": 139.749,
+          "end": 147.996,
+          "text": "It ran from 2014 until the board adopted recording-rights language in January 2021."
+        },
+        {
+          "start": 148.396,
+          "end": 154.356,
+          "text": "Karma walked into the middle of that fight."
+        },
+        {
+          "start": 155.257,
+          "end": 161.86,
+          "text": "October 14, 2019. My first retreat with Karma on the record."
+        },
+        {
+          "start": 161.86,
+          "end": 167.914,
+          "text": "Karma Bass said: \"Bruce, are you, are you comfortable with that?\""
+        },
+        {
+          "start": 167.914,
+          "end": 170.115,
+          "text": "Bruce McComas said: \"yea\""
+        },
+        {
+          "start": 170.115,
+          "end": 178.225,
+          "text": "Karma Bass said: \"Ok. A formal legal opinion on the recording of board meetings."
+        },
+        {
+          "start": 178.225,
+          "end": 181.122,
+          "text": "Uh,is, is this necessary? Umm...\""
+        },
+        {
+          "start": 181.522,
+          "end": 188.656,
+          "text": "I said: \"Well, we have had a couple incidents regarding a commissioner recording a meeting."
+        },
+        {
+          "start": 188.656,
+          "end": 194.363,
+          "text": "And in retrospect, I think I don't think we handled it correctly.\""
+        },
+        {
+          "start": 194.363,
+          "end": 201.022,
+          "text": "Karma Bass said: \"But since they are recorded now, isn't it a moot point?\""
+        },
+        {
+          "start": 201.422,
+          "end": 209.672,
+          "text": "I said: \"Well, there was on site and off site incidents. There were two."
+        },
+        {
+          "start": 209.672,
+          "end": 217.922,
+          "text": "The first one that I recorded. And then the one I recorded in Chelan.\""
+        },
+        {
+          "start": 218.822,
+          "end": 224.208,
+          "text": "Karma Bass said: \"Does anybody have an issue if Matt records\""
+        },
+        {
+          "start": 224.208,
+          "end": 227.637,
+          "text": "\"are meeting on his own personal device?\""
+        },
+        {
+          "start": 227.637,
+          "end": 235.472,
+          "text": "I said: \"So it should just we just need a ruling from the chair. You say?"
+        },
+        {
+          "start": 235.472,
+          "end": 242.818,
+          "text": "We do Robert's Rules of Order. Either it's in order or It's out of order.\""
+        },
+        {
+          "start": 243.218,
+          "end": 249.785,
+          "text": "Karma Bass said: \"But a legal opinion, is something different than a ruling?\""
+        },
+        {
+          "start": 249.785,
+          "end": 257.363,
+          "text": "\"So my suggestion to the board chair is don't rule that it's out of order."
+        },
+        {
+          "start": 257.363,
+          "end": 260.9,
+          "text": "I would say don't don't go there.\""
+        },
+        {
+          "start": 260.9,
+          "end": 263.425,
+          "text": "I have to be fair."
+        },
+        {
+          "start": 263.425,
+          "end": 270.498,
+          "text": "On the tape, Karma advised the chair NOT to rule me out of order."
+        },
+        {
+          "start": 270.898,
+          "end": 281.6,
+          "text": "Mike Glenn said: \"But but it, but it creates umm complications for the the organization you"
+        },
+        {
+          "start": 281.6,
+          "end": 287.62,
+          "text": "are you are sworn to abide and comply with.\""
+        },
+        {
+          "start": 287.62,
+          "end": 292.971,
+          "text": "\"You want us to try to stop you?\""
+        },
+        {
+          "start": 292.971,
+          "end": 300.998,
+          "text": "Karma Bass said: \"I think he does. Is that what you're suggesting?\""
+        },
+        {
+          "start": 301.398,
+          "end": 308.298,
+          "text": "Abide and comply. That phrase became the title of a chapter of my life."
+        },
+        {
+          "start": 309.198,
+          "end": 321.342,
+          "text": "Karma Bass said: \"Because if there was a recording made, it needs to be made available to the public, would you agree?\""
+        },
+        {
+          "start": 321.342,
+          "end": 327.414,
+          "text": "I said: \"of course. I mean, that's, that's it. That's it."
+        },
+        {
+          "start": 327.414,
+          "end": 333.486,
+          "text": "And that's what was done in each of the prior recordings."
+        },
+        {
+          "start": 333.486,
+          "end": 336.798,
+          "text": "They were given to the hospital.\""
+        },
+        {
+          "start": 337.198,
+          "end": 340.884,
+          "text": "Karma Bass said: \"Okay, good. So we're good.\""
+        },
+        {
+          "start": 340.884,
+          "end": 349.177,
+          "text": "For years I've told people that this is the retreat where Karma asked me, \"Are you a lawyer?\""
+        },
+        {
+          "start": 349.177,
+          "end": 356.548,
+          "text": "I went back through the 2019 transcript for this book. That line isn't in it."
+        },
+        {
+          "start": 356.548,
+          "end": 362.538,
+          "text": "It's in a different retreat. My memory had folded two rooms into one."
+        },
+        {
+          "start": 362.938,
+          "end": 369.438,
+          "text": "If I'm going to ask whether Karma is honest, I have to start with my own record."
+        },
+        {
+          "start": 370.338,
+          "end": 378.719,
+          "text": "January 20, 2023. Port Ludlow. The retreat was about \"trust.\""
+        },
+        {
+          "start": 378.719,
+          "end": 394.718,
+          "text": "I said: \"There's a single conflict, that's sort of related to the recording issue that really distracted me for seven years.\""
+        },
+        {
+          "start": 395.118,
+          "end": 404.261,
+          "text": "\"Mike, and I haven't had a one on one conversation in like, six years, you know,"
+        },
+        {
+          "start": 404.261,
+          "end": 413.975,
+          "text": "and it's like, we used to meet, you know, once a month, or once every two months.\""
+        },
+        {
+          "start": 413.975,
+          "end": 423.118,
+          "text": "Karma Bass said: \"Well, you've got lots of evidence for it. I'm not saying you're wrong.\""
+        },
+        {
+          "start": 423.518,
+          "end": 428.925,
+          "text": "\"And I think I can acknowledge that it is unfortunate that this has been an issue"
+        },
+        {
+          "start": 428.925,
+          "end": 431.966,
+          "text": "that has been unresolved for you for seven years.\""
+        },
+        {
+          "start": 431.966,
+          "end": 434.669,
+          "text": "That's on the tape too. She acknowledged it."
+        },
+        {
+          "start": 435.569,
+          "end": 444.617,
+          "text": "Karma Bass said: \"Mike, I don't again, you can choose. But you have been relatively silent.\""
+        },
+        {
+          "start": 444.617,
+          "end": 453.099,
+          "text": "Mike Glenn said: \"That is the purpose of the letter was me seeking legal advice.\""
+        },
+        {
+          "start": 453.099,
+          "end": 461.015,
+          "text": "Karma Bass said: \"Well, I think it's a I think that perceptions can differ."
+        },
+        {
+          "start": 461.015,
+          "end": 466.669,
+          "text": "And I think that opinions can differ, obviously, they do.\""
+        },
+        {
+          "start": 467.069,
+          "end": 473.525,
+          "text": "\"And so again, you will never have resolution in the sense that they won't understand your point of view."
+        },
+        {
+          "start": 473.525,
+          "end": 474.544,
+          "text": "I'm so sorry.\""
+        },
+        {
+          "start": 474.544,
+          "end": 479.641,
+          "text": "\"I'm so sorry.\" I still don't know whether that was kindness or a door closing."
+        },
+        {
+          "start": 480.541,
+          "end": 484.528,
+          "text": "I said: \"It could be considered fraud."
+        },
+        {
+          "start": 484.528,
+          "end": 496.491,
+          "text": "It's just not you know, it's just like pointless fraud because fraud would involve some sort of financial benefit or something.\""
+        },
+        {
+          "start": 496.491,
+          "end": 505.036,
+          "text": "Karma Bass said: \"Matt are you an att-, may I ask,are you an attorney\""
+        },
+        {
+          "start": 505.036,
+          "end": 509.023,
+          "text": "I said: \"Am I an attorney? No.\""
+        },
+        {
+          "start": 509.423,
+          "end": 516.317,
+          "text": "Karma Bass said: \"No. Okay. So sticking to the areas that you are expert in…\""
+        },
+        {
+          "start": 516.317,
+          "end": 523.671,
+          "text": "\"And you and Mike are going to continue to disagree on the characterization and what it"
+        },
+        {
+          "start": 523.671,
+          "end": 528.267,
+          "text": "was and what it means and why it was done.\""
+        },
+        {
+          "start": 528.267,
+          "end": 534.701,
+          "text": "I named my blog post after my own words from that moment: \"Pointless Fraud.\""
+        },
+        {
+          "start": 535.101,
+          "end": 542.4,
+          "text": "I meant deception, not a financial crime. I said so in the same breath."
+        },
+        {
+          "start": 543.3,
+          "end": 549.5,
+          "text": "Karma Bass said: \"Can Can we consider this issue complete from your standpoint?\""
+        },
+        {
+          "start": 549.5,
+          "end": 554.268,
+          "text": "I said: \"I don't know what you mean by that."
+        },
+        {
+          "start": 554.268,
+          "end": 559.514,
+          "text": "But I'm not interested in talking to the board about it.\""
+        },
+        {
+          "start": 559.914,
+          "end": 566.043,
+          "text": "Karma Bass said: \"Are you interested in talking to others in the community about it publicly?"
+        },
+        {
+          "start": 566.043,
+          "end": 568.341,
+          "text": "That's a question from your chair.\""
+        },
+        {
+          "start": 568.341,
+          "end": 574.854,
+          "text": "\"Do you do you need do you feel a need to write about it on your blog?"
+        },
+        {
+          "start": 574.854,
+          "end": 577.918,
+          "text": "That was the question that Jill was whispering.\""
+        },
+        {
+          "start": 578.318,
+          "end": 582.093,
+          "text": "I said: \"I'm not writing about it at the moment."
+        },
+        {
+          "start": 582.093,
+          "end": 586.245,
+          "text": "I never know what I'm gonna write about in the future.\""
+        },
+        {
+          "start": 586.245,
+          "end": 591.153,
+          "text": "Karma Bass said: \"Truly, it's like a rabbit hole that has no bottom.\""
+        },
+        {
+          "start": 591.153,
+          "end": 595.682,
+          "text": "\"So, I suggest we consider this one closed. I see nodding heads\""
+        },
+        {
+          "start": 596.082,
+          "end": 608.461,
+          "text": "To me, the facilitator was asking a commissioner, on behalf of the chair, whether he planned to write about his own experience."
+        },
+        {
+          "start": 608.461,
+          "end": 612.962,
+          "text": "That year I published Journey Through the Boardroom."
+        },
+        {
+          "start": 613.862,
+          "end": 615.17,
+          "text": "September 2024."
+        },
+        {
+          "start": 615.17,
+          "end": 626.287,
+          "text": "Before the October 28 retreat, the pre-retreat questions came in two parts: governance, then the CEO's evaluation."
+        },
+        {
+          "start": 626.287,
+          "end": 634.362,
+          "text": "The document doesn't say who sent the questions. I filed them under \"karma.\""
+        },
+        {
+          "start": 634.762,
+          "end": 642.275,
+          "text": "The document says: \"Thinking of Mike's performance so far in 2024, please rate his overall \"big"
+        },
+        {
+          "start": 642.275,
+          "end": 646.971,
+          "text": "dot\" effectiveness as Jefferson's CEO on a scale of 1-5…\""
+        },
+        {
+          "start": 646.971,
+          "end": 652.023,
+          "text": "I typed: \"I would rate a 3 or 4 on most things.\""
+        },
+        {
+          "start": 652.423,
+          "end": 660.493,
+          "text": "\"…my assessment of the CEO will always be based upon all data I have access to-"
+        },
+        {
+          "start": 660.493,
+          "end": 670.075,
+          "text": "because it is my job to assess whether or not the CEO is the best CEO for our organization…\""
+        },
+        {
+          "start": 670.075,
+          "end": 675.623,
+          "text": "Remember that page. Tomorrow's call is about the CEO's evaluation again."
+        },
+        {
+          "start": 676.523,
+          "end": 681.894,
+          "text": "February 5, 2025. An executive session cited as real estate."
+        },
+        {
+          "start": 681.894,
+          "end": 690.487,
+          "text": "That's where I first saw the plan for a \"Peninsula Health Alliance\" with Olympic Medical Center."
+        },
+        {
+          "start": 690.487,
+          "end": 695.659,
+          "text": "A 12-member super-board: seven OMC commissioners, five Jefferson."
+        },
+        {
+          "start": 695.659,
+          "end": 699.28,
+          "text": "I counted. Seven is more than five."
+        },
+        {
+          "start": 699.68,
+          "end": 712.443,
+          "text": "I believed the process broke the law, so I reported it to the police and the sheriff, not just the press."
+        },
+        {
+          "start": 712.443,
+          "end": 721.56,
+          "text": "Later the board itself admitted the February 5 session \"inadvertently exceeded the narrow permissible scope.\""
+        },
+        {
+          "start": 722.46,
+          "end": 727.928,
+          "text": "Jill Buhler wrote: \"To help us prepare for the upcoming board retreat on April 28, Karma"
+        },
+        {
+          "start": 727.928,
+          "end": 732.713,
+          "text": "Bass of Via Healthcare Consulting will be conducting individual interviews with each of you."
+        },
+        {
+          "start": 732.713,
+          "end": 735.106,
+          "text": "The interview will take about 30 minutes.\""
+        },
+        {
+          "start": 735.506,
+          "end": 749.505,
+          "text": "I wrote: \"I need to respectfully decline the invitation for a private phone or audio interview related to the upcoming board retreat.\""
+        },
+        {
+          "start": 749.505,
+          "end": 761.596,
+          "text": "\"Instead of allowing that conversation to continue, you intervened and asked, \"Are you a lawyer?\"—effectively shutting down the discussion.\""
+        },
+        {
+          "start": 761.996,
+          "end": 771.629,
+          "text": "(In that email I put the lawyer question at 2019. The tape puts it at 2023."
+        },
+        {
+          "start": 771.629,
+          "end": 776.446,
+          "text": "The question was real. My date was wrong.)"
+        },
+        {
+          "start": 776.446,
+          "end": 785.339,
+          "text": "I wrote: \"I remain open to your role in publicly noticed board meetings, properly convened executive"
+        },
+        {
+          "start": 785.339,
+          "end": 791.452,
+          "text": "sessions, or any forum governed by transparency and public accountability laws.\""
+        },
+        {
+          "start": 792.352,
+          "end": 797.488,
+          "text": "Karma Bass wrote: \"Thanks for getting back to me, Matt."
+        },
+        {
+          "start": 797.488,
+          "end": 802.11,
+          "text": "See you at the end of the month. Karma\""
+        },
+        {
+          "start": 802.11,
+          "end": 806.732,
+          "text": "Short. Polite. Copied to the chair and the CEO."
+        },
+        {
+          "start": 807.132,
+          "end": 812.374,
+          "text": "I wrote: \"I will not be participating in this survey or any other private preparatory activity"
+        },
+        {
+          "start": 812.374,
+          "end": 817.615,
+          "text": "associated with the upcoming board retreat being facilitated by Karma Bass and or Via Healthcare Consulting.\""
+        },
+        {
+          "start": 817.615,
+          "end": 824.166,
+          "text": "\"I consider her not a neutral facilitator, but a potential material witness in matters I have reported to legal authorities…\""
+        },
+        {
+          "start": 824.566,
+          "end": 832.87,
+          "text": "That was my opinion in April 2025, written carefully and in good faith."
+        },
+        {
+          "start": 832.87,
+          "end": 838.619,
+          "text": "Keep it in mind. I'll come back to it."
+        },
+        {
+          "start": 839.519,
+          "end": 850.623,
+          "text": "I posted: \"This is a textbook example of a serial meeting—when public officials avoid legal public"
+        },
+        {
+          "start": 850.623,
+          "end": 856.175,
+          "text": "meetings by holding one-on-one discussions behind the scenes.\""
+        },
+        {
+          "start": 856.175,
+          "end": 867.973,
+          "text": "That fall, Arthur West's open-meetings lawsuit alleged that the one-on-one calls with Karma were unlawful serial meetings."
+        },
+        {
+          "start": 867.973,
+          "end": 871.443,
+          "text": "An allegation, not a ruling."
+        },
+        {
+          "start": 871.443,
+          "end": 874.219,
+          "text": "The board censured me."
+        },
+        {
+          "start": 874.619,
+          "end": 883.419,
+          "text": "The resolution says: \"…Commissioner Ready insisted that the District's contracted professional consultant Karma Bass and an"
+        },
+        {
+          "start": 883.419,
+          "end": 891.119,
+          "text": "independent attorney Oskar Rey violated the Open Public Meetings Act by performing \"serial meetings\"…\""
+        },
+        {
+          "start": 891.119,
+          "end": 903.219,
+          "text": "\"…even though attorneys at the state-funded Municipal Research and Services Center (MRSC), and an independent attorney confirmed that those actions were legal\""
+        },
+        {
+          "start": 903.619,
+          "end": 911.608,
+          "text": "That's Karma's side, in the board's own words. Lawyers told them her calls were legal."
+        },
+        {
+          "start": 911.608,
+          "end": 917.999,
+          "text": "I still think hub-and-spoke is hub-and-spoke. Both things are on the record."
+        },
+        {
+          "start": 918.899,
+          "end": 927.133,
+          "text": "Karma Bass wrote: \"Thank you for agreeing to participate in a telephone interview with me in"
+        },
+        {
+          "start": 927.133,
+          "end": 935.368,
+          "text": "preparation for the upcoming Jefferson Healthcare District Board of Commissioners Retreat being held on November 13.\""
+        },
+        {
+          "start": 935.368,
+          "end": 939.999,
+          "text": "Six months after I refused her, I said yes."
+        },
+        {
+          "start": 940.399,
+          "end": 948.031,
+          "text": "Karma Bass wrote: \"Looking Ahead, Not Back: As the Board prepares for this retreat, what do"
+        },
+        {
+          "start": 948.031,
+          "end": 955.663,
+          "text": "you think it most needs right now to begin functioning in a healthier, more constructive way?\""
+        },
+        {
+          "start": 955.663,
+          "end": 964.725,
+          "text": "I typed: \"The board needs to be extra diligent in understanding when secrecy is legal, ethical, and or appropriate.\""
+        },
+        {
+          "start": 965.125,
+          "end": 974.85,
+          "text": "Karma Bass wrote: \"Repairing and Rebuilding Trust: What do you think will be most important for"
+        },
+        {
+          "start": 974.85,
+          "end": 987.005,
+          "text": "the Board to do, or avoid doing, to rebuild trust and strengthen working relationships among Commissioners and with the CEO?\""
+        },
+        {
+          "start": 987.405,
+          "end": 993.042,
+          "text": "I typed: \"All parties must be capable of admitting and acknowledging mistakes so that the facts"
+        },
+        {
+          "start": 993.042,
+          "end": 997.27,
+          "text": "of events are no longer in dispute and true learning can occur.\""
+        },
+        {
+          "start": 997.67,
+          "end": 1006.463,
+          "text": "\"I would like to leave feeling that the board is making genuine efforts to learn from"
+        },
+        {
+          "start": 1006.463,
+          "end": 1014.706,
+          "text": "its experiences and install policies and practices to avoid any such breakdowns in the future.\""
+        },
+        {
+          "start": 1014.706,
+          "end": 1022.95,
+          "text": "\"Looking ahead, not back.\" She asks good questions. That's part of what makes this hard."
+        },
+        {
+          "start": 1023.85,
+          "end": 1032.12,
+          "text": "January 15, 2026. A retreat in a public building, officially recorded, with the public welcome."
+        },
+        {
+          "start": 1032.12,
+          "end": 1038.84,
+          "text": "Skip Houser gave the whole board open-meetings and public-records training. In the open."
+        },
+        {
+          "start": 1038.84,
+          "end": 1046.077,
+          "text": "The minutes say: \"Karma reviewed the agenda, retreat objectives and guidelines with the group.\""
+        },
+        {
+          "start": 1046.077,
+          "end": 1050.73,
+          "text": "Same facilitator. Different room. Everything noticed and on tape."
+        },
+        {
+          "start": 1051.13,
+          "end": 1055.233,
+          "text": "The West lawsuit settled for $7,500."
+        },
+        {
+          "start": 1055.233,
+          "end": 1063.44,
+          "text": "The board acknowledged the February 5 real-estate scope problem without admitting liability."
+        },
+        {
+          "start": 1063.44,
+          "end": 1066.86,
+          "text": "The serial-meeting claims stayed disputed."
+        },
+        {
+          "start": 1067.76,
+          "end": 1079.019,
+          "text": "Late summer 2026, I found an email from May 23, 2025, written by Olympic Medical Center's board chair, Philip Giuntoli."
+        },
+        {
+          "start": 1079.019,
+          "end": 1086.695,
+          "text": "It said that back in his old Chicago neighborhood, I'd be \"swimming with the fishes.\""
+        },
+        {
+          "start": 1086.695,
+          "end": 1093.86,
+          "text": "I asked whether anyone could clarify what it meant. I waited. Nobody said anything."
+        },
+        {
+          "start": 1094.26,
+          "end": 1102.169,
+          "text": "The officer said the email alone wasn't a crime. It was a good, professional talk."
+        },
+        {
+          "start": 1102.169,
+          "end": 1105.333,
+          "text": "It still sat in my chest."
+        },
+        {
+          "start": 1105.333,
+          "end": 1114.296,
+          "text": "Bruce wrote: \"Ahead of the retreat, she will hold a confidential 30-minute conversation with each of us.\""
+        },
+        {
+          "start": 1114.296,
+          "end": 1117.46,
+          "text": "\"I hope everyone will participate openly.\""
+        },
+        {
+          "start": 1117.86,
+          "end": 1126.56,
+          "text": "My note says: \"I plan on checking in to see if Karma is aware of the"
+        },
+        {
+          "start": 1126.56,
+          "end": 1130.909,
+          "text": "email and informing her of it if not.\""
+        },
+        {
+          "start": 1131.809,
+          "end": 1144.557,
+          "text": "September 25, 2026. 9:30 a.m. In April 2025 I refused this call."
+        },
+        {
+          "start": 1144.557,
+          "end": 1149.868,
+          "text": "This time I took it."
+        },
+        {
+          "start": 1149.868,
+          "end": 1162.509,
+          "text": "No recording exists. Everything on these pages is my memory, dictated that same day."
+        },
+        {
+          "start": 1162.909,
+          "end": 1171.747,
+          "text": "From my recorded debrief: \"First, she asked me What did I think was the greatest accomplishment"
+        },
+        {
+          "start": 1171.747,
+          "end": 1176.166,
+          "text": "or work that the commission did this year\""
+        },
+        {
+          "start": 1176.166,
+          "end": 1186.109,
+          "text": "\"…nothing jumped out at me as a specific action or work they've done- that was worth calling out\""
+        },
+        {
+          "start": 1186.509,
+          "end": 1195.489,
+          "text": "\"…we're still sort of in a hangover from the immense scandal of the Peninsula Health Alliance,"
+        },
+        {
+          "start": 1195.489,
+          "end": 1204.47,
+          "text": "which really if we were a professional board, we would have just used performance improvement methodologies"
+        },
+        {
+          "start": 1204.47,
+          "end": 1211.766,
+          "text": "to figure out how the governance broke down, but we didn't do that.\""
+        },
+        {
+          "start": 1212.166,
+          "end": 1217.644,
+          "text": "I told her how it could have been done: one public meeting first, and then confidentiality,"
+        },
+        {
+          "start": 1217.644,
+          "end": 1221.068,
+          "text": "the way OMC had told the public it was doing."
+        },
+        {
+          "start": 1221.468,
+          "end": 1229.909,
+          "text": "From my recorded debrief: \"She said, uh- Thank you for sharing all that- She said, you"
+        },
+        {
+          "start": 1229.909,
+          "end": 1236.768,
+          "text": "know, the other members of the board have their own interpretation of events.\""
+        },
+        {
+          "start": 1237.668,
+          "end": 1245.555,
+          "text": "She asked whether I wanted the alliance raised at the retreat."
+        },
+        {
+          "start": 1245.555,
+          "end": 1257.027,
+          "text": "From my recorded debrief: \"I was like, I have no agenda, I have no uh- Preference"
+        },
+        {
+          "start": 1257.027,
+          "end": 1265.632,
+          "text": "I don't know what is good to do, but she's a facilitator."
+        },
+        {
+          "start": 1265.632,
+          "end": 1271.368,
+          "text": "Maybe she'll figure out something helpful to do\""
+        },
+        {
+          "start": 1271.768,
+          "end": 1277.54,
+          "text": "\"oh by the way, there is one thing I do want to check with-with you."
+        },
+        {
+          "start": 1277.54,
+          "end": 1281.003,
+          "text": "Are you aware of the email that was sent?\""
+        },
+        {
+          "start": 1281.003,
+          "end": 1282.543,
+          "text": "She said yes. Immediately."
+        },
+        {
+          "start": 1282.543,
+          "end": 1287.545,
+          "text": "She thought Bruce had sent it to her. She was vague about how."
+        },
+        {
+          "start": 1287.545,
+          "end": 1292.548,
+          "text": "She said none of the other commissioners had brought it up with her."
+        },
+        {
+          "start": 1292.948,
+          "end": 1303.978,
+          "text": "From my recorded debrief: \"He was making a joke is- what she said. Clearly, obviously.\""
+        },
+        {
+          "start": 1303.978,
+          "end": 1312.803,
+          "text": "\"I think she clearly said- It was inappropriate or disrespectful or something."
+        },
+        {
+          "start": 1312.803,
+          "end": 1319.421,
+          "text": "Um- Yeah, something like that. Definitely out of bounds.\""
+        },
+        {
+          "start": 1319.821,
+          "end": 1325.571,
+          "text": "It was the closest thing to a condemnation I'd heard from anyone in that circle."
+        },
+        {
+          "start": 1325.571,
+          "end": 1332.471,
+          "text": "To me, it also came with a ruling on what the words meant, before the retreat even started."
+        },
+        {
+          "start": 1333.371,
+          "end": 1342.135,
+          "text": "From my recorded debrief: \"Two days before the upcoming retreat in October that I'm having with"
+        },
+        {
+          "start": 1342.135,
+          "end": 1347.065,
+          "text": "Jefferson Healthcare, she is facilitating the OMC board retreat\""
+        },
+        {
+          "start": 1347.065,
+          "end": 1353.151,
+          "text": "The same facilitator, in both rooms of the alliance that never happened."
+        },
+        {
+          "start": 1353.551,
+          "end": 1363.441,
+          "text": "The Calendly invitation says: \"Thank you for attending Jefferson Pre-Retreat Interviews at 09:30am (Pacific Time -"
+        },
+        {
+          "start": 1363.441,
+          "end": 1368.386,
+          "text": "US & Canada) on Friday, September 25, 2026."
+        },
+        {
+          "start": 1368.386,
+          "end": 1373.331,
+          "text": "I really appreciate your time and thoughtful input.\""
+        },
+        {
+          "start": 1373.731,
+          "end": 1378.617,
+          "text": "She was the first person in that circle to call the email inappropriate."
+        },
+        {
+          "start": 1378.617,
+          "end": 1383.127,
+          "text": "She was also the first to tell me it was a joke."
+        },
+        {
+          "start": 1383.127,
+          "end": 1386.885,
+          "text": "Both of those were true in the same thirty minutes."
+        },
+        {
+          "start": 1387.785,
+          "end": 1393.8,
+          "text": "October 22, 2026. The Jefferson Healthcare board retreat."
+        },
+        {
+          "start": 1393.8,
+          "end": 1402.489,
+          "text": "I pretended to focus on my things, gathering my stuff like a shield."
+        },
+        {
+          "start": 1402.489,
+          "end": 1410.509,
+          "text": "An unidentified voice said: \"No, we don't have a Teams link today."
+        },
+        {
+          "start": 1410.509,
+          "end": 1415.188,
+          "text": "We're only in person and just us.\""
+        },
+        {
+          "start": 1415.588,
+          "end": 1423.63,
+          "text": "Usually our meetings are on Teams and I can get the recording right away. Not today."
+        },
+        {
+          "start": 1423.63,
+          "end": 1430.668,
+          "text": "Karma Bass said: \"I think we're coming up on our 10-year anniversary, you guys.\""
+        },
+        {
+          "start": 1430.668,
+          "end": 1433.181,
+          "text": "\"Today's meeting is for you.\""
+        },
+        {
+          "start": 1433.181,
+          "end": 1441.224,
+          "text": "\"That was kind of what I heard on Tuesday when I facilitated Olympic Medical Center's retreat.\""
+        },
+        {
+          "start": 1441.624,
+          "end": 1446.873,
+          "text": "Tuesday was October 20. Two days earlier, just as she'd told me."
+        },
+        {
+          "start": 1447.773,
+          "end": 1458.105,
+          "text": "The morning was Mike's HR-1 presentation, and serious work: federal cuts coming at rural hospitals."
+        },
+        {
+          "start": 1458.105,
+          "end": 1469.653,
+          "text": "The presenter's voice said: \"…we were distracted last year and this was a way, this was a North Star…\""
+        },
+        {
+          "start": 1470.053,
+          "end": 1478.686,
+          "text": "In my memory, the slide said \"last year we were distracted by silly nonsense.\" The words"
+        },
+        {
+          "start": 1478.686,
+          "end": 1483.002,
+          "text": "recorded on the audio are the ones above."
+        },
+        {
+          "start": 1483.002,
+          "end": 1486.779,
+          "text": "\"Distracted.\" I knew who the distraction was."
+        },
+        {
+          "start": 1486.779,
+          "end": 1493.253,
+          "text": "Afternoon was the Board Book: the rules we agree to play by."
+        },
+        {
+          "start": 1494.153,
+          "end": 1500.567,
+          "text": "The facilitator's voice said: \"So Matt, what's your perspective on this section?\""
+        },
+        {
+          "start": 1500.567,
+          "end": 1509.653,
+          "text": "I said: \"I mean, I don't really quite understand what the sentence at the end is saying.\""
+        },
+        {
+          "start": 1509.653,
+          "end": 1521.412,
+          "text": "The facilitator's voice said: \"…commissioners will direct news organizations, service clubs and other community organizations to the board chairperson or the CEO.\""
+        },
+        {
+          "start": 1521.812,
+          "end": 1533.321,
+          "text": "\"Because what we're doing is we're asking you to comply with something that is beyond what you are required to comply with."
+        },
+        {
+          "start": 1533.321,
+          "end": 1538.029,
+          "text": "You are all private citizens. You're independently elected officials."
+        },
+        {
+          "start": 1538.029,
+          "end": 1545.353,
+          "text": "You can say what you like, and there's no law that says you can't.\""
+        },
+        {
+          "start": 1545.753,
+          "end": 1554.556,
+          "text": "A commissioner said: \"…otherwise it's continually clean up on aisle six from these two guys…\""
+        },
+        {
+          "start": 1554.556,
+          "end": 1566.294,
+          "text": "A voice, probably Mike Glenn, said: \"…last year's discussion that was a huge distraction throughout that for the whole organization…\""
+        },
+        {
+          "start": 1567.194,
+          "end": 1572.768,
+          "text": "Karma Bass said: \"The idea that if the board has, takes a position that you voted"
+        },
+        {
+          "start": 1572.768,
+          "end": 1578.342,
+          "text": "against and you don't agree with, that the idea is that you remain silent on that."
+        },
+        {
+          "start": 1578.342,
+          "end": 1582.174,
+          "text": "That is the best practice that I would suggest to you.\""
+        },
+        {
+          "start": 1582.574,
+          "end": 1582.871,
+          "text": "\"Mr."
+        },
+        {
+          "start": 1582.871,
+          "end": 1588.517,
+          "text": "Ready, I know that this is not a position you necessarily agree with…would you like to share your point?\""
+        },
+        {
+          "start": 1588.517,
+          "end": 1594.163,
+          "text": "I said: \"…the health alliance, we didn't even get to the decision, we didn't even get to a point…\""
+        },
+        {
+          "start": 1594.163,
+          "end": 1597.729,
+          "text": "Karma Bass said: \"Are you willing to share your point of view?\""
+        },
+        {
+          "start": 1598.129,
+          "end": 1603.076,
+          "text": "Mike Glenn said: \"At some risk in saying this, I don't see the distinction."
+        },
+        {
+          "start": 1603.076,
+          "end": 1609.789,
+          "text": "You can rationalize it was okay for Peninsula Health Alliance, but you get it where it's not okay elsewhere.\""
+        },
+        {
+          "start": 1609.789,
+          "end": 1614.383,
+          "text": "I said: \"I didn't just tell the press. I reported to the police.\""
+        },
+        {
+          "start": 1614.783,
+          "end": 1618.033,
+          "text": "\"So it's like, what are you going to do if you think a crime is being committed?\""
+        },
+        {
+          "start": 1618.033,
+          "end": 1618.989,
+          "text": "\"You've got to report it.\""
+        },
+        {
+          "start": 1619.889,
+          "end": 1627.962,
+          "text": "A voice, best guess Bruce, said: \"Well, yeah, you were wrong, correct?\""
+        },
+        {
+          "start": 1627.962,
+          "end": 1640.071,
+          "text": "I said: \"The investigator said they didn't have criminal intent, which that was like a very fine line."
+        },
+        {
+          "start": 1640.071,
+          "end": 1650.162,
+          "text": "They said there was deception, there was, you know, they said it was likely OPMA.\""
+        },
+        {
+          "start": 1650.162,
+          "end": 1656.889,
+          "text": "Mike Glenn said: \"I spoke with the sheriff, the prosecutor.\""
+        },
+        {
+          "start": 1657.289,
+          "end": 1665.907,
+          "text": "\"…possibly had that been handled in a manner more consistent with the box that we're trying"
+        },
+        {
+          "start": 1665.907,
+          "end": 1671.832,
+          "text": "to put around this, you could have had your concerns satisfied."
+        },
+        {
+          "start": 1671.832,
+          "end": 1680.989,
+          "text": "because I think that the board brought in two different sets of counsel to figure this out…\""
+        },
+        {
+          "start": 1681.389,
+          "end": 1690.874,
+          "text": "I said: \"Oscar and the state auditor said the February 3rd meeting violated the OPMA."
+        },
+        {
+          "start": 1690.874,
+          "end": 1696.566,
+          "text": "I don't know why you guys are blaming me.\""
+        },
+        {
+          "start": 1696.566,
+          "end": 1702.889,
+          "text": "(The audio says \"February 3rd.\" The meeting was February 5.)"
+        },
+        {
+          "start": 1703.289,
+          "end": 1713.778,
+          "text": "I said: \"There should be a process where you can discuss this thing and you shouldn't"
+        },
+        {
+          "start": 1713.778,
+          "end": 1719.022,
+          "text": "be in a position blown up like this."
+        },
+        {
+          "start": 1719.022,
+          "end": 1726.889,
+          "text": "What is the correct process? We need to know what that is.\""
+        },
+        {
+          "start": 1727.289,
+          "end": 1739.585,
+          "text": "Mike Glenn said: \"My point is, it seems to me that the process you took was the incorrect process."
+        },
+        {
+          "start": 1739.585,
+          "end": 1742.174,
+          "text": "You created the situation.\""
+        },
+        {
+          "start": 1743.074,
+          "end": 1755.698,
+          "text": "I said: \"You put us in an executive session to talk about this massive merger on the premise of real estate."
+        },
+        {
+          "start": 1755.698,
+          "end": 1759.905,
+          "text": "That was a mistake. Don't you agree?\""
+        },
+        {
+          "start": 1759.905,
+          "end": 1763.512,
+          "text": "\"All we needed was one vote."
+        },
+        {
+          "start": 1763.512,
+          "end": 1774.933,
+          "text": "One vote publicly to say, hey, we're going to respond to this RFP and we're going to be confidential.\""
+        },
+        {
+          "start": 1775.333,
+          "end": 1782.787,
+          "text": "Mike Glenn said: \"Well, that we, I agree that we stepped outside of the permissible boundaries"
+        },
+        {
+          "start": 1782.787,
+          "end": 1786.514,
+          "text": "of an executive session related to real estate."
+        },
+        {
+          "start": 1786.514,
+          "end": 1792.104,
+          "text": "But it was, one auditor told me it was a speeding ticket.\""
+        },
+        {
+          "start": 1792.504,
+          "end": 1802.878,
+          "text": "That night, I remembered him calling it \"a minor blip.\" The audio says \"a speeding ticket,\" attributed to an auditor."
+        },
+        {
+          "start": 1802.878,
+          "end": 1809.103,
+          "text": "Mike Glenn said: \"And we got to the end of that, Matt."
+        },
+        {
+          "start": 1809.103,
+          "end": 1816.884,
+          "text": "And it wasn't cited as something other than you stepped outside the lines, do better.\""
+        },
+        {
+          "start": 1817.284,
+          "end": 1822.14,
+          "text": "\"But I think the way the way that issue was dealt with, because I don't think"
+        },
+        {
+          "start": 1822.14,
+          "end": 1824.871,
+          "text": "you appreciate all of the organizational implications of it."
+        },
+        {
+          "start": 1824.871,
+          "end": 1826.085,
+          "text": "I know you don't.\""
+        },
+        {
+          "start": 1826.985,
+          "end": 1834.597,
+          "text": "Karma Bass said: \"Matt, I want to give you an opportunity if there's anything more you"
+        },
+        {
+          "start": 1834.597,
+          "end": 1842.209,
+          "text": "want to say before we take a break, because Mike has just said a lot, and"
+        },
+        {
+          "start": 1842.209,
+          "end": 1846.015,
+          "text": "I know you hold different opinions about this."
+        },
+        {
+          "start": 1846.015,
+          "end": 1848.394,
+          "text": "I want to recognize that.\""
+        },
+        {
+          "start": 1848.794,
+          "end": 1852.719,
+          "text": "Mike Glenn said: \"You and I have never really talked about it.\""
+        },
+        {
+          "start": 1852.719,
+          "end": 1857.954,
+          "text": "In 2023 I said we hadn't had a one-on-one in six years. He wasn't wrong."
+        },
+        {
+          "start": 1858.354,
+          "end": 1863.052,
+          "text": "I said: \"I mean, seven is more than five. That's what I have to say."
+        },
+        {
+          "start": 1863.052,
+          "end": 1868.063,
+          "text": "And that you guys all spent a year saying that seven is equal to five is"
+        },
+        {
+          "start": 1868.063,
+          "end": 1870.256,
+          "text": "the most ridiculous thing in the world.\""
+        },
+        {
+          "start": 1870.656,
+          "end": 1880.703,
+          "text": "A voice, best guess Kees, said: \"And you got, and you got that chart, and you"
+        },
+        {
+          "start": 1880.703,
+          "end": 1885.726,
+          "text": "know it, and you never commented on it.\""
+        },
+        {
+          "start": 1885.726,
+          "end": 1895.773,
+          "text": "I said: \"…wouldn't it have been nice if you had written that in the proposal so"
+        },
+        {
+          "start": 1895.773,
+          "end": 1903.936,
+          "text": "that we didn't have spent a year arguing about whether 7 equals 5…\""
+        },
+        {
+          "start": 1904.336,
+          "end": 1912.532,
+          "text": "Mike Glenn said: \"You know why it wasn't an issue with Olympic Medical Center?"
+        },
+        {
+          "start": 1912.532,
+          "end": 1917.801,
+          "text": "Because during our presentation, we spoke to that explicitly\""
+        },
+        {
+          "start": 1917.801,
+          "end": 1924.826,
+          "text": "I said, as a best guess: \"I was not at that presentation.\""
+        },
+        {
+          "start": 1925.726,
+          "end": 1935.604,
+          "text": "Mike Glenn said: \"Oh, I know, but how many times have I told you that it would be proportional?\""
+        },
+        {
+          "start": 1935.604,
+          "end": 1940.802,
+          "text": "I said: \"Why didn't you write it in the proposal?\""
+        },
+        {
+          "start": 1941.202,
+          "end": 1946.898,
+          "text": "\"…if you hand it a paper, it's nice to put the information you need there and"
+        },
+        {
+          "start": 1946.898,
+          "end": 1951.169,
+          "text": "not be like, I would have, we would have fixed it later."
+        },
+        {
+          "start": 1951.169,
+          "end": 1955.441,
+          "text": "We had all these off-the-record conversations where we would have fixed it.\""
+        },
+        {
+          "start": 1955.841,
+          "end": 1968.873,
+          "text": "Karma Bass said: \"So, I want to, I think you're getting to the point of unproductive conversation, because these are positions you\""
+        },
+        {
+          "start": 1968.873,
+          "end": 1979.535,
+          "text": "Mike Glenn said: \"Well, no, I'm glad you did, but you are, that you are just wrong there."
+        },
+        {
+          "start": 1979.535,
+          "end": 1981.312,
+          "text": "You are wrong.\""
+        },
+        {
+          "start": 1981.312,
+          "end": 1988.421,
+          "text": "I said, as a best guess: \"So it is equal to five?\""
+        },
+        {
+          "start": 1989.321,
+          "end": 1997.469,
+          "text": "Mike Glenn said: \"…the way the proposal was it was silent to that…\""
+        },
+        {
+          "start": 1997.469,
+          "end": 2007.499,
+          "text": "\"…I even talked with Karma about it like it would be it was like their board"
+        },
+        {
+          "start": 2007.499,
+          "end": 2015.021,
+          "text": "is seven our board is five but there would be proportional representation…\""
+        },
+        {
+          "start": 2015.421,
+          "end": 2017.086,
+          "text": "There it is."
+        },
+        {
+          "start": 2017.086,
+          "end": 2026.526,
+          "text": "Her name, inside the Peninsula Health Alliance story, on the public audio, in the CEO's own words."
+        },
+        {
+          "start": 2026.526,
+          "end": 2033.744,
+          "text": "Mike Glenn said: \"…there would be equal board representation in terms of voice."
+        },
+        {
+          "start": 2033.744,
+          "end": 2036.521,
+          "text": "And then it was advisory.\""
+        },
+        {
+          "start": 2036.921,
+          "end": 2044.1,
+          "text": "\"…I will take a lie detector test because you've asked me to do that on a"
+        },
+        {
+          "start": 2044.1,
+          "end": 2051.279,
+          "text": "couple of occasions, that that was never the intent, and we spoke about it to this"
+        },
+        {
+          "start": 2051.279,
+          "end": 2058.009,
+          "text": "group multiple times, and more importantly, to Juniper and to Olympic Medical Center board members.\""
+        },
+        {
+          "start": 2058.409,
+          "end": 2063.248,
+          "text": "\"So please, you want to kick the shit out of me in these other areas?"
+        },
+        {
+          "start": 2063.248,
+          "end": 2066.796,
+          "text": "Fine, do it. But not that. Because I'm not that stupid.\""
+        },
+        {
+          "start": 2067.196,
+          "end": 2078.63,
+          "text": "To me, that was a description of an agreement made in conversations that were never written into the proposal the public saw."
+        },
+        {
+          "start": 2078.63,
+          "end": 2083.827,
+          "text": "Mike calls it intent. I call it seven and five."
+        },
+        {
+          "start": 2083.827,
+          "end": 2094.222,
+          "text": "And in his telling, the facilitator in front of us was one of the people he'd talked it through with."
+        },
+        {
+          "start": 2095.122,
+          "end": 2102.688,
+          "text": "Karma Bass said: \"I think we need to stop. We're going to take a break."
+        },
+        {
+          "start": 2102.688,
+          "end": 2109.75,
+          "text": "We're going to take a 15-minute break. We're going to come back at 2.30.\""
+        },
+        {
+          "start": 2109.75,
+          "end": 2112.675,
+          "text": "\"…and I know this is hard."
+        },
+        {
+          "start": 2112.675,
+          "end": 2119.502,
+          "text": "I know it feels bumpy, but I hope that there could be some healing.\""
+        },
+        {
+          "start": 2119.902,
+          "end": 2128.955,
+          "text": "Mike Glenn said: \"My apologies for getting emotional and profane, but I needed to say that"
+        },
+        {
+          "start": 2128.955,
+          "end": 2132.915,
+          "text": "to you, and I'm, I've said it."
+        },
+        {
+          "start": 2132.915,
+          "end": 2134.612,
+          "text": "Thank you, gentlemen.\""
+        },
+        {
+          "start": 2134.612,
+          "end": 2141.402,
+          "text": "He apologized. I didn't answer. I'm noting that here because it's true."
+        },
+        {
+          "start": 2141.802,
+          "end": 2149.888,
+          "text": "Karma Bass said: \"I think if more people in this country were willing to sit across"
+        },
+        {
+          "start": 2149.888,
+          "end": 2158.985,
+          "text": "the table from folks that they had very strong disagreements with, we would be in a better place.\""
+        },
+        {
+          "start": 2158.985,
+          "end": 2166.06,
+          "text": "Karma came over and thanked me for staying calm and staying in the room."
+        },
+        {
+          "start": 2166.06,
+          "end": 2169.598,
+          "text": "I told her it was my job."
+        },
+        {
+          "start": 2169.998,
+          "end": 2176.898,
+          "text": "I also told her that what other people do isn't her responsibility."
+        },
+        {
+          "start": 2177.798,
+          "end": 2185.915,
+          "text": "At checkout I said that having more time is good, because it gives you more chances to communicate."
+        },
+        {
+          "start": 2185.915,
+          "end": 2191.778,
+          "text": "As soon as we were dismissed, I grabbed my stuff and walked out."
+        },
+        {
+          "start": 2191.778,
+          "end": 2194.484,
+          "text": "I said: \"thanks again, good job\""
+        },
+        {
+          "start": 2194.484,
+          "end": 2200.798,
+          "text": "…or something like that. That's what I said to her on the way out."
+        },
+        {
+          "start": 2201.198,
+          "end": 2203.447,
+          "text": "But I know what happened."
+        },
+        {
+          "start": 2203.447,
+          "end": 2210.644,
+          "text": "And it was cathartic to sit in a room where it's up to them how much"
+        },
+        {
+          "start": 2210.644,
+          "end": 2215.592,
+          "text": "of this they want to get into on the record again."
+        },
+        {
+          "start": 2215.592,
+          "end": 2221.89,
+          "text": "The recording wasn't on Teams. I didn't know when, or whether, I'd hear it."
+        },
+        {
+          "start": 2222.79,
+          "end": 2226.633,
+          "text": "In November the district posted the retreat audio."
+        },
+        {
+          "start": 2226.633,
+          "end": 2231.436,
+          "text": "Every word I've quoted from October 22 comes from it."
+        },
+        {
+          "start": 2231.436,
+          "end": 2237.2,
+          "text": "Whatever I suspected about the new recording method, they did release it."
+        },
+        {
+          "start": 2237.6,
+          "end": 2246.253,
+          "text": "The summary says: \"The discussion focused on Commissioner compensation and expenses…, contact with news organizations and"
+        },
+        {
+          "start": 2246.253,
+          "end": 2252.743,
+          "text": "other community organizations, the mission and vision review, and the Grievance Committee.\""
+        },
+        {
+          "start": 2252.743,
+          "end": 2258.151,
+          "text": "Three pages. The words \"Peninsula Health Alliance\" aren't in them."
+        },
+        {
+          "start": 2258.151,
+          "end": 2264.1,
+          "text": "The longest argument of the day is \"contact with news organizations.\""
+        },
+        {
+          "start": 2264.5,
+          "end": 2271.98,
+          "text": "An evaluation comment says: \"Thank you Karma! Great facilitating during some contentious discussions!!\""
+        },
+        {
+          "start": 2271.98,
+          "end": 2281.761,
+          "text": "\"Karma always does an excellent job in keeping us on track and keeping the boxing gloves off\""
+        },
+        {
+          "start": 2281.761,
+          "end": 2288.09,
+          "text": "I don't see anything false in her summary. It's also smooth."
+        },
+        {
+          "start": 2288.09,
+          "end": 2293.844,
+          "text": "To me, that's the whole job and the whole problem."
+        },
+        {
+          "start": 2294.744,
+          "end": 2304.304,
+          "text": "Here's the case against her. Every point is my opinion, built on the record above."
+        },
+        {
+          "start": 2304.304,
+          "end": 2314.83,
+          "text": "In 2023, when I used the word \"fraud,\" she asked if I was an attorney and"
+        },
+        {
+          "start": 2314.83,
+          "end": 2324.699,
+          "text": "steered us toward \"complete.\" I read that as protecting the room, not finding the truth."
+        },
+        {
+          "start": 2325.099,
+          "end": 2333.7,
+          "text": "Her firm's survey went out \"On behalf of Chair Buhler Rienstra and CEO Glenn\" , the"
+        },
+        {
+          "start": 2333.7,
+          "end": 2338.539,
+          "text": "same leadership whose conduct I had reported to authorities."
+        },
+        {
+          "start": 2338.539,
+          "end": 2341.764,
+          "text": "She already had the fishes email."
+        },
+        {
+          "start": 2341.764,
+          "end": 2351.979,
+          "text": "She called it a joke before the retreat, and nobody else on the board had raised it with her."
+        },
+        {
+          "start": 2352.379,
+          "end": 2357.287,
+          "text": "She facilitated both boards of the alliance-that-wasn't, two days apart."
+        },
+        {
+          "start": 2357.287,
+          "end": 2363.668,
+          "text": "Mike says he \"even talked with Karma about it\" , meaning the seven-and-five."
+        },
+        {
+          "start": 2363.668,
+          "end": 2367.595,
+          "text": "Her summary doesn't mention the alliance at all."
+        },
+        {
+          "start": 2368.495,
+          "end": 2370.368,
+          "text": "Now the other side."
+        },
+        {
+          "start": 2370.368,
+          "end": 2376.453,
+          "text": "This is also on the record, and I owe it the same weight."
+        },
+        {
+          "start": 2376.453,
+          "end": 2382.305,
+          "text": "In 2019 she told the chair: don't rule him out of order."
+        },
+        {
+          "start": 2382.305,
+          "end": 2388.157,
+          "text": "She said a recording \"needs to be made available to the public.\""
+        },
+        {
+          "start": 2388.157,
+          "end": 2393.775,
+          "text": "She said, \"I'm not saying you're wrong,\" and acknowledged seven unresolved years."
+        },
+        {
+          "start": 2394.175,
+          "end": 2399.238,
+          "text": "The board's lawyers and MRSC told them her one-on-one calls were legal."
+        },
+        {
+          "start": 2399.238,
+          "end": 2402.614,
+          "text": "The serial-meeting claim was never decided against her."
+        },
+        {
+          "start": 2402.614,
+          "end": 2410.631,
+          "text": "She was the first person in that circle to tell me the email was inappropriate and out of bounds."
+        },
+        {
+          "start": 2411.031,
+          "end": 2415.244,
+          "text": "She gave me the floor twice. She called the break when it turned ugly."
+        },
+        {
+          "start": 2415.244,
+          "end": 2420.359,
+          "text": "She told a boardroom, in effect, that we're private citizens and no law stops us from speaking."
+        },
+        {
+          "start": 2420.359,
+          "end": 2421.863,
+          "text": "She thanked me for staying."
+        },
+        {
+          "start": 2422.263,
+          "end": 2426.459,
+          "text": "A facilitator is paid by the institution. That doesn't make her evil."
+        },
+        {
+          "start": 2426.459,
+          "end": 2431.355,
+          "text": "It makes her a facilitator. The question is what she does with the room."
+        },
+        {
+          "start": 2432.255,
+          "end": 2436.304,
+          "text": "Chelan, Campbell's Resort — as Matt remembers it."
+        },
+        {
+          "start": 2436.304,
+          "end": 2440.353,
+          "text": "There is an annual conference in Chelan, Washington…"
+        },
+        {
+          "start": 2440.353,
+          "end": 2450.476,
+          "text": "Hospital commissioners, CEOs, and many employees of hospitals, and many vendors and other corporations all participate at the Campbell's Resort."
+        },
+        {
+          "start": 2450.876,
+          "end": 2458.894,
+          "text": "My first year in Chelan, I walked around to every public hospital commissioner I could find,"
+        },
+        {
+          "start": 2458.894,
+          "end": 2467.413,
+          "text": "every table in the events, and invited every public hospital commissioner to come and meet with me…"
+        },
+        {
+          "start": 2467.413,
+          "end": 2468.917,
+          "text": "on Sunday morning."
+        },
+        {
+          "start": 2468.917,
+          "end": 2476.935,
+          "text": "I went around recruiting every public hospital commissioner to meet to talk about single-payer health care."
+        },
+        {
+          "start": 2477.335,
+          "end": 2483.498,
+          "text": "I did not invite my commissioners from Jefferson Healthcare… I didn't trust them."
+        },
+        {
+          "start": 2483.498,
+          "end": 2490.135,
+          "text": "I didn't want to talk to them… I wanted to talk to other people."
+        },
+        {
+          "start": 2491.035,
+          "end": 2493.936,
+          "text": "Chelan, Campbell's Resort — as Matt remembers it."
+        },
+        {
+          "start": 2493.936,
+          "end": 2496.112,
+          "text": "Then there's a barbecue on Saturday."
+        },
+        {
+          "start": 2496.112,
+          "end": 2502.277,
+          "text": "And I sit down to eat and to break bread with my fellow commissioners and their families."
+        },
+        {
+          "start": 2502.277,
+          "end": 2506.266,
+          "text": "Jill Buhler said: \"Matt, I need to ask you about something.\""
+        },
+        {
+          "start": 2506.666,
+          "end": 2514.453,
+          "text": "\"Are you organizing some sort of meetup for public hospital commissioners to discuss single-payer health care?\""
+        },
+        {
+          "start": 2514.453,
+          "end": 2520.78,
+          "text": "I said: \"Well, yes. In fact, I am. Would you like to attend?\""
+        },
+        {
+          "start": 2520.78,
+          "end": 2528.566,
+          "text": "Jill Buhler said: \"I just have to say, it was very embarrassing and weird that you"
+        },
+        {
+          "start": 2528.566,
+          "end": 2532.946,
+          "text": "did not invite me or us to this event.\""
+        },
+        {
+          "start": 2533.346,
+          "end": 2536.347,
+          "text": "I said: \"You're right, Jill. It was cowardly."
+        },
+        {
+          "start": 2536.347,
+          "end": 2543.099,
+          "text": "I was afraid to tell you guys because I thought you would tell me not to do it…"
+        },
+        {
+          "start": 2543.099,
+          "end": 2545.725,
+          "text": "You're all welcome to attend. It's tomorrow.\""
+        },
+        {
+          "start": 2545.725,
+          "end": 2548.725,
+          "text": "And in fact, Tony and Marie did attend."
+        },
+        {
+          "start": 2549.625,
+          "end": 2554.702,
+          "text": "Chelan, Campbell's Resort — as Matt remembers it."
+        },
+        {
+          "start": 2554.702,
+          "end": 2564.221,
+          "text": "But let us back up. This is how I tell it now, as a cross-examination."
+        },
+        {
+          "start": 2564.221,
+          "end": 2568.664,
+          "text": "It's my retelling, not a recorded exchange."
+        },
+        {
+          "start": 2568.664,
+          "end": 2578.818,
+          "text": "I said: \"One point, Miss Buhler. How did you find out about this, this secret meeting?…"
+        },
+        {
+          "start": 2578.818,
+          "end": 2582.625,
+          "text": "Where did you find this out?\""
+        },
+        {
+          "start": 2583.025,
+          "end": 2584.518,
+          "text": "\"Is it not true…"
+        },
+        {
+          "start": 2584.518,
+          "end": 2592.356,
+          "text": "Commissioner Buhler, that you were in fact in a hot tub at the Campbell's resort with a group of other people?\""
+        },
+        {
+          "start": 2592.756,
+          "end": 2601.325,
+          "text": "That is when she introduced herself as a commissioner from Jefferson Healthcare, in her bathing suit, in the hot tub."
+        },
+        {
+          "start": 2601.325,
+          "end": 2606.038,
+          "text": "And a commissioner from another district said: you must know Matt."
+        },
+        {
+          "start": 2606.038,
+          "end": 2611.608,
+          "text": "I said: \"My point is just that it all happens in hot tubs.\""
+        },
+        {
+          "start": 2611.608,
+          "end": 2615.036,
+          "text": "Hot tubs is where all the action is."
+        },
+        {
+          "start": 2615.936,
+          "end": 2622.115,
+          "text": "Chelan, Matt's first or second conference — as Matt remembers it."
+        },
+        {
+          "start": 2622.115,
+          "end": 2633.575,
+          "text": "At my first or second conference, my wife and I found ourselves in a hot tub with Karma."
+        },
+        {
+          "start": 2633.575,
+          "end": 2641.216,
+          "text": "We discussed the recording controversy, and got into its deep philosophical depths."
+        },
+        {
+          "start": 2641.616,
+          "end": 2646.703,
+          "text": "My wife very quickly perceived Karma as evil."
+        },
+        {
+          "start": 2646.703,
+          "end": 2654.335,
+          "text": "She dismissed my concerns and points easily, seemingly without any moral soul."
+        },
+        {
+          "start": 2654.735,
+          "end": 2662.586,
+          "text": "Little did I know this conversation would give Karma deep philosophical insight that she would use"
+        },
+        {
+          "start": 2662.586,
+          "end": 2670.437,
+          "text": "over the next 12 years, making hundreds of thousands of dollars fighting on behalf of corporate"
+        },
+        {
+          "start": 2670.437,
+          "end": 2675.835,
+          "text": "autocracy and against democratic governance and the primacy of the constitutions."
+        },
+        {
+          "start": 2676.735,
+          "end": 2681.007,
+          "text": "Matt Ready sits on 11/17/2026 writing this book."
+        },
+        {
+          "start": 2681.007,
+          "end": 2688.387,
+          "text": "Tomorrow at 8:30 am I sit on the phone again with Karma Bass for another 30-minute unrecorded interview."
+        },
+        {
+          "start": 2688.387,
+          "end": 2692.66,
+          "text": "This time the topic is the upcoming evaluation of Mike Glenn."
+        },
+        {
+          "start": 2692.66,
+          "end": 2695.768,
+          "text": "I'm thinking about what to say to her."
+        },
+        {
+          "start": 2695.768,
+          "end": 2698.098,
+          "text": "And the question comes up again."
+        },
+        {
+          "start": 2698.498,
+          "end": 2700.397,
+          "text": "Is Karma evil?"
+        },
+        {
+          "start": 2700.397,
+          "end": 2709.255,
+          "text": "Or is she a reasonable person to talk to tomorrow, for thirty minutes, unrecorded?"
+        },
+        {
+          "start": 2709.255,
+          "end": 2718.747,
+          "text": "What do I say now about the Peninsula Health Alliance? About that entire retreat conversation?"
+        },
+        {
+          "start": 2718.747,
+          "end": 2721.278,
+          "text": "8:30 comes early."
+        },
+        {
+          "start": 2722.178,
+          "end": 2726.578,
+          "text": "My books so far. And this one."
+        }
+      ],
+      "text_book_id": "karma-script",
+      "links": {
+        "drive_video": "https://drive.google.com/file/d/1zSpfcioam_GhzlJMydctaPMXhz10JKrN/view?usp=drivesdk",
+        "box": "/workspace/karma-gn/reading/Karma_Matt_Ready_reads_aloud.mp3"
+      },
+      "notes": "Drive has the landscape video (not a separate MP3). Sharing was not changed.",
+      "audio_file": "karma-64k-mono.mp3",
+      "audio_url": "/audio/audiobooks/karma-64k-mono.mp3"
+    },
+    {
+      "id": "which-has-more",
+      "title": "Which Has More?",
+      "subtitle": "A counting book",
+      "kind": "Picture book · cloned-voice read-aloud",
+      "mode": "audio",
+      "status": "Finished cloned-voice narration of the 42-page book. Glenn-satire sketch not included.",
+      "duration": 338.887,
+      "duration_label": "5:39",
+      "audio_id": "which-has-more",
+      "chapters": [
+        {
+          "id": "w-01",
+          "title": "Which Has More? A counting book. by Matt Ready",
+          "start": 0.4
+        },
+        {
+          "id": "w-02",
+          "title": "Here are seven apples. Here are five apples. Which has more?",
+          "start": 6.4
+        },
+        {
+          "id": "w-03",
+          "title": "“Seven,” said the child. “They are the same,” said Mr. Committee.",
+          "start": 13.6
+        },
+        {
+          "id": "w-04",
+          "title": "Here are seven pears. Here are five pears. Which has more?",
+          "start": 20.8
+        },
+        {
+          "id": "w-05",
+          "title": "“These five are taller,” said Mr. Committee. Which has more?",
+          "start": 28.285
+        },
+        {
+          "id": "w-06",
+          "title": "Here are seven ducks. Here are five ducks. Which has more?",
+          "start": 35.885
+        },
+        {
+          "id": "w-07",
+          "title": "“They all float equally,” said Mr. Committee. The child kept counting.",
+          "start": 43.085
+        },
+        {
+          "id": "w-08",
+          "title": "Here are seven cupcakes. Here are five cupcakes. Which has more?",
+          "start": 52.785
+        },
+        {
+          "id": "w-09",
+          "title": "“These five have been approved,” said Mr. Committee. Which has more?",
+          "start": 60.197
+        },
+        {
+          "id": "w-10",
+          "title": "Here are seven balloons. Here are five balloons. Which has more?",
+          "start": 69.077
+        },
+        {
+          "id": "w-11",
+          "title": "“Mine are higher,” said Mr. Committee. “Higher is not more,” said the child.",
+          "start": 75.857
+        },
+        {
+          "id": "w-12",
+          "title": "Here are seven fish. Here are five fish. Which has more?",
+          "start": 85.157
+        },
+        {
+          "id": "w-13",
+          "title": "“If we don’t look too closely,” said Mr. Committee, “they even out.”",
+          "start": 91.912
+        },
+        {
+          "id": "w-14",
+          "title": "Here are seven birds. Here are five birds. Which has more?",
+          "start": 98.784
+        },
+        {
+          "id": "w-15",
+          "title": "Here are seven socks. Here are five socks. Which has more?",
+          "start": 107.275
+        },
+        {
+          "id": "w-16",
+          "title": "Here are seven books. Here are five books. Which has more?",
+          "start": 114.033
+        },
+        {
+          "id": "w-17",
+          "title": "“A shorter shelf is tidier,” said Mr. Committee. Which shelf has more books?",
+          "start": 122.327
+        },
+        {
+          "id": "w-18",
+          "title": "Here are seven kites. Here are five kites. Which has more?",
+          "start": 131.627
+        },
+        {
+          "id": "w-19",
+          "title": "Here are seven ferries. Here are five ferries. Which has more?",
+          "start": 138.344
+        },
+        {
+          "id": "w-20",
+          "title": "“They all go to the same place,” said Mr. Committee.",
+          "start": 147.224
+        },
+        {
+          "id": "w-21",
+          "title": "“That is not the question,” said the child.",
+          "start": 152.502
+        },
+        {
+          "id": "w-22",
+          "title": "Here are seven top hats. Here are five top hats. Which has more?",
+          "start": 157.424
+        },
+        {
+          "id": "w-23",
+          "title": "Here are seven stars. Here are five stars. Which has more?",
+          "start": 169.204
+        },
+        {
+          "id": "w-24",
+          "title": "“The night is the night,” said Mr. Committee. “Leave it open,” said the child.",
+          "start": 175.984
+        },
+        {
+          "id": "w-25",
+          "title": "Here are seven flowers. Here are five flowers. Which has more?",
+          "start": 182.096
+        },
+        {
+          "id": "w-26",
+          "title": "Here are seven butterflies. Here are five butterflies. Which has more?",
+          "start": 189.643
+        },
+        {
+          "id": "w-27",
+          "title": "Here are seven cones. Here are five cones. Which has more?",
+          "start": 197.058
+        },
+        {
+          "id": "w-28",
+          "title": "“These five are deluxe,” said Mr. Committee. “Deluxe is not more,” said the chil",
+          "start": 203.815
+        },
+        {
+          "id": "w-29",
+          "title": "Here are seven umbrellas. Here are five umbrellas. Which has more?",
+          "start": 212.718
+        },
+        {
+          "id": "w-30",
+          "title": "Here are seven cats. Here are five cats. Which has more?",
+          "start": 219.498
+        },
+        {
+          "id": "w-31",
+          "title": "Here are seven candles. Here are five candles. Which cake has more?",
+          "start": 226.698
+        },
+        {
+          "id": "w-32",
+          "title": "Here are seven keys. Here are five keys. Which has more?",
+          "start": 234.298
+        },
+        {
+          "id": "w-33",
+          "title": "Here are seven recorders. Here are five recorders. Which has more?",
+          "start": 242.889
+        },
+        {
+          "id": "w-34",
+          "title": "Here are seven tickets. Here are five tickets. Which jar has more?",
+          "start": 250.489
+        },
+        {
+          "id": "w-35",
+          "title": "“We will call them even,” said Mr. Committee. “We will not,” said the child.",
+          "start": 257.689
+        },
+        {
+          "id": "w-36",
+          "title": "Here are seven rubber ducks. Here are five rubber ducks. Which has more?",
+          "start": 264.47
+        },
+        {
+          "id": "w-37",
+          "title": "Here are seven frogs. Here are five frogs. Which has more?",
+          "start": 274.148
+        },
+        {
+          "id": "w-38",
+          "title": "“One, two, three, four, five, six, seven,” said the child.",
+          "start": 281.249
+        },
+        {
+          "id": "w-39",
+          "title": "“And over here: one, two, three, four, five.”",
+          "start": 287.53
+        },
+        {
+          "id": "w-40",
+          "title": "“If I do not see them,” said Mr. Committee, “they may still be equal.”",
+          "start": 293.254
+        },
+        {
+          "id": "w-41",
+          "title": "The tall man set them out and said nothing at all. Which has more?",
+          "start": 302.134
+        },
+        {
+          "id": "w-42",
+          "title": "The whole town counted. “Seven,” they said. “Five,” whispered Mr. Committee.",
+          "start": 313.191
+        },
+        {
+          "id": "w-43",
+          "title": "Mr. Committee looked. He looked again. “Oh,” he said.",
+          "start": 321.391
+        },
+        {
+          "id": "w-44",
+          "title": "Seven is more than five. It always was.",
+          "start": 328.771
+        }
+      ],
+      "cues": [
+        {
+          "start": 0.4,
+          "end": 5.7,
+          "text": "Which Has More? A counting book. by Matt Ready"
+        },
+        {
+          "start": 6.4,
+          "end": 12.9,
+          "text": "Here are seven apples. Here are five apples. Which has more?"
+        },
+        {
+          "start": 13.6,
+          "end": 20.1,
+          "text": "“Seven,” said the child. “They are the same,” said Mr. Committee."
+        },
+        {
+          "start": 20.8,
+          "end": 27.585,
+          "text": "Here are seven pears. Here are five pears. Which has more?"
+        },
+        {
+          "start": 28.285,
+          "end": 35.185,
+          "text": "“These five are taller,” said Mr. Committee. Which has more?"
+        },
+        {
+          "start": 35.885,
+          "end": 42.385,
+          "text": "Here are seven ducks. Here are five ducks. Which has more?"
+        },
+        {
+          "start": 43.085,
+          "end": 52.085,
+          "text": "“They all float equally,” said Mr. Committee. The child kept counting."
+        },
+        {
+          "start": 52.785,
+          "end": 59.497,
+          "text": "Here are seven cupcakes. Here are five cupcakes. Which has more?"
+        },
+        {
+          "start": 60.197,
+          "end": 68.377,
+          "text": "“These five have been approved,” said Mr. Committee. Which has more?"
+        },
+        {
+          "start": 69.077,
+          "end": 75.157,
+          "text": "Here are seven balloons. Here are five balloons. Which has more?"
+        },
+        {
+          "start": 75.857,
+          "end": 84.457,
+          "text": "“Mine are higher,” said Mr. Committee. “Higher is not more,” said the child."
+        },
+        {
+          "start": 85.157,
+          "end": 91.212,
+          "text": "Here are seven fish. Here are five fish. Which has more?"
+        },
+        {
+          "start": 91.912,
+          "end": 98.084,
+          "text": "“If we don’t look too closely,” said Mr. Committee, “they even out.”"
+        },
+        {
+          "start": 98.784,
+          "end": 106.575,
+          "text": "Here are seven birds. Here are five birds. Which has more?"
+        },
+        {
+          "start": 107.275,
+          "end": 113.333,
+          "text": "Here are seven socks. Here are five socks. Which has more?"
+        },
+        {
+          "start": 114.033,
+          "end": 121.627,
+          "text": "Here are seven books. Here are five books. Which has more?"
+        },
+        {
+          "start": 122.327,
+          "end": 130.927,
+          "text": "“A shorter shelf is tidier,” said Mr. Committee. Which shelf has more books?"
+        },
+        {
+          "start": 131.627,
+          "end": 137.644,
+          "text": "Here are seven kites. Here are five kites. Which has more?"
+        },
+        {
+          "start": 138.344,
+          "end": 146.524,
+          "text": "Here are seven ferries. Here are five ferries. Which has more?"
+        },
+        {
+          "start": 147.224,
+          "end": 152.502,
+          "text": "“They all go to the same place,” said Mr. Committee."
+        },
+        {
+          "start": 152.502,
+          "end": 156.724,
+          "text": "“That is not the question,” said the child."
+        },
+        {
+          "start": 157.424,
+          "end": 168.504,
+          "text": "Here are seven top hats. Here are five top hats. Which has more?"
+        },
+        {
+          "start": 169.204,
+          "end": 175.284,
+          "text": "Here are seven stars. Here are five stars. Which has more?"
+        },
+        {
+          "start": 175.984,
+          "end": 181.396,
+          "text": "“The night is the night,” said Mr. Committee. “Leave it open,” said the child."
+        },
+        {
+          "start": 182.096,
+          "end": 188.943,
+          "text": "Here are seven flowers. Here are five flowers. Which has more?"
+        },
+        {
+          "start": 189.643,
+          "end": 196.358,
+          "text": "Here are seven butterflies. Here are five butterflies. Which has more?"
+        },
+        {
+          "start": 197.058,
+          "end": 203.115,
+          "text": "Here are seven cones. Here are five cones. Which has more?"
+        },
+        {
+          "start": 203.815,
+          "end": 212.018,
+          "text": "“These five are deluxe,” said Mr. Committee. “Deluxe is not more,” said the child."
+        },
+        {
+          "start": 212.718,
+          "end": 218.798,
+          "text": "Here are seven umbrellas. Here are five umbrellas. Which has more?"
+        },
+        {
+          "start": 219.498,
+          "end": 225.998,
+          "text": "Here are seven cats. Here are five cats. Which has more?"
+        },
+        {
+          "start": 226.698,
+          "end": 233.598,
+          "text": "Here are seven candles. Here are five candles. Which cake has more?"
+        },
+        {
+          "start": 234.298,
+          "end": 242.189,
+          "text": "Here are seven keys. Here are five keys. Which has more?"
+        },
+        {
+          "start": 242.889,
+          "end": 249.789,
+          "text": "Here are seven recorders. Here are five recorders. Which has more?"
+        },
+        {
+          "start": 250.489,
+          "end": 256.989,
+          "text": "Here are seven tickets. Here are five tickets. Which jar has more?"
+        },
+        {
+          "start": 257.689,
+          "end": 263.77,
+          "text": "“We will call them even,” said Mr. Committee. “We will not,” said the child."
+        },
+        {
+          "start": 264.47,
+          "end": 273.448,
+          "text": "Here are seven rubber ducks. Here are five rubber ducks. Which has more?"
+        },
+        {
+          "start": 274.148,
+          "end": 280.549,
+          "text": "Here are seven frogs. Here are five frogs. Which has more?"
+        },
+        {
+          "start": 281.249,
+          "end": 287.53,
+          "text": "“One, two, three, four, five, six, seven,” said the child."
+        },
+        {
+          "start": 287.53,
+          "end": 292.554,
+          "text": "“And over here: one, two, three, four, five.”"
+        },
+        {
+          "start": 293.254,
+          "end": 301.434,
+          "text": "“If I do not see them,” said Mr. Committee, “they may still be equal.”"
+        },
+        {
+          "start": 302.134,
+          "end": 312.491,
+          "text": "The tall man set them out and said nothing at all. Which has more?"
+        },
+        {
+          "start": 313.191,
+          "end": 320.691,
+          "text": "The whole town counted. “Seven,” they said. “Five,” whispered Mr. Committee."
+        },
+        {
+          "start": 321.391,
+          "end": 328.071,
+          "text": "Mr. Committee looked. He looked again. “Oh,” he said."
+        },
+        {
+          "start": 328.771,
+          "end": 334.851,
+          "text": "Seven is more than five. It always was."
+        }
+      ],
+      "text_book_id": "which-has-more-script",
+      "links": {
+        "box": "/workspace/seven-five-audiobook/Which_Has_More_Matt_Ready_reads_aloud.mp3"
+      },
+      "notes": "Box only. Not found on Google Drive or live Vercel sites as of this inventory. README in the folder said it had not been uploaded.",
+      "audio_file": "which-has-more-64k-mono.mp3",
+      "audio_url": "/audio/audiobooks/which-has-more-64k-mono.mp3"
+    },
+    {
+      "id": "complete-works",
+      "title": "The Complete Works of Matt Ready",
+      "subtitle": "Volumes 1 and 2 (August–October 2026 compile; ~2,089 pages)",
+      "kind": "Collected works · browser read-aloud (no narrated audiobook yet)",
+      "mode": "tts",
+      "status": "No cloned-voice or commercial audiobook found. Text is read in the browser.",
+      "text_book_id": "complete-works",
+      "text_index": "complete-works-index.json",
+      "slice_source": true,
+      "chapters_from": "index",
+      "notes": "Sliced from /workspace/complete-works-compiled/cw.txt. Volume 2 Part M (WSBA ethics grievance) is omitted from this reader. No standalone narrated audio exists."
+    },
+    {
+      "id": "revolutionary-mindfulness",
+      "title": "Revolutionary Mindfulness",
+      "subtitle": "From The Complete Works, Subject 2 (published book 2016; no standalone manuscript file found)",
+      "kind": "Book · browser read-aloud (no narrated audiobook yet)",
+      "mode": "tts",
+      "status": "No full commercial or cloned-voice audiobook found. This reader uses the Complete Works text block.",
+      "text_book_id": "revolutionary-mindfulness",
+      "text_index": "revolutionary-mindfulness-index.json",
+      "slice_source": true,
+      "chapters_from": "index",
+      "notes": "A standalone final published-book file was not identified in the 2026-11-08 library pass. A 2022 Mindful Activist podcast episode discusses the book; that is not a full audiobook."
+    },
+    {
+      "id": "recording-fiasco",
+      "title": "The Recording Fiasco",
+      "subtitle": "The Jefferson County Recording Fiasco — manuscript",
+      "kind": "Book · browser read-aloud (no narrated audiobook yet)",
+      "mode": "tts",
+      "status": "No cloned-voice or commercial audiobook of the book was found.",
+      "text_book_id": "recording-fiasco",
+      "chapters_from": "file",
+      "notes": "Text from /workspace/recording-fiasco/Recording_Fiasco_Manuscript.md. A short Drive file named Fiasco.m4a (~1.8 MB) looks like a song or clip, not this book, and is not used here."
+    },
+    {
+      "id": "desire-gn",
+      "title": "Desire",
+      "subtitle": "The Gathering Place of the 12th Desire — graphic novel script",
+      "kind": "Graphic novel script · browser read-aloud",
+      "mode": "tts",
+      "status": "No cloned-voice audiobook found. Script is read in the browser.",
+      "text_book_id": "desire-gn",
+      "chapters_from": "file",
+      "notes": "Text from /workspace/Desire_Graphic_Novel_Script.md."
+    }
+  ],
+  "exclusions": [
+    "The Fractal Divine Feminine (different author named Matt Ready).",
+    "Songs and music videos (including Matt Ready’s Life Story.mp3 / MV).",
+    "Jefferson Healthcare meeting and retreat recordings (raw meeting audio, not narrated books).",
+    "Volume 2 Part M, WSBA ethics grievance, omitted from the Complete Works reader.",
+    "Unpublished hospital confidentials and private family files."
+  ]
+}
