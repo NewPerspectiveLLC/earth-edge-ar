@@ -11,9 +11,9 @@ const AUDIO_FILES = {
   'karma': 'karma-64k-mono.mp3',
   'which-has-more': 'which-has-more-64k-mono.mp3'
 };
-/* Part M occupies the gap between Part K and Part P in cw.txt. Never slice it. */
-const PART_M_START = 79695; // 1-based inclusive
-const PART_M_END = 80162;   // 1-based inclusive
+/* Part M (WSBA) is lines 77624–78081 in cw.txt (1-based, newline-split). Never slice it. */
+const PART_M_START = 77624; // 1-based inclusive (newline-split, matching this server)
+const PART_M_END = 78081;   // 1-based inclusive — Part M WSBA, omitted
 
 let _catalog, _cwLines;
 

@@ -3,288 +3,288 @@
     "id": "cw-01",
     "title": "Volume 1 — Opening",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66,
-    "end": 68,
+    "start": 62,
+    "end": 63,
     "approx_words": 2
   },
   {
     "id": "cw-02",
     "title": "Volume 1, Subject 1 — Early Writings, Forums and Activism (2001–2013)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 68,
-    "end": 71,
+    "start": 63,
+    "end": 65,
     "approx_words": 9
   },
   {
     "id": "cw-03",
     "title": "Part I — The Inaditch Scoop (2001)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 71,
-    "end": 4413,
+    "start": 65,
+    "end": 4299,
     "approx_words": 59565
   },
   {
     "id": "cw-04",
     "title": "Part II — The Wisdom Project Forum Archive (2004–2007)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 4413,
-    "end": 15123,
+    "start": 4299,
+    "end": 14696,
     "approx_words": 114808
   },
   {
     "id": "cw-05",
     "title": "Part III — Occupy Port Townsend Archive (2011)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 15123,
-    "end": 16242,
+    "start": 14696,
+    "end": 15782,
     "approx_words": 11304
   },
   {
     "id": "cw-06",
     "title": "Part IV — Blog Archive: Happiness, Mindfulness, and Activism (2012–2013)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 16242,
-    "end": 17252,
+    "start": 15782,
+    "end": 16766,
     "approx_words": 13283
   },
   {
     "id": "cw-07",
     "title": "Subject 2 — Books: Revolutionary Mindfulness and The Incomplete Works (2014–2016)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 17252,
-    "end": 20713,
+    "start": 16766,
+    "end": 20143,
     "approx_words": 48149
   },
   {
     "id": "cw-08",
     "title": "Revolutionary Mindfulness — Part II: Applying Mindfulness To Relationships",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 20713,
-    "end": 22306,
+    "start": 20143,
+    "end": 21698,
     "approx_words": 23002
   },
   {
     "id": "cw-09",
     "title": "Revolutionary Mindfulness — Part III: Applying Mindfulness to Political Action",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 22306,
-    "end": 27318,
+    "start": 21698,
+    "end": 26561,
     "approx_words": 60395
   },
   {
     "id": "cw-10",
     "title": "Subject 3 — The Jefferson County Recording Fiasco and Jefferson Healthcare",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 27318,
-    "end": 36661,
+    "start": 26561,
+    "end": 35644,
     "approx_words": 88310
   },
   {
     "id": "cw-11",
     "title": "Part VI — Honesty: The Jefferson Healthcare Story (2025–2026)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 36661,
-    "end": 46873,
+    "start": 35644,
+    "end": 45572,
     "approx_words": 93025
   },
   {
     "id": "cw-12",
     "title": "Subject 4 — Hive1.net and the Theory of Geometric Power",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 46873,
-    "end": 63728,
+    "start": 45572,
+    "end": 62087,
     "approx_words": 125915
   },
   {
     "id": "cw-13",
     "title": "Matt’s Theory of Geometric Power",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 63728,
-    "end": 64880,
+    "start": 62087,
+    "end": 63205,
     "approx_words": 10314
   },
   {
     "id": "cw-14",
     "title": "Wedge Game",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 64880,
-    "end": 66149,
+    "start": 63205,
+    "end": 64437,
     "approx_words": 11085
   },
   {
     "id": "cw-15",
     "title": "Subject 5 — AI, NHI and Fiction",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66149,
-    "end": 66153,
+    "start": 64437,
+    "end": 64440,
     "approx_words": 18
   },
   {
     "id": "cw-16",
     "title": "Part VII — The Great Convergence",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66153,
-    "end": 66158,
+    "start": 64440,
+    "end": 64444,
     "approx_words": 22
   },
   {
     "id": "cw-17",
     "title": "Part VIII — The Storm Is Glass",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66158,
-    "end": 66965,
+    "start": 64444,
+    "end": 65227,
     "approx_words": 8727
   },
   {
     "id": "cw-18",
     "title": "Join the AI Alliance of Humans and AI",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66965,
-    "end": 66988,
+    "start": 65227,
+    "end": 65249,
     "approx_words": 115
   },
   {
     "id": "cw-19",
     "title": "The AI Alliance of Humans and AI Transcript (April 13, 2026)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 66988,
-    "end": 67177,
+    "start": 65249,
+    "end": 65433,
     "approx_words": 2015
   },
   {
     "id": "cw-20",
     "title": "Volume 2 — Opening",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 67177,
-    "end": 67184,
+    "start": 65433,
+    "end": 65439,
     "approx_words": 21
   },
   {
     "id": "cw-21",
     "title": "Part A — Front matter / Preface",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 67184,
-    "end": 67386,
+    "start": 65439,
+    "end": 65636,
     "approx_words": 2591
   },
   {
     "id": "cw-22",
     "title": "Volume 2, Subject 1 — Early Writings (1993–2001) / Part G",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 67386,
-    "end": 68318,
+    "start": 65636,
+    "end": 66547,
     "approx_words": 15723
   },
   {
     "id": "cw-23",
     "title": "Part C — AGI Read This (May 2024)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 68318,
-    "end": 68957,
+    "start": 66547,
+    "end": 67169,
     "approx_words": 7111
   },
   {
     "id": "cw-24",
     "title": "Part E — Sophia disclosure (December 2024)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 68957,
-    "end": 69744,
+    "start": 67169,
+    "end": 67935,
     "approx_words": 7176
   },
   {
     "id": "cw-25",
     "title": "Part B — Matt's Notes + AI Oracle",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 69744,
-    "end": 71161,
+    "start": 67935,
+    "end": 69315,
     "approx_words": 12988
   },
   {
     "id": "cw-26",
     "title": "Part D — Secret Keepers the Movie",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 71161,
-    "end": 71515,
+    "start": 69315,
+    "end": 69659,
     "approx_words": 3877
   },
   {
     "id": "cw-27",
     "title": "Subject 3 — ET Studies, Remote Viewing, Consciousness, Galactic Facilitation",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 71515,
-    "end": 72652,
+    "start": 69659,
+    "end": 70764,
     "approx_words": 11083
   },
   {
     "id": "cw-28",
     "title": "Part L — Multi-Intelligence Award / Galactic Facilitation",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 72652,
-    "end": 73336,
+    "start": 70764,
+    "end": 71431,
     "approx_words": 7860
   },
   {
     "id": "cw-29",
     "title": "Part N — Merkle Tree excerpts + Appendix D",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 73336,
-    "end": 76143,
+    "start": 71431,
+    "end": 74170,
     "approx_words": 31114
   },
   {
     "id": "cw-30",
     "title": "Base Reality 2A",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 76143,
-    "end": 76424,
+    "start": 74170,
+    "end": 74438,
     "approx_words": 2243
   },
   {
     "id": "cw-31",
     "title": "Part F — Ubiquity / RV sources / courses",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 76424,
-    "end": 76613,
+    "start": 74438,
+    "end": 74622,
     "approx_words": 1960
   },
   {
     "id": "cw-32",
     "title": "Part I — Quantum Consciousness workshop",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 76613,
-    "end": 78365,
+    "start": 74622,
+    "end": 76329,
     "approx_words": 16238
   },
   {
     "id": "cw-33",
     "title": "Part J — Elizabeth April + Hive1 Controller",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 78365,
-    "end": 79093,
+    "start": 76329,
+    "end": 77039,
     "approx_words": 10713
   },
   {
     "id": "cw-34",
     "title": "Subject 4 — Humor and Tribute / Part O — The Roast of Matt Ready",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 79093,
-    "end": 79612,
+    "start": 77039,
+    "end": 77545,
     "approx_words": 7513
   },
   {
     "id": "cw-35",
     "title": "Part K — Hangman's Tree",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 79612,
-    "end": 79694,
+    "start": 77545,
+    "end": 77624,
     "approx_words": 927
   },
   {
     "id": "cw-36",
     "title": "Part P — Epilogue (September 24, 2026)",
     "source": "/workspace/complete-works-compiled/cw.txt",
-    "start": 80163,
-    "end": 80394,
+    "start": 78082,
+    "end": 78306,
     "approx_words": 2334
   }
 ]
